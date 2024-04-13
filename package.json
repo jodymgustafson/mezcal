@@ -1,0 +1,17 @@
+{
+  "name": "mex",
+  "version": "1.0.0",
+  "description": "Mathematical Expression programming language interpreter",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "author": "JM Gustafson",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jasmine": "^5.1.1",
+    "@types/node": "^20.11.16",
+    "jasmine": "^5.1.0",
+    "typescript": "^5.2.2"
+  }
+}
