@@ -1,7 +1,7 @@
 import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, Visitor } from "./ast";
 
 /**
- * Class used to print out an abstract syntax tree
+ * An implementation of Visitor used to print out an abstract syntax tree
  */
 export class AstPrinter implements Visitor<string> {
     print(expr: Expr): string {

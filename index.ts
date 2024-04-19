@@ -1,7 +1,7 @@
 import { AstPrinter } from "./src/ast-printer";
 import { MexScanner } from "./src/mex-scanner";
 import { MexParser } from "./src/mex-parser";
-import exp from "constants";
+import { MexInterpreter } from "./src/mex-interpreter";
 
 // const program =`REM This is a program
 // start:
@@ -27,7 +27,7 @@ import exp from "constants";
 //     getToken<MathTokenType>("STAR", "*"),
 //     new GroupingExpr(new LiteralExpr(45.67)));
 
-const expr = "2 * (3 + x)^2";
+const expr = "2 * (-3 + 1)^2";
 console.log("Parsing", expr);
 
 const scanner = new MexScanner(expr);
@@ -46,5 +46,7 @@ else {
     }
     else {
         console.log(new AstPrinter().print(ast));
+        const interpreter = new MexInterpreter();
+        interpreter.interpret(ast);
     }
 }

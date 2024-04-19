@@ -109,13 +109,20 @@ export class MexParser {
         }
 
         if (this.match("IDENTIFIER")) {
-            return new LiteralExpr(this.previous().lexeme);
+            const value = this.previous().lexeme;
+            return new LiteralExpr(value);
         }
 
         if (this.match("LEFT_PAREN")) {
+            const isFnCall = this.previous().type === "IDENTIFIER";
             const expr = this.expression();
             this.consume("RIGHT_PAREN", "Expect ')' after expression.");
-            return new GroupingExpr(expr);
+
+            const group = new GroupingExpr(expr);
+            // if (isFnCall) {
+            //     return new CallExpr(group)
+            // }
+            return group;
         }
     }
 

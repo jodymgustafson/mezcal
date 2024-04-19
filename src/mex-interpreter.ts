@@ -2,7 +2,7 @@ import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr,
 import { Token } from "./common/token";
 import { MathTokenType } from "./mex-scanner";
 
-export class CompilerError extends Error {
+export class RuntimeError extends Error {
     constructor(readonly operator: Token, msg: string) {
         super(msg);
     }
@@ -11,18 +11,14 @@ export class CompilerError extends Error {
 /**
  * Class used to compile Mex code into StackVM assembly code 
  */
-export class Mex2SVMCompiler implements Visitor<string> {
-    private code: string[];
-
-    compile(expression: Expr): string[] {
+export class MexInterpreter implements Visitor<any> {
+    interpret(expression: Expr): void {
         try {
-            this.code = [":start"];
-            this.evaluate(expression);
-            this.code.push("end");
-            return this.code;
+            const value = this.evaluate(expression);
+            console.log("Result:", value);
         }
         catch (error) {
-            if (error instanceof CompilerError) {
+            if (error instanceof RuntimeError) {
                 console.error(error.message, "on line", error.operator.line);
             }
             else throw error;
@@ -34,33 +30,36 @@ export class Mex2SVMCompiler implements Visitor<string> {
     }
 
     visitBinary(expr: BinaryExpr): any {
-        this.evaluate(expr.left);
-        // this.checkNumberOperand(expr.operator, expr.left.value);
+        const left = this.evaluate(expr.left);
+        this.checkNumberOperand(expr.operator, left);
 
-        this.evaluate(expr.right);
-        // this.checkNumberOperand(expr.operator, right);
+        const right = this.evaluate(expr.right);
+        this.checkNumberOperand(expr.operator, right);
 
         switch (expr.operator.type as MathTokenType) {
             case "PLUS":
-                this.code.push("add"); break;
+                return left + right;
             case "MINUS":
-                this.code.push("sub"); break;
+                return left - right;
             case "SLASH":
-                this.code.push("div"); break;
+                return left / right;
             case "STAR":
-                this.code.push("mul"); break;
+                return left * right;
             case "POWER":
-                this.code.push("call pow"); break;
+                return left ** right;
             case "GREATER":
+                return left > right;
             case "GREATER_EQUAL":
+                return left >= right;
             case "LESS":
+                return left < right;
             case "LESS_EQUAL":
-            case "NOT_EQUAL":
-            case "EQUAL_EQUAL":
-                this.code.push("cmp"); break;
-            default:
-                throw new CompilerError(expr.operator, "Invalid operator: " + expr.operator.type);
-            }
+                return left <= right;
+            case "NOT_EQUAL": return !this.isEqual(left, right);
+            case "EQUAL_EQUAL": return this.isEqual(left, right);
+        }
+
+        throw new RuntimeError(expr.operator, "Unknown operator: " + expr.operator.type);
     }
 
     visitGrouping(expr: GroupingExpr): any {
@@ -68,10 +67,7 @@ export class Mex2SVMCompiler implements Visitor<string> {
     }
 
     visitLiteral(expr: LiteralExpr): any {
-        const value = typeof expr.value === "string" ?
-            `"${expr.value}"` : expr.value.toString();
-
-        this.code.push(`push ${value}`);
+        return expr.value;
     }
 
     visitUnary(expr: UnaryExpr): any {
@@ -79,10 +75,12 @@ export class Mex2SVMCompiler implements Visitor<string> {
 
         switch (expr.operator.type) {
             case "MINUS":
-                this.checkNumberOperand(expr.operator, (expr.right as LiteralExpr).value);
-                this.code.push(`push -1`, "mul");
-                return;
+                this.checkNumberOperand(expr.operator, right);
+                return -right;
         }
+
+        // Unreachable.
+        return null;
     }
 
     visitIdentifier(expr: IdentifierExpr): any {
@@ -98,6 +96,6 @@ export class Mex2SVMCompiler implements Visitor<string> {
 
     private checkNumberOperand(operator: Token, operand: any): void {
         if (typeof operand === "number") return;
-        throw new CompilerError(operator, "Operand must be a number.");
+        throw new RuntimeError(operator, "Operand must be a number.");
     }
 }
