@@ -1,23 +1,24 @@
 import { argv } from "process";
 import { Scanner } from "./src/scanner";
 import { Parser } from "./src/parser";
-import { StackVMCompiler } from "./src/stackvm-compiler";
+import { InterpreterVariables, Interpreter } from "./src/interpreter";
 
 const input = argv[2];
 if (input) {
-    const code = compile(input);
+    const code = execute(input);
     console.log(JSON.stringify(code));
 }
 else {
-    console.log("Usage: compile [expr]");
+    console.log("Usage: execute [expr]");
 }
 
 /**
- * Compiles an expression into StackVM assembly code.
+ * Executes an expression
  * @param expr Mathematical expression
- * @returns An array of assembly code instructions
+ * @param variables A map of variable names to values
+ * @returns The result of the expression
  */
-export function compile(expr: string): string[] {
+export function execute(expr: string, variables?: InterpreterVariables): number {
     const scanner = new Scanner(expr);
     const tokens = scanner.scanTokens();
     if (scanner.errors.length > 0) {
@@ -25,7 +26,7 @@ export function compile(expr: string): string[] {
         console.error(JSON.stringify(scanner.errors));
     }
     else {
-        // console.log(JSON.stringify(tokens, null, 2));
+        console.log(JSON.stringify(tokens, null, 2));
         const parser = new Parser(tokens);
         const ast = parser.parse();
         if (parser.errors.length > 0) {
@@ -34,8 +35,8 @@ export function compile(expr: string): string[] {
         }
         else {
             // console.log(new AstPrinter().print(ast));
-            const compiler = new StackVMCompiler();
-            return compiler.compile(ast);
+            const int = new Interpreter(variables);
+            return int.interpret(ast);
         }
     }
 }

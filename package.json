@@ -4,7 +4,8 @@
   "description": "Mathematical Expression programming language interpreter",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine",
+    "clean": "rimraf ./dist"
   },
   "author": "JM Gustafson",
   "license": "ISC",
@@ -12,6 +13,7 @@
     "@types/jasmine": "^5.1.1",
     "@types/node": "^20.11.16",
     "jasmine": "^5.1.0",
+    "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
   }
 }

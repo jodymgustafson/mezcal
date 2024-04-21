@@ -1,11 +1,12 @@
 import { Token } from "./common/token";
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr } from "./ast";
-import { MathTokenType } from "./mex-scanner";
+import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr } from "./expr";
+import { MathTokenType } from "./scanner";
+import { Stmt } from "./stmt";
 
 /**
- * Parses tokens from a MEX expression into an abstract syntax tree
+ * Parses tokens from the scanner into an abstract syntax tree
  */
-export class MexParser {
+export class Parser {
     private current = 0;
     readonly errors: ParseError[] = [];
 
@@ -20,6 +21,7 @@ export class MexParser {
      */
     parse(): Expr {
         try {
+            // const statements: Stmt[] = [];
             return this.expression();
         }
         catch(err) {
@@ -110,7 +112,7 @@ export class MexParser {
 
         if (this.match("IDENTIFIER")) {
             const value = this.previous().lexeme;
-            return new LiteralExpr(value);
+            return new IdentifierExpr(value);
         }
 
         if (this.match("LEFT_PAREN")) {
@@ -119,9 +121,6 @@ export class MexParser {
             this.consume("RIGHT_PAREN", "Expect ')' after expression.");
 
             const group = new GroupingExpr(expr);
-            // if (isFnCall) {
-            //     return new CallExpr(group)
-            // }
             return group;
         }
     }

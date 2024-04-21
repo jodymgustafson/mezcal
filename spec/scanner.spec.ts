@@ -1,9 +1,9 @@
-import { MexScanner } from "../src/mex-scanner";
+import { Scanner } from "../src/scanner";
 
 describe("When run mex scanner", () => {
     it("Should get correct tokens for 2^3", () => {
         const source = "2^3";
-        const tokens = new MexScanner(source).scanTokens();
+        const tokens = new Scanner(source).scanTokens();
         console.log(tokens);
         expect(tokens).toEqual([
             { type: 'NUMBER', lexeme: '2', line: 1, value: 2 },
@@ -14,7 +14,7 @@ describe("When run mex scanner", () => {
     });
     it("Should get correct tokens for (2+x)*5^3", () => {
         const source = "(2+x)*5^3";
-        const tokens = new MexScanner(source).scanTokens();
+        const tokens = new Scanner(source).scanTokens();
         console.log(tokens);
         expect(tokens).toEqual([
             { type: 'LEFT_PAREN', lexeme: '(', line: 1, value: undefined },
@@ -31,7 +31,7 @@ describe("When run mex scanner", () => {
     });
     it("Should get correct tokens for sin(2pi/x) * (3^x)", () => {
         const source = "sin(2pi/x) * (3^x)";
-        const tokens = new MexScanner(source).scanTokens();
+        const tokens = new Scanner(source).scanTokens();
         console.log(tokens);
         expect(tokens).toEqual([
             { type: 'IDENTIFIER', lexeme: 'sin', line: 1, value: undefined },
@@ -56,7 +56,7 @@ describe("When run mex scanner", () => {
                 if n < 0 then error "Invalid value" 
                 if n = 0 then return 1
                 return n * factorial(n - 1)`;
-        const tokens = new MexScanner(source).scanTokens();
+        const tokens = new Scanner(source).scanTokens();
         console.log(tokens);
         expect(tokens).toEqual([
             { type: 'DEFINE', lexeme: 'define', line: 2, value: undefined },

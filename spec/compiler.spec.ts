@@ -1,5 +1,4 @@
 import { compile } from "../compile"
-import { Mex2SVMCompiler } from "../src/mex-compiler"
 
 describe("When compile mex code to StackVM", () => {
     it("should compile 2 * (-3 + 1)^2", () => {

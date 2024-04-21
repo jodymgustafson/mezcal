@@ -1,6 +1,6 @@
-import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, Visitor } from "./ast";
+import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, Visitor } from "./expr";
 import { Token } from "./common/token";
-import { MathTokenType } from "./mex-scanner";
+import { MathTokenType } from "./scanner";
 
 export class CompilerError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -9,9 +9,9 @@ export class CompilerError extends Error {
 }
 
 /**
- * Class used to compile Mex code into StackVM assembly code 
+ * Class used to compile an AST into StackVM assembly code 
  */
-export class Mex2SVMCompiler implements Visitor<string> {
+export class StackVMCompiler implements Visitor<string> {
     private code: string[];
 
     compile(expression: Expr): string[] {

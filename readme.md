@@ -1,8 +1,14 @@
-# Math Expression (MEX) Scanner
+# Mezcal: Mathematical Expression Calculator
 
-Lexical parser for mathematical expressions. Also supports defining custom functions and simple boolean logic.
+Mezcal is a package for dynamically executing mathematical expressions at runtime.
 
-See test.mex for examples.
+It also contains a simple scripting language for defining custom functions and simple boolean logic.
+
+The package consists of a lexical scanner, a parser to create an abstract syntax tree, and an interpreter to evaluate the expression.
+
+There is also a compiler to compile to StackVM assembly language. Use this when you need to execute an expression many times, such as drawing a graph.
+
+See test.mez for examples.
 
 ## Keywords
 
@@ -24,6 +30,10 @@ See test.mex for examples.
 
 ## Grammar:
 
+program        → statement* EOF ;
+statement      → exprStmt | printStmt ;
+exprStmt       → expression ;
+printStmt      → "print" expression ;
 expression     → equality ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -58,5 +68,18 @@ const ast = parser.parse();
 You can print out the tree using the AstPrinter
 
 ```typescript
-new AstPrinter().print(ast)
+new AstPrinter().print(ast);
+```
+
+Execute the output from the parser using the interpreter.
+
+```typescript
+const interpreter = new MexInterpreter();
+const result = interpreter.interpret(ast);
+```
+
+There is a function that performs all of the steps above called execute().
+
+```typescript
+const result = execute("2 * x^3");
 ```

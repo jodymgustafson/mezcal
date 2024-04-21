@@ -1,6 +1,6 @@
-import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, Visitor } from "./ast";
+import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, Visitor } from "./expr";
 import { Token } from "./common/token";
-import { MathTokenType } from "./mex-scanner";
+import { MathTokenType } from "./scanner";
 
 export class RuntimeError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -8,25 +8,37 @@ export class RuntimeError extends Error {
     }
 }
 
+export type InterpreterVariables = Record<string, (number | string)>;
+
 /**
  * Class used to compile Mex code into StackVM assembly code 
  */
-export class MexInterpreter implements Visitor<any> {
-    interpret(expression: Expr): void {
-        try {
-            const value = this.evaluate(expression);
-            console.log("Result:", value);
-        }
-        catch (error) {
-            if (error instanceof RuntimeError) {
-                console.error(error.message, "on line", error.operator.line);
-            }
-            else throw error;
-        }
+export class Interpreter implements Visitor<any> {
+    private isLet = false;
+    private setVarName = "";
+
+    constructor(readonly variables: InterpreterVariables = {}) {}
+    
+    /**
+     * Interprets the expression defined by the AST 
+     * @param ast Top level of an abstract syntax tree
+     * @returns Result of the expression
+     */
+    interpret(ast: Expr): number {
+        const value = this.evaluate(ast);
+        // console.log("Result:", value);
+        return value
     }
 
     private evaluate(expr: Expr): any {
-        return expr.accept(this);
+        const result =  expr.accept(this);
+        if (this.setVarName) {
+            this.variables[this.setVarName] = result;
+            this.isLet = false;
+            this.setVarName = "";
+        }
+
+        return result;
     }
 
     visitBinary(expr: BinaryExpr): any {
@@ -84,7 +96,21 @@ export class MexInterpreter implements Visitor<any> {
     }
 
     visitIdentifier(expr: IdentifierExpr): any {
-        throw new Error("Method not implemented.");
+        switch (expr.name) {
+            case "let":
+                this.isLet = true
+                return 0;
+        }
+
+        const v = this.variables[expr.name];
+        if (this.isLet) {
+            this.setVarName = expr.name;
+        }
+        else if (typeof v === "undefined") {
+            throw new RuntimeError(null, `Undefined variable "${expr.name}"`);
+        }
+
+        return v;
     }
 
     private isEqual(a: any, b: any): boolean {

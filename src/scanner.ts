@@ -17,9 +17,9 @@ const KEYWORDS = [
 ];
 
 /**
- * A lexical scanner that parses MEX math expressions
+ * A lexical scanner that parses Mezcal source code into an array of tokens
  */
-export class MexScanner extends BaseLexicalScanner<MathTokenType> {
+export class Scanner extends BaseLexicalScanner<MathTokenType> {
     protected scanToken(char: string) {
         switch (char) {
             // whitespace

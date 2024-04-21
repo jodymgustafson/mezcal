@@ -1,7 +1,7 @@
 import { AstPrinter } from "./src/ast-printer";
-import { MexScanner } from "./src/mex-scanner";
-import { MexParser } from "./src/mex-parser";
-import { MexInterpreter } from "./src/mex-interpreter";
+import { Scanner } from "./src/scanner";
+import { Parser } from "./src/parser";
+import { Interpreter } from "./src/interpreter";
 
 // const program =`REM This is a program
 // start:
@@ -27,26 +27,65 @@ import { MexInterpreter } from "./src/mex-interpreter";
 //     getToken<MathTokenType>("STAR", "*"),
 //     new GroupingExpr(new LiteralExpr(45.67)));
 
-const expr = "2 * (-3 + 1)^2";
-console.log("Parsing", expr);
+// const expr = "2 * (-3 + 1)^2";
+// console.log("Parsing", expr);
 
-const scanner = new MexScanner(expr);
-const tokens = scanner.scanTokens();
-if (scanner.errors.length > 0) {
-    console.error("There were scanner errors:");
-    console.error(JSON.stringify(scanner.errors));
+// const scanner = new Scanner(expr);
+// const tokens = scanner.scanTokens();
+// if (scanner.errors.length > 0) {
+//     console.error("There were scanner errors:");
+//     console.error(JSON.stringify(scanner.errors));
+// }
+// else {
+//     console.log(JSON.stringify(tokens, null, 2));
+//     const parser = new Parser(tokens);
+//     const ast = parser.parse();
+//     if (parser.errors.length > 0) {
+//         console.error("There were parser errors:");
+//         console.error(parser.errors[0].message);
+//     }
+//     else {
+//         console.log(new AstPrinter().print(ast));
+//         const interpreter = new Interpreter();
+//         interpreter.interpret(ast);
+//     }
+// }
+
+import readline from 'readline';
+import { Runtime } from "./src/runtime";
+import { exit } from "process";
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+async function readLineAsync(message): Promise<string> {
+    return new Promise((resolve, reject) => {
+        rl.question(message, (answer) => {
+            resolve(answer);
+        });
+    });
 }
-else {
-    console.log(JSON.stringify(tokens, null, 2));
-    const parser = new MexParser(tokens);
-    const ast = parser.parse();
-    if (parser.errors.length > 0) {
-        console.error("There were parser errors:");
-        console.error(parser.errors[0].message);
+
+(async () => {
+    // REPL loop
+    const mezcal = new Runtime();
+    let quit = false;
+    while (!quit) {
+        const expr = await readLineAsync(">");
+        if (expr === "q") {
+            quit = true;
+        }
+        else {
+            try {
+                console.log(mezcal.evaluate(expr));
+            }
+            catch (err) {
+                console.error(err.message);
+            }
+        }
     }
-    else {
-        console.log(new AstPrinter().print(ast));
-        const interpreter = new MexInterpreter();
-        interpreter.interpret(ast);
-    }
-}
+    console.log("bye");
+    exit();
+})();
