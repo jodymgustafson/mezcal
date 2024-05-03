@@ -2,21 +2,21 @@ import { Token } from "./common/token";
 import { Expr } from "./expr";
 
 export interface StmtVisitor<R> {
-    visitBlockStmt(stmt: Block): R;
-    visitExpressionStmt(stmt: Expression): R;
-    visitFunctionStmt(stmt: MezFunction): R;
-    visitIfStmt(stmt: If): R;
-    visitPrintStmt(stmt: Print): R;
-    visitReturnStmt(stmt: Return): R;
-    visitLetStmt(stmt: Let): R;
-    visitWhileStmt(stmt: While): R;
+    visitBlockStmt(stmt: BlockStmt): R;
+    visitExpressionStmt(stmt: ExpressionStmt): R;
+    visitFunctionStmt(stmt: FunctionStmt): R;
+    visitIfStmt(stmt: IfStmt): R;
+    visitPrintStmt(stmt: PrintStmt): R;
+    visitReturnStmt(stmt: ReturnStmt): R;
+    visitLetStmt(stmt: LetStmt): R;
+    visitWhileStmt(stmt: WhileStmt): R;
 }
 
 export abstract class Stmt {
     abstract accept<R>(visitor: StmtVisitor<R>): R;
 }
 
-export class Block extends Stmt {
+export class BlockStmt extends Stmt {
     constructor(readonly statements: Stmt[]) {
         super();
     }
@@ -26,7 +26,7 @@ export class Block extends Stmt {
     }
 }
 
-export class Expression extends Stmt {
+export class ExpressionStmt extends Stmt {
     constructor(readonly expression: Expr) {
       super();
     }
@@ -36,7 +36,7 @@ export class Expression extends Stmt {
     }
 }
 
-export class MezFunction extends Stmt {
+export class FunctionStmt extends Stmt {
     constructor(readonly name: Token, readonly params: Token[], readonly body: Stmt[]) {
         super();
     }
@@ -46,7 +46,7 @@ export class MezFunction extends Stmt {
     }
 }
 
-export class If extends Stmt {
+export class IfStmt extends Stmt {
     constructor(readonly condition: Expr, readonly thenBranch: Stmt, readonly elseBranch: Stmt) {
         super();
     }
@@ -56,7 +56,7 @@ export class If extends Stmt {
     }
 }
 
-export class Print extends Stmt {
+export class PrintStmt extends Stmt {
     constructor(readonly expression: Expr) {
         super();
     }
@@ -66,7 +66,7 @@ export class Print extends Stmt {
     }
 }
 
-export class Return extends Stmt {
+export class ReturnStmt extends Stmt {
     constructor(readonly keyword: Token, readonly value: Expr) {
         super();
     }
@@ -76,7 +76,7 @@ export class Return extends Stmt {
     }
 }
 
-export class Let extends Stmt {
+export class LetStmt extends Stmt {
     constructor(readonly name: Token, readonly initializer: Expr) {
         super();
     }
@@ -86,7 +86,7 @@ export class Let extends Stmt {
     }
 }
 
-export class While extends Stmt {
+export class WhileStmt extends Stmt {
     constructor(readonly condition: Expr, body: Stmt) {
         super();
     }

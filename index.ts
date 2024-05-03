@@ -61,7 +61,7 @@ const rl = readline.createInterface({
 });
 
 async function readLineAsync(message): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         rl.question(message, (answer) => {
             resolve(answer);
         });
@@ -73,19 +73,26 @@ async function readLineAsync(message): Promise<string> {
     const mezcal = new Runtime();
     let quit = false;
     while (!quit) {
-        const expr = await readLineAsync(">");
-        if (expr === "q") {
-            quit = true;
+        try {
+            const expr = await readLineAsync(">");
+            console.log("expr=", expr);
+            if (expr === "q") {
+                quit = true;
+            }
+            else {
+                try {
+                    console.log(mezcal.evaluate(expr));
+                }
+                catch (err) {
+                    console.error(err.message);
+                }
+            }
         }
-        else {
-            try {
-                console.log(mezcal.evaluate(expr));
-            }
-            catch (err) {
-                console.error(err.message);
-            }
+        catch (err) {
+            console.error(err.message);
         }
     }
+
     console.log("bye");
     exit();
 })();

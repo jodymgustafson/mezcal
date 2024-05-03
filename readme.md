@@ -30,8 +30,10 @@ See test.mez for examples.
 
 ## Grammar:
 
-program        → statement* EOF ;
+program        → declaration* EOF ;
+declaration    → letDecl | statement ;
 statement      → exprStmt | printStmt ;
+letDecl        → "let" IDENTIFIER ( "=" expression )? ;
 exprStmt       → expression ;
 printStmt      → "print" expression ;
 expression     → equality ;
@@ -43,7 +45,8 @@ base           → unary ( "^" unary )*
 unary          → ( "+" | "-" ) unary
                | primary ;
 primary        → NUMBER | STRING | IDENTIFIER
-               | "(" expression ")" ;
+                | "(" expression ")"
+                | IDENTIFIER ;
 
 ## Usage
 You compile a program into an abstract syntax tree then transform that into output.

@@ -1,11 +1,12 @@
 {
-  "name": "mex",
+  "name": "mezcal",
   "version": "1.0.0",
-  "description": "Mathematical Expression programming language interpreter",
+  "description": "Mathematical Expression Calculator programming language interpreter",
   "main": "index.js",
   "scripts": {
     "test": "jasmine",
-    "clean": "rimraf ./dist"
+    "clean": "tsc --build --clean",
+    "build": "tsc"
   },
   "author": "JM Gustafson",
   "license": "ISC",

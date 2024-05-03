@@ -1,6 +1,7 @@
-import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, Visitor } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
+import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
 
 export class RuntimeError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -11,12 +12,9 @@ export class RuntimeError extends Error {
 export type InterpreterVariables = Record<string, (number | string)>;
 
 /**
- * Class used to compile Mex code into StackVM assembly code 
+ * Class used to interpret Mezcal code
  */
-export class Interpreter implements Visitor<any> {
-    private isLet = false;
-    private setVarName = "";
-
+export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     constructor(readonly variables: InterpreterVariables = {}) {}
     
     /**
@@ -24,22 +22,57 @@ export class Interpreter implements Visitor<any> {
      * @param ast Top level of an abstract syntax tree
      * @returns Result of the expression
      */
-    interpret(ast: Expr): number {
-        const value = this.evaluate(ast);
+    interpret(statements: Stmt[]): number {
+        let value = 0;
+        for (const stmt of statements) {
+            value = this.execute(stmt);
+        }
+        // const value = this.evaluate(ast);
         // console.log("Result:", value);
         return value
     }
 
+    private execute(stmt: Stmt): any {
+        return stmt.accept(this);
+    }
+
     private evaluate(expr: Expr): any {
         const result =  expr.accept(this);
-        if (this.setVarName) {
-            this.variables[this.setVarName] = result;
-            this.isLet = false;
-            this.setVarName = "";
-        }
-
         return result;
     }
+
+    visitExpressionStmt(stmt: ExpressionStmt): any {
+        return this.evaluate(stmt.expression);
+    }
+
+    visitPrintStmt(stmt: PrintStmt): any {
+        const value = this.evaluate(stmt.expression);
+        console.log(value);
+        return 0;
+    }
+    
+    visitVariableExpr(expr: VariableExpr) {
+        throw new Error("Method not implemented.");
+    }
+    visitBlockStmt(stmt: BlockStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitFunctionStmt(stmt: FunctionStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitIfStmt(stmt: IfStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitReturnStmt(stmt: ReturnStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitLetStmt(stmt: LetStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitWhileStmt(stmt: WhileStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    
 
     visitBinary(expr: BinaryExpr): any {
         const left = this.evaluate(expr.left);
@@ -96,17 +129,8 @@ export class Interpreter implements Visitor<any> {
     }
 
     visitIdentifier(expr: IdentifierExpr): any {
-        switch (expr.name) {
-            case "let":
-                this.isLet = true
-                return 0;
-        }
-
         const v = this.variables[expr.name];
-        if (this.isLet) {
-            this.setVarName = expr.name;
-        }
-        else if (typeof v === "undefined") {
+        if (typeof v === "undefined") {
             throw new RuntimeError(null, `Undefined variable "${expr.name}"`);
         }
 

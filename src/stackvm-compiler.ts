@@ -1,6 +1,7 @@
-import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, Visitor } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
+import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
 
 export class CompilerError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -11,13 +12,16 @@ export class CompilerError extends Error {
 /**
  * Class used to compile an AST into StackVM assembly code 
  */
-export class StackVMCompiler implements Visitor<string> {
+export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string> {
     private code: string[];
 
-    compile(expression: Expr): string[] {
+    compile(statements: Stmt[]): string[] {
         try {
             this.code = [":start"];
-            this.evaluate(expression);
+            let value = 0;
+            for (const stmt of statements) {
+                this.execute(stmt);
+            }
             this.code.push("end");
             return this.code;
         }
@@ -27,6 +31,10 @@ export class StackVMCompiler implements Visitor<string> {
             }
             else throw error;
         }
+    }
+
+    private execute(stmt: Stmt): any {
+        return stmt.accept(this);
     }
 
     private evaluate(expr: Expr): any {
@@ -86,6 +94,38 @@ export class StackVMCompiler implements Visitor<string> {
     }
 
     visitIdentifier(expr: IdentifierExpr): any {
+        throw new Error("Method not implemented.");
+    }
+
+    visitExpressionStmt(stmt: ExpressionStmt): any {
+        return this.evaluate(stmt.expression);
+    }
+
+    visitPrintStmt(stmt: PrintStmt): any {
+        const value = this.evaluate(stmt.expression);
+        console.log(value);
+        return 0;
+    }
+    
+    visitVariableExpr(expr: VariableExpr): string {
+        throw new Error("Method not implemented.");
+    }
+    visitBlockStmt(stmt: BlockStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitFunctionStmt(stmt: FunctionStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitIfStmt(stmt: IfStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitReturnStmt(stmt: ReturnStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitLetStmt(stmt: LetStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitWhileStmt(stmt: WhileStmt): any {
         throw new Error("Method not implemented.");
     }
 

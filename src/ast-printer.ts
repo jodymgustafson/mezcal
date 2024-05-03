@@ -1,9 +1,9 @@
-import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, Visitor } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
 
 /**
  * An implementation of Visitor used to print out an abstract syntax tree
  */
-export class AstPrinter implements Visitor<string> {
+export class AstPrinter implements ExprVisitor<string> {
     print(expr: Expr): string {
         return expr.accept(this);
     }
@@ -25,6 +25,10 @@ export class AstPrinter implements Visitor<string> {
     }
 
     visitIdentifier(expr: IdentifierExpr): string {
+        return expr.name;
+    }
+
+    visitVariableExpr(expr: VariableExpr): string {
         return expr.name;
     }
 

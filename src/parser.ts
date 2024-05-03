@@ -1,7 +1,7 @@
 import { Token } from "./common/token";
-import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
-import { Stmt } from "./stmt";
+import { ExpressionStmt, LetStmt, PrintStmt, Stmt } from "./stmt";
 
 /**
  * Parses tokens from the scanner into an abstract syntax tree
@@ -19,16 +19,59 @@ export class Parser {
      * Parses the lexical tokens into an abstract syntax tree
      * @returns Root element of the AST
      */
-    parse(): Expr {
+    parse(): Stmt[] {
         try {
-            // const statements: Stmt[] = [];
-            return this.expression();
+            const statements: Stmt[] = [];
+            while (!this.isAtEnd()) {
+                statements.push(this.declaration());
+            }
+            return statements;
         }
-        catch(err) {
+        catch (err) {
             if (err instanceof ParseError)
                 this.errors.push(err);
             throw err;
         }
+    }
+
+    private synchronize(): void {
+        // TODO
+    }
+
+    private declaration(): Stmt {
+        try {
+            if (this.match("LET")) return this.letDeclaration();
+            return this.statement();
+        }
+        catch (err) {
+            this.synchronize();
+        }
+    }
+
+    private letDeclaration(): Stmt {
+        const name = this.consume("IDENTIFIER", "Expect variable name.");
+
+        let initializer: Expr;
+        if (this.match("EQUAL")) {
+            initializer = this.expression();
+        }
+
+        return new LetStmt(name, initializer);
+    }
+
+    private statement(): Stmt {
+        if (this.match("PRINT")) return this.printStatement();
+        return this.expressionStatement();
+    }
+
+    private printStatement(): Stmt {
+        const value = this.expression();
+        return new PrintStmt(value);
+    }
+
+    private expressionStatement(): Stmt {
+        const expr = this.expression();
+        return new ExpressionStmt(expr);
     }
 
     private expression(): Expr {
@@ -111,12 +154,10 @@ export class Parser {
         }
 
         if (this.match("IDENTIFIER")) {
-            const value = this.previous().lexeme;
-            return new IdentifierExpr(value);
+            return new VariableExpr(this.previous().value);
         }
 
         if (this.match("LEFT_PAREN")) {
-            const isFnCall = this.previous().type === "IDENTIFIER";
             const expr = this.expression();
             this.consume("RIGHT_PAREN", "Expect ')' after expression.");
 

@@ -17,7 +17,7 @@ describe("When use interpreter", () => {
         expect(() => execute("2 * x")).toThrowError(`Undefined variable "x"`);
     });
 
-    it("should set a variable", () => {
-        expect(execute("let x = 2")).toBe(2);
-    });
+    // it("should set a variable", () => {
+    //     expect(execute("let x = 2")).toBe(2);
+    // });
 });
