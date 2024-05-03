@@ -75,4 +75,21 @@ describe("When use the mex parser", () => {
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"name":{"type":"IDENTIFIER","lexeme":"z","line":1},"initializer":{"value":3}}]`);
     });
+
+    it("should parse lexical tokens for 'let a = 3\\na = a^2'", () => {
+        const parser = new Parser([
+            { type: 'LET', lexeme: 'let', line: 1, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 1, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 1, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'POWER', lexeme: '^', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '2', line: 2, value: 2 },
+            { type: 'EOF', lexeme: '', line: 2, value: undefined }
+          ]);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(`[{"name":{"type":"IDENTIFIER","lexeme":"a","line":1},"initializer":{"value":3}},{"expression":{"name":"a","value":{"left":{"name":"a"},"operator":{"type":"POWER","lexeme":"^","line":2},"right":{"value":2}}}}]`);
+    });
 });

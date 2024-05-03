@@ -24,4 +24,8 @@ describe("When use interpreter", () => {
     it("should get a variable", () => {
         expect(execute("let x = 2\n3*x")).toBe(6);
     });
+
+    it("should reassign a variable", () => {
+        expect(execute("let a = 3\na = a^2")).toBe(9);
+    });
 });

@@ -75,7 +75,6 @@ async function readLineAsync(message): Promise<string> {
     while (!quit) {
         try {
             const expr = await readLineAsync(">");
-            console.log("expr=", expr);
             if (expr === "q") {
                 quit = true;
             }

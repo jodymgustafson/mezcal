@@ -1,5 +1,5 @@
 import { Token } from "./common/token";
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
+import { AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
 import { ExpressionStmt, LetStmt, PrintStmt, Stmt } from "./stmt";
 
@@ -75,7 +75,25 @@ export class Parser {
     }
 
     private expression(): Expr {
-        return this.equality();
+        return this.assignment();
+    }
+
+    private assignment(): Expr {
+        const expr = this.equality();
+
+        if (this.match("EQUAL")) {
+            const equals = this.previous();
+            const value = this.assignment();
+
+            if (expr instanceof VariableExpr) {
+                const name = (expr as VariableExpr).name;
+                return new AssignExpr(name, value);
+            }
+
+            this.error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
     }
 
     private equality(): Expr {

@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
@@ -50,7 +50,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         console.log(value);
         return 0;
     }
-    
+
     visitBlockStmt(stmt: BlockStmt): any {
         throw new Error("Method not implemented.");
     }
@@ -71,6 +71,12 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         }
 
         this.variables[stmt.name.lexeme] = value;
+        return value;
+    }
+
+    visitAssign(expr: AssignExpr) {
+        const value = this.evaluate(expr.value);
+        this.variables[expr.name] = value;
         return value;
     }
 

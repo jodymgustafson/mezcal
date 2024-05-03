@@ -28,6 +28,10 @@ export class AstPrinter implements ExprVisitor<string> {
         return expr.name;
     }
 
+    visitAssign(expr: VariableExpr): string {
+        return expr.name
+    }
+
     private parenthesize(name: string, ...exprs: Expr[]): string {
         const parts = ["(", name];
         for (const expr of exprs) {

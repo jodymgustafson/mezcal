@@ -103,6 +103,9 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
         return 0;
     }
     
+    visitAssign(expr: VariableExpr): string {
+        throw new Error("Method not implemented.");
+    }
     visitVariable(expr: VariableExpr): string {
         throw new Error("Method not implemented.");
     }

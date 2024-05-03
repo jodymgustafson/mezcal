@@ -103,4 +103,22 @@ describe("When run mex scanner", () => {
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
     });
+
+    it("Should get correct tokens for assignment let a = 3\\na = a^2", () => {
+        const source = "let a = 3\na = a^2";
+        const tokens = new Scanner(source).scanTokens();
+        console.log(tokens);
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 1, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 1, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 1, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'POWER', lexeme: '^', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '2', line: 2, value: 2 },
+            { type: 'EOF', lexeme: '', line: 2, value: undefined }
+        ]);
+    });
 });

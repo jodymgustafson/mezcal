@@ -6,6 +6,7 @@ export interface ExprVisitor<R> {
     visitLiteral(expr: LiteralExpr): R;
     visitUnary(expr: UnaryExpr): R;
     visitVariable(expr: VariableExpr): R;
+    visitAssign(expr: VariableExpr): R;
 };
 
 export interface Expr {
@@ -44,5 +45,12 @@ export class VariableExpr implements Expr {
     constructor(readonly name: string) { }
     accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitVariable(this);
+    }
+};
+
+export class AssignExpr implements Expr {
+    constructor(readonly name: string, readonly value: Expr) { }
+    accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitAssign(this);
     }
 };
