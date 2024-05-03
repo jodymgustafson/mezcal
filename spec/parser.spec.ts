@@ -10,7 +10,7 @@ describe("When use the mex parser", () => {
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
         const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(`{"expression":{"left":{"value":2},"operator":{"type":"POWER","lexeme":"^","line":1},"right":{"value":3}}}`);
+        expect(JSON.stringify(ast)).toEqual(`[{"expression":{"left":{"value":2},"operator":{"type":"POWER","lexeme":"^","line":1},"right":{"value":3}}}]`);
     });
 
     it("should parse lexical tokens for 2 + x", () => {
@@ -21,7 +21,7 @@ describe("When use the mex parser", () => {
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
         const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(`{"left":{"value":2},"operator":{"type":"PLUS","lexeme":"+","line":1},"right":{"name":"x"}}`);
+        expect(JSON.stringify(ast)).toEqual(`[{"expression":{"left":{"value":2},"operator":{"type":"PLUS","lexeme":"+","line":1},"right":{"name":"x"}}}]`);
     });
 
     it("should parse lexical tokens for (2+x)*5^3", () => {
@@ -38,7 +38,7 @@ describe("When use the mex parser", () => {
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
           ]);
         const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(`{"left":{"expr":{"left":{"value":2},"operator":{"type":"PLUS","lexeme":"+","line":1},"right":{"name":"x"}}},"operator":{"type":"STAR","lexeme":"*","line":1},"right":{"left":{"value":5},"operator":{"type":"POWER","lexeme":"^","line":1},"right":{"value":3}}}`);
+        expect(JSON.stringify(ast)).toEqual(`[{"expression":{"left":{"expr":{"left":{"value":2},"operator":{"type":"PLUS","lexeme":"+","line":1},"right":{"name":"x"}}},"operator":{"type":"STAR","lexeme":"*","line":1},"right":{"left":{"value":5},"operator":{"type":"POWER","lexeme":"^","line":1},"right":{"value":3}}}}]`);
     });
 
     it("should parse lexical tokens for sin(2*pi/x) * (3^x)", () => {
@@ -61,6 +61,6 @@ describe("When use the mex parser", () => {
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
         const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(`{"left":{"value":2},"operator":{"type":"POWER","lexeme":"^","line":1},"right":{"value":3}}`);
+        expect(JSON.stringify(ast)).toEqual(`[{"expression":{"name":"sin"}},{"expression":{"left":{"expr":{"left":{"left":{"value":2},"operator":{"type":"STAR","lexeme":"*","line":1},"right":{"name":"pi"}},"operator":{"type":"SLASH","lexeme":"/","line":1},"right":{"name":"x"}}},"operator":{"type":"STAR","lexeme":"*","line":1},"right":{"expr":{"left":{"value":3},"operator":{"type":"POWER","lexeme":"^","line":1},"right":{"name":"x"}}}}}]`);
     });
 });

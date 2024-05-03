@@ -1,5 +1,5 @@
 import { Token } from "./common/token";
-import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
 import { ExpressionStmt, LetStmt, PrintStmt, Stmt } from "./stmt";
 
@@ -154,7 +154,7 @@ export class Parser {
         }
 
         if (this.match("IDENTIFIER")) {
-            return new VariableExpr(this.previous().value);
+            return new VariableExpr(this.previous().lexeme);
         }
 
         if (this.match("LEFT_PAREN")) {

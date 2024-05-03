@@ -5,8 +5,7 @@ export interface ExprVisitor<R> {
     visitGrouping(expr: GroupingExpr): R;
     visitLiteral(expr: LiteralExpr): R;
     visitUnary(expr: UnaryExpr): R;
-    visitIdentifier(expr: IdentifierExpr): R;
-    visitVariableExpr(expr: VariableExpr): R;
+    visitVariable(expr: VariableExpr): R;
 };
 
 export interface Expr {
@@ -34,13 +33,6 @@ export class LiteralExpr implements Expr {
     }
 };
 
-export class IdentifierExpr implements Expr {
-    constructor(readonly name: any) { }
-    accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitIdentifier(this);
-    }
-};
-
 export class UnaryExpr implements Expr {
     constructor(readonly operator: Token, readonly right: Expr) { }
     accept<R>(visitor: ExprVisitor<R>): R {
@@ -51,6 +43,6 @@ export class UnaryExpr implements Expr {
 export class VariableExpr implements Expr {
     constructor(readonly name: string) { }
     accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitVariableExpr(this);
+        return visitor.visitVariable(this);
     }
 };

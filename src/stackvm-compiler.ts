@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
@@ -93,10 +93,6 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
         }
     }
 
-    visitIdentifier(expr: IdentifierExpr): any {
-        throw new Error("Method not implemented.");
-    }
-
     visitExpressionStmt(stmt: ExpressionStmt): any {
         return this.evaluate(stmt.expression);
     }
@@ -107,7 +103,7 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
         return 0;
     }
     
-    visitVariableExpr(expr: VariableExpr): string {
+    visitVariable(expr: VariableExpr): string {
         throw new Error("Method not implemented.");
     }
     visitBlockStmt(stmt: BlockStmt): any {

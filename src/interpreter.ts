@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, IdentifierExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
@@ -49,10 +49,6 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         const value = this.evaluate(stmt.expression);
         console.log(value);
         return 0;
-    }
-
-    visitVariableExpr(expr: VariableExpr) {
-        return this.variables[expr.name];
     }
     
     visitBlockStmt(stmt: BlockStmt): any {
@@ -136,7 +132,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         return null;
     }
 
-    visitIdentifier(expr: IdentifierExpr): any {
+    visitVariable(expr: VariableExpr) {
         const v = this.variables[expr.name];
         if (typeof v === "undefined") {
             throw new RuntimeError(null, `Undefined variable "${expr.name}"`);
