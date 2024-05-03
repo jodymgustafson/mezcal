@@ -1,0 +1,20 @@
+{
+  "name": "mezcal",
+  "version": "1.0.0",
+  "description": "Mathematical Expression Calculator programming language interpreter",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine",
+    "clean": "tsc --build --clean",
+    "build": "tsc"
+  },
+  "author": "JM Gustafson",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jasmine": "^5.1.1",
+    "@types/node": "^20.11.16",
+    "jasmine": "^5.1.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.2.2"
+  }
+}
