@@ -71,6 +71,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         }
 
         this.variables[stmt.name.lexeme] = value;
+        return value;
     }
 
     visitWhileStmt(stmt: WhileStmt): any {

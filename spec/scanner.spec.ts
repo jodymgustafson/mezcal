@@ -90,4 +90,17 @@ describe("When run mex scanner", () => {
             { type: 'EOF', lexeme: '', line: 5, value: undefined }
         ]);
     });
+
+    it("Should get correct tokens for assignment let z = 3", () => {
+        const source = "let z = 3";
+        const tokens = new Scanner(source).scanTokens();
+        console.log(tokens);
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 1, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'z', line: 1, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 1, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
+            { type: 'EOF', lexeme: '', line: 1, value: undefined }
+        ]);
+    });
 });
