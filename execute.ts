@@ -1,7 +1,8 @@
 import { argv } from "process";
 import { Scanner } from "./src/scanner";
 import { Parser } from "./src/parser";
-import { InterpreterVariables, Interpreter } from "./src/interpreter";
+import { Interpreter } from "./src/interpreter";
+import { InterpreterEnvironment, InterpreterVariables } from "./src/environment";
 
 const input = argv[2];
 if (input) {
@@ -35,7 +36,7 @@ export function execute(expr: string, variables?: InterpreterVariables): number 
         }
         else {
             // console.log(new AstPrinter().print(ast));
-            const int = new Interpreter(variables);
+            const int = new Interpreter(new InterpreterEnvironment(variables));
             return int.interpret(ast);
         }
     }

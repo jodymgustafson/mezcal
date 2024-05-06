@@ -1,7 +1,7 @@
 import { BaseLexicalScanner, BaseTokenType } from "./common/lexical-scanner";
 
 export type MathTokenType = BaseTokenType | 
-    "DEFINE" | "LET" | "IF" | "THEN" | "ELSE" | "ERROR" | "RETURN" |
+    "DEFINE" | "LET" | "IF" | "THEN" | "ELSE" | "ERROR" | "RETURN" | "BEGIN" | "END" |
     "INPUT" | "PRINT" | "IMPORT" |
     "AND" | "OR" | "NOT" |
     "LEFT_PAREN" | "RIGHT_PAREN"|

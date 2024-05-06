@@ -14,8 +14,8 @@ See test.mez for examples.
 
 - "define": Defines a new function
 - "let": Defines a new variable
-- "const": Defines a constant value
 - "if", "then", "else": Boolean logic
+- "begin", "end": Block operators
 - "error": Throws an error
 - "return": Returns a value from a function
 - "input": Gets input from the user
@@ -30,6 +30,7 @@ See test.mez for examples.
 
 ## Grammar:
 
+```
 program        → declaration* EOF ;
 declaration    → letDecl | statement ;
 statement      → exprStmt | printStmt ;
@@ -48,6 +49,7 @@ unary          → ( "+" | "-" ) unary
 primary        → NUMBER | STRING | IDENTIFIER
                 | "(" expression ")"
                 | IDENTIFIER ;
+```
 
 ## Usage
 You compile a program into an abstract syntax tree then transform that into output.
@@ -57,7 +59,7 @@ Use the scanner to parse a program into lexical tokens.
 
 ```typescript
 const expr = "2 * (3 + x)^2";
-const scanner = new MexScanner(expr);
+const scanner = new Scanner(expr);
 const tokens = scanner.scanTokens();
 ```
 
@@ -65,7 +67,7 @@ const tokens = scanner.scanTokens();
 Use the parser to parse lexical tokens to an abstract syntax tree.
 
 ```typescript
-const parser = new MexParser(tokens);
+const parser = new Parser(tokens);
 const ast = parser.parse();
 ```
 
@@ -78,7 +80,7 @@ new AstPrinter().print(ast);
 Execute the output from the parser using the interpreter.
 
 ```typescript
-const interpreter = new MexInterpreter();
+const interpreter = new Interpreter();
 const result = interpreter.interpret(ast);
 ```
 
@@ -86,4 +88,26 @@ There is a function that performs all of the steps above called execute().
 
 ```typescript
 const result = execute("2 * x^3");
+```
+
+## REPL
+
+You can also run in REPL mode (command line) by running index.js.
+
+    node dist/index.js
+
+Enter Mezcal code and/or mathematical expressions to evaluate. It supports the following commands.
+
+- :h => Show help
+- :q => Quit
+
+For example you could run these lines of code:
+
+```
+> let x = 3;
+3
+> let y = 2^x
+8
+> x * y
+24
 ```

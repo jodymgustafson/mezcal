@@ -2,6 +2,7 @@ import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, Va
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
+import { InterpreterEnvironment } from "./environment";
 
 export class RuntimeError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -9,13 +10,12 @@ export class RuntimeError extends Error {
     }
 }
 
-export type InterpreterVariables = Record<string, (number | string)>;
 
 /**
  * Class used to interpret Mezcal code
  */
 export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
-    constructor(readonly variables: InterpreterVariables = {}) { }
+    constructor(readonly environment: InterpreterEnvironment = new InterpreterEnvironment()) { }
 
     /**
      * Interprets the expression defined by the AST 
@@ -70,13 +70,13 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
             value = this.evaluate(stmt.initializer);
         }
 
-        this.variables[stmt.name.lexeme] = value;
+        this.environment.setVariable(stmt.name.lexeme, value);
         return value;
     }
 
     visitAssign(expr: AssignExpr) {
         const value = this.evaluate(expr.value);
-        this.variables[expr.name] = value;
+        this.environment.setVariable(expr.name, value);
         return value;
     }
 
@@ -140,8 +140,8 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     }
 
     visitVariable(expr: VariableExpr) {
-        const v = this.variables[expr.name];
-        if (typeof v === "undefined") {
+        const v = this.environment.getVariable(expr.name);
+        if (v === undefined) {
             throw new RuntimeError(null, `Undefined variable "${expr.name}"`);
         }
 

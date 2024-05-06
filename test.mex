@@ -21,10 +21,10 @@ define rFibonacci(n):
 define fibonacci(n):
   if n < 0 then error "Invalid value" 
   let result = 0;
-  while n > 0
+  while n > 0 begin
     result = result + n
     n = n - 1
-  wend
+  end
   return result
 
 # Converts celsius to fahrenheit
@@ -36,29 +36,15 @@ define fahr2Celsius(f):
  return (f - 32) * 5 / 9
 
 input "Convert from fahrenheit or celsius (f/c)", a
-if a == "c" then
+if a == "c" then begin
   input "Enter degrees celsius: ", c
   print c ," celsius is ", fahr2Celsius(c)
 end
-if a == "f" then
+if a == "f" then begin
   input "Enter degrees fahrenheit: ", f
   print f ," fahrenheit is ", celsius2Fahr(f)
 end
 
-
-factorial
-    put _n
-    push 0          # [n, 0]
-    blt :b1         # n < 0
-    beq :b2         # n == 0
-    pop             # [n]
-    push 1          # [n, 1]
-    sub             # n - 1
-    call factorial
-    push _n
-    mul
-:b1
-    err "Invalid value"
-:b2
-    pop
-    push 1
+for i = 1 to 10 step 3 begin
+  print i
+end
