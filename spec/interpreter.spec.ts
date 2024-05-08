@@ -22,10 +22,37 @@ describe("When use interpreter", () => {
     });
 
     it("should get a variable", () => {
-        expect(execute("let x = 2\n3*x")).toBe(6);
+        expect(execute(`
+            let x = 2
+            3*x`
+        )).toBe(6);
     });
 
     it("should reassign a variable", () => {
-        expect(execute("let a = 3\na = a^2")).toBe(9);
+        expect(execute(`
+            let a = 3
+            a = a^2`
+        )).toBe(9);
+    });
+
+    it("should use block scope with let", () => {
+        // The value in the parent block should not change because let was used in the block
+        expect(execute(`
+            let a = 3
+            begin
+              let a = 2
+            end
+            a`)).toBe(3);
+    });
+
+    it("should use block scope without let", () => {
+        // The value in the parent block should change because let wasn't used in the block
+        expect(execute(`
+            let a = 3
+            begin
+              a = 2
+            end
+            a`
+        )).toBe(2);
     });
 });

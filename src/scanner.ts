@@ -11,7 +11,7 @@ export type MathTokenType = BaseTokenType |
 ;
 
 const KEYWORDS = [
-    "define", "let", "if", "then", "else", "error", "return",
+    "define", "let", "if", "then", "else", "error", "return", "begin", "end",
     "input", "print", "import", 
     "and", "or", "not"
 ];

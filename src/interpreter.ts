@@ -2,7 +2,7 @@ import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, Va
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
-import { InterpreterEnvironment } from "./environment";
+import { InterpreterContext } from "./interpreter-context";
 
 export class RuntimeError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -15,7 +15,7 @@ export class RuntimeError extends Error {
  * Class used to interpret Mezcal code
  */
 export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
-    constructor(readonly environment: InterpreterEnvironment = new InterpreterEnvironment()) { }
+    constructor(private context: InterpreterContext = new InterpreterContext()) { }
 
     /**
      * Interprets the expression defined by the AST 
@@ -52,8 +52,9 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     }
 
     visitBlockStmt(stmt: BlockStmt): any {
-        throw new Error("Method not implemented.");
+        return this.executeBlock(stmt.statements, new InterpreterContext(this.context))
     }
+
     visitFunctionStmt(stmt: FunctionStmt): any {
         throw new Error("Method not implemented.");
     }
@@ -70,13 +71,13 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
             value = this.evaluate(stmt.initializer);
         }
 
-        this.environment.setVariable(stmt.name.lexeme, value);
+        this.context.setVariable(stmt.name.lexeme, value, true);
         return value;
     }
 
     visitAssign(expr: AssignExpr) {
         const value = this.evaluate(expr.value);
-        this.environment.setVariable(expr.name, value);
+        this.context.setVariable(expr.name, value);
         return value;
     }
 
@@ -140,7 +141,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     }
 
     visitVariable(expr: VariableExpr) {
-        const v = this.environment.getVariable(expr.name);
+        const v = this.context.getVariable(expr.name);
         if (v === undefined) {
             throw new RuntimeError(null, `Undefined variable "${expr.name}"`);
         }
@@ -158,5 +159,22 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     private checkNumberOperand(operator: Token, operand: any): void {
         if (typeof operand === "number") return;
         throw new RuntimeError(operator, "Operand must be a number.");
+    }
+
+    private executeBlock(statements: Stmt[], context: InterpreterContext): any {
+        const previous = this.context;
+        let value = 0;
+        try {
+            this.context = context;
+
+            for (const statement of statements) {
+                value = this.execute(statement);
+            }
+        }
+        finally {
+            this.context = previous;
+        }
+
+        return value;
     }
 }

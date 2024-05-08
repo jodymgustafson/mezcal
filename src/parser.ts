@@ -1,7 +1,7 @@
 import { Token } from "./common/token";
 import { AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
-import { ExpressionStmt, LetStmt, PrintStmt, Stmt } from "./stmt";
+import { BlockStmt, ExpressionStmt, LetStmt, PrintStmt, Stmt } from "./stmt";
 
 /**
  * Parses tokens from the scanner into an abstract syntax tree
@@ -61,6 +61,7 @@ export class Parser {
 
     private statement(): Stmt {
         if (this.match("PRINT")) return this.printStatement();
+        if (this.match("BEGIN")) return new BlockStmt(this.block());
         return this.expressionStatement();
     }
 
@@ -182,6 +183,17 @@ export class Parser {
             const group = new GroupingExpr(expr);
             return group;
         }
+    }
+
+    private block(): Stmt[] {
+        const statements: Stmt[] = [];
+
+        while (!this.check("END") && !this.isAtEnd()) {
+            statements.push(this.declaration());
+        }
+
+        this.consume("END", "Expect 'end' after block.");
+        return statements;
     }
 
     private consume(type: MathTokenType, message: string): Token {

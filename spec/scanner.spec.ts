@@ -105,20 +105,48 @@ describe("When run mex scanner", () => {
     });
 
     it("Should get correct tokens for assignment let a = 3\\na = a^2", () => {
-        const source = "let a = 3\na = a^2";
+        const source = `
+            let a = 3
+            a = a^2`;
         const tokens = new Scanner(source).scanTokens();
         console.log(tokens);
         expect(tokens).toEqual([
-            { type: 'LET', lexeme: 'let', line: 1, value: undefined },
-            { type: 'IDENTIFIER', lexeme: 'a', line: 1, value: undefined },
-            { type: 'EQUAL', lexeme: '=', line: 1, value: undefined },
-            { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 2, value: 3 },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'POWER', lexeme: '^', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '2', line: 3, value: 2 },
+            { type: 'EOF', lexeme: '', line: 3, value: undefined }
+        ]);
+    });
+
+    it("Should get correct tokens when using blocks:\nlet a = 3\nbegin a = 2 end\n a = 1", () => {
+        const source = `
+            let a = 3
+            begin
+                a = 2
+            end
+            a = 1`;
+        const tokens = new Scanner(source).scanTokens();
+        console.log(tokens);
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
-            { type: 'POWER', lexeme: '^', line: 2, value: undefined },
-            { type: 'NUMBER', lexeme: '2', line: 2, value: 2 },
-            { type: 'EOF', lexeme: '', line: 2, value: undefined }
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 2, value: 3 },
+            { type: 'BEGIN', lexeme: 'begin', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
+            { type: 'NUMBER', lexeme: '2', line: 4, value: 2 },
+            { type: 'END', lexeme: 'end', line: 5, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 6, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 6, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 6, value: 1 },
+            { type: 'EOF', lexeme: '', line: 6, value: undefined }
         ]);
     });
 });

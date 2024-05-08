@@ -33,10 +33,11 @@ See test.mez for examples.
 ```
 program        → declaration* EOF ;
 declaration    → letDecl | statement ;
-statement      → exprStmt | printStmt ;
+statement      → exprStmt | printStmt | block ;
 letDecl        → "let" IDENTIFIER ( "=" expression )? ;
 exprStmt       → expression ;
 printStmt      → "print" expression ;
+block          → "begin" declaration* "end" ;
 expression     → assignment ;
 assignment     → IDENTIFIER "=" assignment | equality ;
 equality       → comparison ( ( "!=" | "==" ) comparison )* ;

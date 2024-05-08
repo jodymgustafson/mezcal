@@ -92,4 +92,24 @@ describe("When use the mex parser", () => {
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"name":{"type":"IDENTIFIER","lexeme":"a","line":1},"initializer":{"value":3}},{"expression":{"name":"a","value":{"left":{"name":"a"},"operator":{"type":"POWER","lexeme":"^","line":2},"right":{"value":2}}}}]`);
     });
+
+    it("should parse lexical tokens for\nlet a = 3\nbegin a = 2 end\n a = 1", () => {
+        const parser = new Parser([
+            { type: 'LET', lexeme: 'let', line: 1, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 1, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 1, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
+            { type: 'BEGIN', lexeme: 'begin', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '2', line: 2, value: 2 },
+            { type: 'END', lexeme: 'end', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
+            { type: 'EOF', lexeme: '', line: 3, value: undefined }
+          ]);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(`[{"name":{"type":"IDENTIFIER","lexeme":"a","line":1},"initializer":{"value":3}},{"statements":[{"expression":{"name":"a","value":{"value":2}}}]},{"expression":{"name":"a","value":{"value":1}}}]`);
+    });    
 });
