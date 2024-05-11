@@ -122,4 +122,24 @@ describe("When use interpreter", () => {
             a`
         )).toBe(-1);
     });
+
+    it("should interpret while loop", () => {
+        expect(execute(`
+            let a = 0
+            while a < 100 begin
+                a = a + 1
+            end
+            a`
+        )).toBe(100);
+    });
+
+    it("should interpret while loop no block", () => {
+        expect(execute(`
+            let b = 0
+            let a = 100
+            while a > 0 a = a - 1
+            let b = b + 1
+            a`
+        )).toBe(0);
+    });
 });

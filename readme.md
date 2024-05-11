@@ -33,11 +33,12 @@ See test.mez for examples.
 ```
 program        → declaration* EOF ;
 declaration    → letDecl | statement ;
-statement      → exprStmt | ifStmt | printStmt | block ;
 letDecl        → "let" IDENTIFIER ( "=" expression )? ;
+statement      → exprStmt | ifStmt | printStmt | whileStmt | block ;
 exprStmt       → expression ;
-ifStmt         → "if" expression statement ( "else" statement )? ;
+ifStmt         → "if" expression "then" statement ( "else" statement )? ;
 printStmt      → "print" expression ;
+whileStmt      → "while" expression statement;
 block          → "begin" declaration* "end" ;
 expression     → assignment ;
 assignment     → IDENTIFIER "=" assignment | logic_or ;

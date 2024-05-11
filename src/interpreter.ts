@@ -93,7 +93,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         if (expr.operator.type === "OR") {
             if (this.isTruthy(left)) return left;
         }
-        else /* and */{
+        else /* and */ {
             if (!this.isTruthy(left)) return left;
         }
 
@@ -107,7 +107,11 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     }
 
     visitWhileStmt(stmt: WhileStmt): any {
-        throw new Error("Method not implemented.");
+        let value: any;
+        while (this.isTruthy(this.evaluate(stmt.condition))) {
+            value = this.execute(stmt.body);
+        }
+        return value;
     }
 
 

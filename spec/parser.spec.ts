@@ -211,4 +211,30 @@ describe("When use the mex parser", () => {
             `[{"name":{"type":"IDENTIFIER","lexeme":"a","line":2},"initializer":{"value":0}},{"name":{"type":"IDENTIFIER","lexeme":"b","line":3},"initializer":{"left":{"name":"a"},"operator":{"type":"OR","lexeme":"or","line":3},"right":{"value":2}}}]`
         );
     });
+
+    it("should parse lexical tokens for\nlet a = 0\nwhile a < 100 begin\na = a + 1\nend", () => {
+        const source = `
+            let a = 0
+            while a < 100 begin
+                a = a + 1
+            end`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"a","line":2},"initializer":{"value":0}},{"condition":{"left":{"name":"a"},"operator":{"type":"LESS","lexeme":"<","line":3},"right":{"value":100}},"body":{"statements":[{"expression":{"name":"a","value":{"left":{"name":"a"},"operator":{"type":"PLUS","lexeme":"+","line":4},"right":{"value":1}}}}]}}]`
+        );
+    });
+
+    it("should parse lexical tokens for\nlet a = 0\nwhile a < 100 a = a + 1", () => {
+        const source = `
+            let a = 0
+            while a < 100 a = a + 1`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"a","line":2},"initializer":{"value":0}},{"condition":{"left":{"name":"a"},"operator":{"type":"LESS","lexeme":"<","line":3},"right":{"value":100}},"body":{"expression":{"name":"a","value":{"left":{"name":"a"},"operator":{"type":"PLUS","lexeme":"+","line":3},"right":{"value":1}}}}}]`
+        );
+    });
 });

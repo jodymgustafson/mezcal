@@ -60,6 +60,7 @@ describe("When run mex scanner", () => {
             { type: 'LEFT_PAREN', lexeme: '(', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'n', line: 2, value: undefined },
             { type: 'RIGHT_PAREN', lexeme: ')', line: 2, value: undefined },
+
             { type: 'IF', lexeme: 'if', line: 3, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'n', line: 3, value: undefined },
             { type: 'LESS', lexeme: '<', line: 3, value: undefined },
@@ -67,6 +68,7 @@ describe("When run mex scanner", () => {
             { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
             { type: 'ERROR', lexeme: 'error', line: 3, value: undefined },
             { type: 'STRING', lexeme: '"Invalid value"', line: 3, value: 'Invalid value' },
+
             { type: 'IF', lexeme: 'if', line: 4, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'n', line: 4, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
@@ -74,6 +76,7 @@ describe("When run mex scanner", () => {
             { type: 'THEN', lexeme: 'then', line: 4, value: undefined },
             { type: 'RETURN', lexeme: 'return', line: 4, value: undefined },
             { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
+            
             { type: 'RETURN', lexeme: 'return', line: 5, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'n', line: 5, value: undefined },
             { type: 'STAR', lexeme: '*', line: 5, value: undefined },
@@ -109,6 +112,7 @@ describe("When run mex scanner", () => {
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
             { type: 'NUMBER', lexeme: '3', line: 2, value: 3 },
+
             { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
@@ -131,11 +135,15 @@ describe("When run mex scanner", () => {
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
             { type: 'NUMBER', lexeme: '3', line: 2, value: 3 },
+
             { type: 'BEGIN', lexeme: 'begin', line: 3, value: undefined },
+
             { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
             { type: 'NUMBER', lexeme: '2', line: 4, value: 2 },
+
             { type: 'END', lexeme: 'end', line: 5, value: undefined },
+
             { type: 'IDENTIFIER', lexeme: 'a', line: 6, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 6, value: undefined },
             { type: 'NUMBER', lexeme: '1', line: 6, value: 1 },
@@ -154,6 +162,7 @@ describe("When run mex scanner", () => {
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
             { type: 'NUMBER', lexeme: '3', line: 2, value: 3 },
+
             { type: 'IF', lexeme: 'if', line: 3, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
             { type: 'LESS', lexeme: '<', line: 3, value: undefined },
@@ -162,6 +171,7 @@ describe("When run mex scanner", () => {
             { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
             { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+
             { type: 'ELSE', lexeme: 'else', line: 4, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
@@ -183,16 +193,20 @@ describe("When run mex scanner", () => {
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
             { type: 'NUMBER', lexeme: '3', line: 2, value: 3 },
+
             { type: 'IF', lexeme: 'if', line: 3, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
             { type: 'LESS', lexeme: '<', line: 3, value: undefined },
             { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
             { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
             { type: 'BEGIN', lexeme: 'begin', line: 3, value: undefined },
+
             { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
             { type: 'NUMBER', lexeme: '0', line: 4, value: 0 },
+
             { type: 'END', lexeme: 'end', line: 5, value: undefined },
+
             { type: 'ELSE', lexeme: 'else', line: 6, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 6, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 6, value: undefined },
@@ -212,6 +226,7 @@ describe("When run mex scanner", () => {
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
             { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
+
             { type: 'IF', lexeme: 'if', line: 3, value: undefined },
             { type: 'LEFT_PAREN', lexeme: '(', line: 3, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
@@ -226,6 +241,7 @@ describe("When run mex scanner", () => {
             { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
             { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
+
             { type: 'ELSE', lexeme: 'else', line: 4, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
@@ -235,7 +251,7 @@ describe("When run mex scanner", () => {
         ]);
     });
 
-    it("should get correct tokens when using logical and/or:\nlet a = 0\nlet b = a or 2", () => {
+    it("should get correct tokens when using logical or:\nlet a = 0\nlet b = a or 2", () => {
         const source = `
             let a = 0
             let b = a or 2`;
@@ -245,6 +261,7 @@ describe("When run mex scanner", () => {
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
             { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
+
             { type: 'LET', lexeme: 'let', line: 3, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'b', line: 3, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
@@ -252,6 +269,36 @@ describe("When run mex scanner", () => {
             { type: 'OR', lexeme: 'or', line: 3, value: undefined },
             { type: 'NUMBER', lexeme: '2', line: 3, value: 2 },
             { type: 'EOF', lexeme: '', line: 3, value: undefined },
+        ]);
+    });
+
+    it("should get correct tokens when using while:\nlet a = 0\nwhile a < 100 begin\na = a + 1\nend", () => {
+        const source = `
+            let a = 0
+            while a < 100 begin
+                a = a + 1
+            end`;
+        const tokens = new Scanner(source).scanTokens();
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
+
+            { type: 'WHILE', lexeme: 'while', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'LESS', lexeme: '<', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '100', line: 3, value: 100 },
+            { type: 'BEGIN', lexeme: 'begin', line: 3, value: undefined },
+
+            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+            { type: 'PLUS', lexeme: '+', line: 4, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
+
+            { type: 'END', lexeme: 'end', line: 5, value: undefined },
+            { type: 'EOF', lexeme: '', line: 5, value: undefined },
         ]);
     });
 });

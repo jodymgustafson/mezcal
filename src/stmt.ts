@@ -87,7 +87,7 @@ export class LetStmt extends Stmt {
 }
 
 export class WhileStmt extends Stmt {
-    constructor(readonly condition: Expr, body: Stmt) {
+    constructor(readonly condition: Expr, readonly body: Stmt) {
         super();
     }
 

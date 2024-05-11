@@ -1,7 +1,7 @@
 import { Token } from "./common/token";
 import { AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, IfStmt, LetStmt, PrintStmt, Stmt } from "./stmt";
+import { BlockStmt, ExpressionStmt, IfStmt, LetStmt, PrintStmt, Stmt, WhileStmt } from "./stmt";
 
 /**
  * Parses tokens from the scanner into an abstract syntax tree
@@ -60,9 +60,17 @@ export class Parser {
         return new LetStmt(name, initializer);
     }
 
+    private whileStatement(): Stmt {
+        const condition = this.expression();
+        const body = this.statement();
+
+        return new WhileStmt(condition, body);
+    }
+
     private statement(): Stmt {
         if (this.match("IF")) return this.ifStatement();
         if (this.match("PRINT")) return this.printStatement();
+        if (this.match("WHILE")) return this.whileStatement();
         if (this.match("BEGIN")) return new BlockStmt(this.block());
         return this.expressionStatement();
     }
