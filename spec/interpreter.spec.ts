@@ -137,9 +137,47 @@ describe("When use interpreter", () => {
         expect(execute(`
             let b = 0
             let a = 100
-            while a > 0 a = a - 1
+            while a > 0 and b == 0 a = a - 1
             let b = b + 1
             a`
         )).toBe(0);
+    });
+
+    it("should interpret for-step loop", () => {
+        expect(execute(`
+            let cnt = 0
+            for a = 0 to 100 step 2 cnt = cnt + 1
+            cnt`
+        )).toBe(50);
+    });
+
+    it("should interpret negative for-step loop", () => {
+        expect(execute(`
+            let cnt = 0
+            for a = 100 to 0 step -4 begin
+                cnt = cnt + 1
+            end
+            cnt`
+        )).toBe(25);
+    });
+
+    it("should interpret for loop no step", () => {
+        expect(execute(`
+            let cnt = 0
+            for a = 0 to 100 begin
+                cnt = cnt + 1
+            end
+            cnt`
+        )).toBe(100);
+    });
+
+    it("should interpret negative for loop no step", () => {
+        expect(execute(`
+            let cnt = 0
+            for a = 100 to 0 begin
+                cnt = cnt + 1
+            end
+            cnt`
+        )).toBe(100);
     });
 });

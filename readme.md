@@ -34,8 +34,9 @@ See test.mez for examples.
 program        → declaration* EOF ;
 declaration    → letDecl | statement ;
 letDecl        → "let" IDENTIFIER ( "=" expression )? ;
-statement      → exprStmt | ifStmt | printStmt | whileStmt | block ;
+statement      → exprStmt | forStmt | ifStmt | printStmt | whileStmt | block ;
 exprStmt       → expression ;
+forStmt        → "for" assignment "to" expression ( "step" expression )? ;  
 ifStmt         → "if" expression "then" statement ( "else" statement )? ;
 printStmt      → "print" expression ;
 whileStmt      → "while" expression statement;

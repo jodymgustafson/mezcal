@@ -237,4 +237,30 @@ describe("When use the mex parser", () => {
             `[{"name":{"type":"IDENTIFIER","lexeme":"a","line":2},"initializer":{"value":0}},{"condition":{"left":{"name":"a"},"operator":{"type":"LESS","lexeme":"<","line":3},"right":{"value":100}},"body":{"expression":{"name":"a","value":{"left":{"name":"a"},"operator":{"type":"PLUS","lexeme":"+","line":3},"right":{"value":1}}}}}]`
         );
     });
+
+    it("should parse lexical tokens for\nlet cnt = 0\nfor a = 0 to 100 step 1 cnt = cnt + 1", () => {
+        const source = `
+            let cnt = 0
+            for a = 0 to 100 step 1 cnt = cnt + 1`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"cnt","line":2},"initializer":{"value":0}},{"initializer":{"name":"a","value":{"value":0}},"to":{"value":100},"step":{"value":1},"body":{"expression":{"name":"cnt","value":{"left":{"name":"cnt"},"operator":{"type":"PLUS","lexeme":"+","line":3},"right":{"value":1}}}}}]`
+        );
+    });
+
+    it("should parse lexical tokens for\nlet cnt = 0\nfor a = 0 to 100 begin\ncnt = cnt + 1\nend", () => {
+        const source = `
+            let cnt = 0
+            for a = 0 to 100 begin
+                cnt = cnt + 1
+            end`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"cnt","line":2},"initializer":{"value":0}},{"initializer":{"name":"a","value":{"value":0}},"to":{"value":100},"body":{"statements":[{"expression":{"name":"cnt","value":{"left":{"name":"cnt"},"operator":{"type":"PLUS","lexeme":"+","line":4},"right":{"value":1}}}}]}}]`
+        );
+    });
 });

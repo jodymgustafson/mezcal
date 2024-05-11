@@ -10,6 +10,7 @@ export interface StmtVisitor<R> {
     visitReturnStmt(stmt: ReturnStmt): R;
     visitLetStmt(stmt: LetStmt): R;
     visitWhileStmt(stmt: WhileStmt): R;
+    visitForStmt(stmt: ForStmt): R;
 }
 
 export abstract class Stmt {
@@ -93,5 +94,15 @@ export class WhileStmt extends Stmt {
 
     accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitWhileStmt(this);
+    }
+}
+
+export class ForStmt extends Stmt {
+    constructor(readonly initializer: Expr, readonly to: Expr, readonly step: Expr, readonly body: Stmt) {
+        super();
+    }
+
+    accept<R>(visitor: StmtVisitor<R>): R {
+        return visitor.visitForStmt(this);
     }
 }

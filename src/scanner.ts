@@ -2,18 +2,18 @@ import { BaseLexicalScanner, BaseTokenType } from "./common/lexical-scanner";
 
 export type MathTokenType = BaseTokenType | 
     "DEFINE" | "LET" | "IF" | "THEN" | "ELSE" | "ERROR" | "RETURN" | "BEGIN" | "END" |
-    "WHILE" | "FOR" |
+    "WHILE" | "FOR" | "TO" | "STEP" |
     "INPUT" | "PRINT" | "IMPORT" |
     "AND" | "OR" | "NOT" |
     "LEFT_PAREN" | "RIGHT_PAREN"|
-    "COMMA" | "DOT" | "MINUS" | "PLUS" | "SEMICOLON" | "SLASH" | "STAR" | "POWER" |
+    "COMMA" | "DOT" | "MINUS" | "PLUS" | "SLASH" | "STAR" | "POWER" |
     "EQUAL" | "EQUAL_EQUAL" | "NOT_EQUAL" | "GREATER" | "GREATER_EQUAL" | "LESS" | "LESS_EQUAL" |
-    "LABEL" | "IDENTIFIER" | "STRING" | "NUMBER" | "ERROR"
+    "IDENTIFIER" | "STRING" | "NUMBER" | "ERROR"
 ;
 
 const KEYWORDS = [
     "define", "let", "if", "then", "else", "error", "return", "begin", "end",
-    "while", "for",
+    "while", "for", "to", "step",
     "input", "print", "import", 
     "and", "or", "not"
 ];
@@ -37,7 +37,6 @@ export class Scanner extends BaseLexicalScanner<MathTokenType> {
             case "/": this.addToken("SLASH", char); break;
             case "*": this.addToken("STAR", char); break;
             case "^": this.addToken("POWER", char); break;
-            case ";": this.addToken("SEMICOLON", char); break;
             case "(": this.addToken("LEFT_PAREN", char); break;
             case ")": this.addToken("RIGHT_PAREN", char); break;
             case "=": 
@@ -111,12 +110,6 @@ export class Scanner extends BaseLexicalScanner<MathTokenType> {
     }
 
     private getIdentifierType(lexeme: string): MathTokenType {
-        // An identifier that ends with a colon is a label
-        if (this.peek(":")) {
-            this.next();
-            return "LABEL";
-        }
-
         return KEYWORDS.indexOf(lexeme) >= 0 ? lexeme.toUpperCase() as MathTokenType : "IDENTIFIER";
     }
 

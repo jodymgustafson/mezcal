@@ -1,7 +1,7 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
+import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
 
 export class CompilerError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -129,6 +129,9 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
         throw new Error("Method not implemented.");
     }
     visitWhileStmt(stmt: WhileStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitForStmt(stmt: ForStmt): string {
         throw new Error("Method not implemented.");
     }
 

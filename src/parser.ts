@@ -1,7 +1,7 @@
 import { Token } from "./common/token";
 import { AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, IfStmt, LetStmt, PrintStmt, Stmt, WhileStmt } from "./stmt";
+import { BlockStmt, ExpressionStmt, ForStmt, IfStmt, LetStmt, PrintStmt, Stmt, WhileStmt } from "./stmt";
 
 /**
  * Parses tokens from the scanner into an abstract syntax tree
@@ -60,6 +60,15 @@ export class Parser {
         return new LetStmt(name, initializer);
     }
 
+    private statement(): Stmt {
+        if (this.match("FOR")) return this.forStatement();
+        if (this.match("IF")) return this.ifStatement();
+        if (this.match("PRINT")) return this.printStatement();
+        if (this.match("WHILE")) return this.whileStatement();
+        if (this.match("BEGIN")) return new BlockStmt(this.block());
+        return this.expressionStatement();
+    }
+
     private whileStatement(): Stmt {
         const condition = this.expression();
         const body = this.statement();
@@ -67,12 +76,19 @@ export class Parser {
         return new WhileStmt(condition, body);
     }
 
-    private statement(): Stmt {
-        if (this.match("IF")) return this.ifStatement();
-        if (this.match("PRINT")) return this.printStatement();
-        if (this.match("WHILE")) return this.whileStatement();
-        if (this.match("BEGIN")) return new BlockStmt(this.block());
-        return this.expressionStatement();
+    private forStatement(): Stmt {
+        let initializer = this.assignment();
+        this.consume("TO", "Expect 'to' in a for loop.");
+        const toExpr = this.expression();
+
+        let stepExpr: Expr;
+        if (this.match("STEP")) {
+            stepExpr = this.expression();
+        }
+
+        const body = this.statement();
+
+        return new ForStmt(initializer, toExpr, stepExpr, body);
     }
 
     private ifStatement(): Stmt {

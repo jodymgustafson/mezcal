@@ -1,7 +1,7 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, LogicalExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
+import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
 import { InterpreterContext } from "./interpreter-context";
 
 export class RuntimeError extends Error {
@@ -114,6 +114,19 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         return value;
     }
 
+    visitForStmt(stmt: ForStmt) {
+        let value: any;
+        let i = this.evaluate(stmt.initializer);
+        const to = this.evaluate(stmt.to);
+        const step = stmt.step ? this.evaluate(stmt.step) : (i <= to ? 1 : -1);
+
+        while ((step > 0 && i < to) || (step < 0 && i > to)) {
+            value = this.execute(stmt.body);
+            i += step;
+        }
+
+        return value;
+    }
 
     visitBinary(expr: BinaryExpr): any {
         const left = this.evaluate(expr.left);

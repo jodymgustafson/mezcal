@@ -76,7 +76,7 @@ describe("When run mex scanner", () => {
             { type: 'THEN', lexeme: 'then', line: 4, value: undefined },
             { type: 'RETURN', lexeme: 'return', line: 4, value: undefined },
             { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
-            
+
             { type: 'RETURN', lexeme: 'return', line: 5, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'n', line: 5, value: undefined },
             { type: 'STAR', lexeme: '*', line: 5, value: undefined },
@@ -299,6 +299,34 @@ describe("When run mex scanner", () => {
 
             { type: 'END', lexeme: 'end', line: 5, value: undefined },
             { type: 'EOF', lexeme: '', line: 5, value: undefined },
+        ]);
+    });
+
+    it("should get correct tokens when using for with step:\nlet cnt = 0\nfor a = 0 to 100 step 1 cnt = cnt + 1", () => {
+        const source = `
+            let cnt = 0
+            for a = 0 to 100 step 1 cnt = cnt + 1`;
+        const tokens = new Scanner(source).scanTokens();
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'cnt', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
+
+            { type: 'FOR', lexeme: 'for', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'TO', lexeme: 'to', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '100', line: 3, value: 100 },
+            { type: 'STEP', lexeme: 'step', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
+            { type: 'IDENTIFIER', lexeme: 'cnt', line: 3, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'cnt', line: 3, value: undefined },
+            { type: 'PLUS', lexeme: '+', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
+            { type: 'EOF', lexeme: '', line: 3, value: undefined },
         ]);
     });
 });
