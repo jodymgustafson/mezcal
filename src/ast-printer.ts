@@ -1,12 +1,9 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, IfExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
 
 /**
  * An implementation of Visitor used to print out an abstract syntax tree
  */
 export class AstPrinter implements ExprVisitor<string> {
-    visitIf(expr: IfExpr): string {
-        throw new Error("Method not implemented.");
-    }
     print(expr: Expr): string {
         return expr.accept(this);
     }

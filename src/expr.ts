@@ -8,7 +8,6 @@ export interface ExprVisitor<R> {
     visitUnary(expr: UnaryExpr): R;
     visitVariable(expr: VariableExpr): R;
     visitAssign(expr: VariableExpr): R;
-    visitIf(expr: IfExpr): R;
 };
 
 export interface Expr {
@@ -54,12 +53,5 @@ export class AssignExpr implements Expr {
     constructor(readonly name: string, readonly value: Expr) { }
     accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitAssign(this);
-    }
-};
-
-export class IfExpr implements Expr {
-    constructor(readonly condition: Expr, readonly thenBranch: Stmt) { }
-    accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitIf(this);
     }
 };

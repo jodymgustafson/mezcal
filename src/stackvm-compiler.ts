@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, IfExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
@@ -13,9 +13,6 @@ export class CompilerError extends Error {
  * Class used to compile an AST into StackVM assembly code 
  */
 export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string> {
-    visitIf(expr: IfExpr): string {
-        throw new Error("Method not implemented.");
-    }
     private code: string[];
 
     compile(statements: Stmt[]): string[] {

@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, IfExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
@@ -159,10 +159,6 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         }
 
         return v;
-    }
-
-    visitIf(expr: IfExpr) {
-        throw new Error("Method not implemented.");
     }
 
     private isEqual(a: any, b: any): boolean {
