@@ -120,7 +120,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         const to = this.evaluate(stmt.to);
         const step = stmt.step ? this.evaluate(stmt.step) : (i <= to ? 1 : -1);
 
-        while ((step > 0 && i < to) || (step < 0 && i > to)) {
+        while ((step > 0 && i <= to) || (step < 0 && i >= to)) {
             value = this.execute(stmt.body);
             i += step;
         }

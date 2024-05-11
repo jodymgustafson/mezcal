@@ -49,17 +49,19 @@ describe("When run mex scanner", () => {
     });
     it("Should get correct tokens for factorial function", () => {
         const source = `# defines a factorial function
-            define factorial(n):
+            function factorial(n) begin
                 if n < 0 then error "Invalid value" 
                 if n = 0 then return 1
-                return n * factorial(n - 1)`;
+                return n * factorial(n - 1)
+            end`;
         const tokens = new Scanner(source).scanTokens();
         expect(tokens).toEqual([
-            { type: 'DEFINE', lexeme: 'define', line: 2, value: undefined },
+            { type: 'FUNCTION', lexeme: 'function', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'factorial', line: 2, value: undefined },
             { type: 'LEFT_PAREN', lexeme: '(', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'n', line: 2, value: undefined },
             { type: 'RIGHT_PAREN', lexeme: ')', line: 2, value: undefined },
+            { type: 'BEGIN', lexeme: 'begin', line: 2, value: undefined },
 
             { type: 'IF', lexeme: 'if', line: 3, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'n', line: 3, value: undefined },
@@ -86,7 +88,9 @@ describe("When run mex scanner", () => {
             { type: 'MINUS', lexeme: '-', line: 5, value: undefined },
             { type: 'NUMBER', lexeme: '1', line: 5, value: 1 },
             { type: 'RIGHT_PAREN', lexeme: ')', line: 5, value: undefined },
-            { type: 'EOF', lexeme: '', line: 5, value: undefined }
+
+            { type: 'END', lexeme: 'end', line: 6, value: undefined },
+            { type: 'EOF', lexeme: '', line: 6, value: undefined },
         ]);
     });
 

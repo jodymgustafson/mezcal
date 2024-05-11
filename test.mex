@@ -18,7 +18,7 @@ define rFibonacci(n):
   if n = 0 then return 0
   return n + rFibonacci(n - 1)
 
-define fibonacci(n):
+function fibonacci(n):
   if n < 0 then error "Invalid value" 
   let result = 0;
   while n > 0 begin
