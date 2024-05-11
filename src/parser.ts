@@ -1,7 +1,7 @@
 import { Token } from "./common/token";
 import { AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, LetStmt, PrintStmt, Stmt } from "./stmt";
+import { BlockStmt, ExpressionStmt, IfStmt, LetStmt, PrintStmt, Stmt } from "./stmt";
 
 /**
  * Parses tokens from the scanner into an abstract syntax tree
@@ -45,6 +45,7 @@ export class Parser {
         }
         catch (err) {
             this.synchronize();
+            throw err;
         }
     }
 
@@ -60,9 +61,23 @@ export class Parser {
     }
 
     private statement(): Stmt {
+        if (this.match("IF")) return this.ifStatement();
         if (this.match("PRINT")) return this.printStatement();
         if (this.match("BEGIN")) return new BlockStmt(this.block());
         return this.expressionStatement();
+    }
+
+    private ifStatement(): Stmt {
+        const condition = this.expression();
+        this.consume("THEN", "Expect 'then' after if condition."); 
+
+        const thenBranch = this.statement();
+        let elseBranch = null;
+        if (this.match("ELSE")) {
+            elseBranch = this.statement();
+        }
+
+        return new IfStmt(condition, thenBranch, elseBranch);
     }
 
     private printStatement(): Stmt {

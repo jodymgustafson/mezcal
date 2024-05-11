@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, IfExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
@@ -45,6 +45,20 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         return this.evaluate(stmt.expression);
     }
 
+    visitIfStmt(stmt: IfStmt): any {
+        if (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.thenBranch);
+          }
+          else if (stmt.elseBranch != null) {
+            this.execute(stmt.elseBranch);
+          }
+          return null;
+    }
+
+    private isTruthy(value: any): boolean {
+        return Boolean(value);
+    }
+
     visitPrintStmt(stmt: PrintStmt): any {
         const value = this.evaluate(stmt.expression);
         console.log(value);
@@ -58,9 +72,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     visitFunctionStmt(stmt: FunctionStmt): any {
         throw new Error("Method not implemented.");
     }
-    visitIfStmt(stmt: IfStmt): any {
-        throw new Error("Method not implemented.");
-    }
+
     visitReturnStmt(stmt: ReturnStmt): any {
         throw new Error("Method not implemented.");
     }
@@ -147,6 +159,10 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         }
 
         return v;
+    }
+
+    visitIf(expr: IfExpr) {
+        throw new Error("Method not implemented.");
     }
 
     private isEqual(a: any, b: any): boolean {

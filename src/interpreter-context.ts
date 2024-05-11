@@ -13,6 +13,12 @@ export class InterpreterContext {
         return value;
     }
 
+    /**
+     * Sets the value of a variable
+     * @param name Name of the variable
+     * @param value Value of the variable
+     * @param isLet Set true if it's being set with a let statement so it gets the correct block scope
+     */
     setVariable(name: string, value: VariableValue, isLet = false): void {
         if (!isLet && this.variables[name] === undefined && this.enclosing && this.enclosing.getVariable(name) !== undefined) {
             this.enclosing.setVariable(name, value);

@@ -112,4 +112,49 @@ describe("When use the mex parser", () => {
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"name":{"type":"IDENTIFIER","lexeme":"a","line":1},"initializer":{"value":3}},{"statements":[{"expression":{"name":"a","value":{"value":2}}}]},{"expression":{"name":"a","value":{"value":1}}}]`);
     });    
+
+    it("should parse lexical tokens for\nlet a = 3\nif a < 0 then begin\na = 0\nend\nelse a = 1", () => {
+        const parser = new Parser([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 2, value: 3 },
+            { type: 'IF', lexeme: 'if', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'LESS', lexeme: '<', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
+            { type: 'BEGIN', lexeme: 'begin', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 4, value: 0 },
+            { type: 'END', lexeme: 'end', line: 5, value: undefined },
+            { type: 'ELSE', lexeme: 'else', line: 6, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 6, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 6, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 6, value: 1 },
+            { type: 'EOF', lexeme: '', line: 6, value: undefined },
+          ]);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"a","line":2},"initializer":{"value":3}},{"condition":{"left":{"name":"a"},"operator":{"type":"LESS","lexeme":"<","line":3},"right":{"value":0}},"thenBranch":{"statements":[{"expression":{"name":"a","value":{"value":0}}}]},"elseBranch":{"expression":{"name":"a","value":{"value":1}}}}]`
+        );
+    });    
+
+    it("should get an error when if has no then", () => {
+        const parser = new Parser([
+            { type: 'IF', lexeme: 'if', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'LESS', lexeme: '<', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            // { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
+            { type: 'BEGIN', lexeme: 'begin', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 4, value: 0 },
+            { type: 'END', lexeme: 'end', line: 5, value: undefined },
+            { type: 'EOF', lexeme: '', line: 6, value: undefined },
+        ]);
+        expect(() => parser.parse()).toThrowError("Expect 'then' after if condition.");
+    });
 });

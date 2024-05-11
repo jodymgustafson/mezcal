@@ -149,4 +149,64 @@ describe("When run mex scanner", () => {
             { type: 'EOF', lexeme: '', line: 6, value: undefined }
         ]);
     });
+
+    it("Should get correct tokens when using if-then-else:\nlet a = 3\nif a < 0 then a = 0\n else a = 1", () => {
+        const source = `
+            let a = 3
+            if a < 0 then a = 0
+            else a = 1`;
+        const tokens = new Scanner(source).scanTokens();
+        console.log(tokens);
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 2, value: 3 },
+            { type: 'IF', lexeme: 'if', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'LESS', lexeme: '<', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'ELSE', lexeme: 'else', line: 4, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
+            { type: 'EOF', lexeme: '', line: 4, value: undefined },
+        ]);
+    });
+
+    it("Should get correct tokens when using if-then-block:\nlet a = 3\nif a < 0 then begin\na = 0\nend\nelse a = 1", () => {
+        const source = `
+            let a = 3
+            if a < 0 then begin
+                a = 0
+            end
+            else a = 1`;
+        const tokens = new Scanner(source).scanTokens();
+        console.log(tokens);
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 2, value: 3 },
+            { type: 'IF', lexeme: 'if', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'LESS', lexeme: '<', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
+            { type: 'BEGIN', lexeme: 'begin', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 4, value: 0 },
+            { type: 'END', lexeme: 'end', line: 5, value: undefined },
+            { type: 'ELSE', lexeme: 'else', line: 6, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 6, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 6, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 6, value: 1 },
+            { type: 'EOF', lexeme: '', line: 6, value: undefined },
+        ]);
+    });
 });

@@ -55,4 +55,35 @@ describe("When use interpreter", () => {
             a`
         )).toBe(2);
     });
+
+    it("should interpret if-then-else", () => {
+        expect(execute(`
+            let a = 3
+            if a < 0 then a = -1
+            else a = 1
+            a`
+        )).toBe(1);
+    });
+
+    it("should interpret if-then-else block", () => {
+        expect(execute(`
+            let a = -3
+            if a < 0 then begin
+                a = -1
+            end
+            else begin
+                a = 1
+            end
+            a`
+        )).toBe(-1);
+    });
+
+    it("should get an error if missing then", () => {
+        expect(() => execute(`
+            let a = 3
+            if a < 0 begin a = -1 end
+            else a = 1
+            a`
+        )).toThrowError("Expect 'then' after if condition.");
+    });
 });
