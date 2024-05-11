@@ -86,4 +86,40 @@ describe("When use interpreter", () => {
             a`
         )).toThrowError("Expect 'then' after if condition.");
     });
+
+    it("should interpret logical or in if", () => {
+        expect(execute(`
+            let a = 0
+            if (a < 0 or a > 0) then a = 1
+            else a = -1
+            a`
+        )).toBe(-1);
+    });
+
+    it("should interpret logical or in else", () => {
+        expect(execute(`
+            let a = 3
+            if (a < 0 or a > 0) then a = 1
+            else a = -1
+            a`
+        )).toBe(1);
+    });
+
+    it("should interpret logical and in if", () => {
+        expect(execute(`
+            let a = -2
+            if (a < 0 and a <> -1) then a = 1
+            else a = -1
+            a`
+        )).toBe(1);
+    });
+
+    it("should interpret logical and in else", () => {
+        expect(execute(`
+            let a = 2
+            if (a < 0 and a <> -1) then a = 1
+            else a = -1
+            a`
+        )).toBe(-1);
+    });
 });

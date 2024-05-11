@@ -1,5 +1,5 @@
 import { Token } from "./common/token";
-import { AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr } from "./expr";
+import { AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, IfStmt, LetStmt, PrintStmt, Stmt } from "./stmt";
 
@@ -69,7 +69,7 @@ export class Parser {
 
     private ifStatement(): Stmt {
         const condition = this.expression();
-        this.consume("THEN", "Expect 'then' after if condition."); 
+        this.consume("THEN", "Expect 'then' after if condition.");
 
         const thenBranch = this.statement();
         let elseBranch = null;
@@ -95,7 +95,7 @@ export class Parser {
     }
 
     private assignment(): Expr {
-        const expr = this.equality();
+        const expr = this.or();
 
         if (this.match("EQUAL")) {
             const equals = this.previous();
@@ -107,6 +107,30 @@ export class Parser {
             }
 
             this.error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
+    private or(): Expr {
+        let expr = this.and();
+
+        while (this.match("OR")) {
+            const operator = this.previous();
+            const right = this.and();
+            expr = new LogicalExpr(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private and(): Expr {
+        let expr = this.equality();
+
+        while (this.match("AND")) {
+            const operator = this.previous();
+            const right = this.equality();
+            expr = new LogicalExpr(expr, operator, right);
         }
 
         return expr;

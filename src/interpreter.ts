@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, LogicalExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
@@ -48,11 +48,11 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     visitIfStmt(stmt: IfStmt): any {
         if (this.isTruthy(this.evaluate(stmt.condition))) {
             this.execute(stmt.thenBranch);
-          }
-          else if (stmt.elseBranch != null) {
+        }
+        else if (stmt.elseBranch != null) {
             this.execute(stmt.elseBranch);
-          }
-          return null;
+        }
+        return null;
     }
 
     private isTruthy(value: any): boolean {
@@ -85,6 +85,19 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
 
         this.context.setVariable(stmt.name.lexeme, value, true);
         return value;
+    }
+
+    visitLogicalExpr(expr: LogicalExpr) {
+        const left = this.evaluate(expr.left);
+
+        if (expr.operator.type === "OR") {
+            if (this.isTruthy(left)) return left;
+        }
+        else /* and */{
+            if (!this.isTruthy(left)) return left;
+        }
+
+        return this.evaluate(expr.right);
     }
 
     visitAssign(expr: AssignExpr) {

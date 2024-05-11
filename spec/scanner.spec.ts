@@ -4,7 +4,6 @@ describe("When run mex scanner", () => {
     it("Should get correct tokens for 2^3", () => {
         const source = "2^3";
         const tokens = new Scanner(source).scanTokens();
-        console.log(tokens);
         expect(tokens).toEqual([
             { type: 'NUMBER', lexeme: '2', line: 1, value: 2 },
             { type: 'POWER', lexeme: '^', line: 1, value: undefined },
@@ -15,7 +14,6 @@ describe("When run mex scanner", () => {
     it("Should get correct tokens for (2+x)*5^3", () => {
         const source = "(2+x)*5^3";
         const tokens = new Scanner(source).scanTokens();
-        console.log(tokens);
         expect(tokens).toEqual([
             { type: 'LEFT_PAREN', lexeme: '(', line: 1, value: undefined },
             { type: 'NUMBER', lexeme: '2', line: 1, value: 2 },
@@ -32,7 +30,6 @@ describe("When run mex scanner", () => {
     it("Should get correct tokens for sin(2pi/x) * (3^x)", () => {
         const source = "sin(2pi/x) * (3^x)";
         const tokens = new Scanner(source).scanTokens();
-        console.log(tokens);
         expect(tokens).toEqual([
             { type: 'IDENTIFIER', lexeme: 'sin', line: 1, value: undefined },
             { type: 'LEFT_PAREN', lexeme: '(', line: 1, value: undefined },
@@ -57,7 +54,6 @@ describe("When run mex scanner", () => {
                 if n = 0 then return 1
                 return n * factorial(n - 1)`;
         const tokens = new Scanner(source).scanTokens();
-        console.log(tokens);
         expect(tokens).toEqual([
             { type: 'DEFINE', lexeme: 'define', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'factorial', line: 2, value: undefined },
@@ -94,7 +90,6 @@ describe("When run mex scanner", () => {
     it("Should get correct tokens for assignment let z = 3", () => {
         const source = "let z = 3";
         const tokens = new Scanner(source).scanTokens();
-        console.log(tokens);
         expect(tokens).toEqual([
             { type: 'LET', lexeme: 'let', line: 1, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'z', line: 1, value: undefined },
@@ -109,7 +104,6 @@ describe("When run mex scanner", () => {
             let a = 3
             a = a^2`;
         const tokens = new Scanner(source).scanTokens();
-        console.log(tokens);
         expect(tokens).toEqual([
             { type: 'LET', lexeme: 'let', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
@@ -132,7 +126,6 @@ describe("When run mex scanner", () => {
             end
             a = 1`;
         const tokens = new Scanner(source).scanTokens();
-        console.log(tokens);
         expect(tokens).toEqual([
             { type: 'LET', lexeme: 'let', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
@@ -156,7 +149,6 @@ describe("When run mex scanner", () => {
             if a < 0 then a = 0
             else a = 1`;
         const tokens = new Scanner(source).scanTokens();
-        console.log(tokens);
         expect(tokens).toEqual([
             { type: 'LET', lexeme: 'let', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
@@ -186,7 +178,6 @@ describe("When run mex scanner", () => {
             end
             else a = 1`;
         const tokens = new Scanner(source).scanTokens();
-        console.log(tokens);
         expect(tokens).toEqual([
             { type: 'LET', lexeme: 'let', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
@@ -207,6 +198,60 @@ describe("When run mex scanner", () => {
             { type: 'EQUAL', lexeme: '=', line: 6, value: undefined },
             { type: 'NUMBER', lexeme: '1', line: 6, value: 1 },
             { type: 'EOF', lexeme: '', line: 6, value: undefined },
+        ]);
+    });
+
+    it("should get correct tokens when using logical and/or in if:\nlet a = 0\if (a < 0 or a > 0) then a=1\nelse a=-1", () => {
+        const source = `
+            let a = 0
+            if (a < 0 or a > 0) then a = 1
+            else a = -1`;
+        const tokens = new Scanner(source).scanTokens();
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
+            { type: 'IF', lexeme: 'if', line: 3, value: undefined },
+            { type: 'LEFT_PAREN', lexeme: '(', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'LESS', lexeme: '<', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'OR', lexeme: 'or', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'GREATER', lexeme: '>', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'RIGHT_PAREN', lexeme: ')', line: 3, value: undefined },
+            { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
+            { type: 'ELSE', lexeme: 'else', line: 4, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
+            { type: 'MINUS', lexeme: '-', line: 4, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
+            { type: 'EOF', lexeme: '', line: 4, value: undefined },
+        ]);
+    });
+
+    it("should get correct tokens when using logical and/or:\nlet a = 0\nlet b = a or 2", () => {
+        const source = `
+            let a = 0
+            let b = a or 2`;
+        const tokens = new Scanner(source).scanTokens();
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
+            { type: 'LET', lexeme: 'let', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'b', line: 3, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'OR', lexeme: 'or', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '2', line: 3, value: 2 },
+            { type: 'EOF', lexeme: '', line: 3, value: undefined },
         ]);
     });
 });

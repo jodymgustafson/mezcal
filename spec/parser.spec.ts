@@ -1,5 +1,6 @@
 import { LiteralExpr } from "../src/expr";
 import { Parser } from "../src/parser";
+import { Scanner } from "../src/scanner";
 
 describe("When use the mex parser", () => {
     it("should parse lexical tokens for 2^3", () => {
@@ -156,5 +157,58 @@ describe("When use the mex parser", () => {
             { type: 'EOF', lexeme: '', line: 6, value: undefined },
         ]);
         expect(() => parser.parse()).toThrowError("Expect 'then' after if condition.");
+    });
+
+    it("should parse lexical tokens for\nlet a = 0\if (a < 0 or a > 0) then a=1\nelse a=-1", () => {
+        const parser = new Parser([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
+            { type: 'IF', lexeme: 'if', line: 3, value: undefined },
+            { type: 'LEFT_PAREN', lexeme: '(', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'LESS', lexeme: '<', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'OR', lexeme: 'or', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'GREATER', lexeme: '>', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'RIGHT_PAREN', lexeme: ')', line: 3, value: undefined },
+            { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
+            { type: 'ELSE', lexeme: 'else', line: 4, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
+            { type: 'MINUS', lexeme: '-', line: 4, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
+            { type: 'EOF', lexeme: '', line: 4, value: undefined },
+        ]);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"a","line":2},"initializer":{"value":0}},{"condition":{"expr":{"left":{"left":{"name":"a"},"operator":{"type":"LESS","lexeme":"<","line":3},"right":{"value":0}},"operator":{"type":"OR","lexeme":"or","line":3},"right":{"left":{"name":"a"},"operator":{"type":"GREATER","lexeme":">","line":3},"right":{"value":0}}}},"thenBranch":{"expression":{"name":"a","value":{"value":1}}},"elseBranch":{"expression":{"name":"a","value":{"operator":{"type":"MINUS","lexeme":"-","line":4},"right":{"value":1}}}}}]`
+        );
+    });
+
+    it("should parse lexical tokens for\nlet a = 0\nlet b = a or 2", () => {
+        const parser = new Parser([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
+            { type: 'LET', lexeme: 'let', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'b', line: 3, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+            { type: 'OR', lexeme: 'or', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '2', line: 3, value: 2 },
+            { type: 'EOF', lexeme: '', line: 3, value: undefined },
+        ]);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"a","line":2},"initializer":{"value":0}},{"name":{"type":"IDENTIFIER","lexeme":"b","line":3},"initializer":{"left":{"name":"a"},"operator":{"type":"OR","lexeme":"or","line":3},"right":{"value":2}}}]`
+        );
     });
 });
