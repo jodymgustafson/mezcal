@@ -62,7 +62,7 @@ describe("When use the mex parser", () => {
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
         const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(`[{"expression":{"name":"sin"}},{"expression":{"left":{"expr":{"left":{"left":{"value":2},"operator":{"type":"STAR","lexeme":"*","line":1},"right":{"name":"pi"}},"operator":{"type":"SLASH","lexeme":"/","line":1},"right":{"name":"x"}}},"operator":{"type":"STAR","lexeme":"*","line":1},"right":{"expr":{"left":{"value":3},"operator":{"type":"POWER","lexeme":"^","line":1},"right":{"name":"x"}}}}}]`);
+        expect(JSON.stringify(ast)).toEqual(`[{"expression":{"left":{"callee":{"name":"sin"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":1},"args":[{"left":{"left":{"value":2},"operator":{"type":"STAR","lexeme":"*","line":1},"right":{"name":"pi"}},"operator":{"type":"SLASH","lexeme":"/","line":1},"right":{"name":"x"}}]},"operator":{"type":"STAR","lexeme":"*","line":1},"right":{"expr":{"left":{"value":3},"operator":{"type":"POWER","lexeme":"^","line":1},"right":{"name":"x"}}}}}]`);
     });
 
     it("should parse lexical tokens for let z = 3", () => {

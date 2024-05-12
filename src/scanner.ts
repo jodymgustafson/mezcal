@@ -3,7 +3,7 @@ import { BaseLexicalScanner, BaseTokenType } from "./common/lexical-scanner";
 export type MathTokenType = BaseTokenType | 
     "FUNCTION" | "LET" | "IF" | "THEN" | "ELSE" | "ERROR" | "RETURN" | "BEGIN" | "END" |
     "WHILE" | "FOR" | "TO" | "STEP" |
-    "INPUT" | "PRINT" | "IMPORT" |
+    "INPUT" | "IMPORT" |
     "AND" | "OR" | "NOT" |
     "LEFT_PAREN" | "RIGHT_PAREN"|
     "COMMA" | "DOT" | "MINUS" | "PLUS" | "SLASH" | "STAR" | "POWER" |
@@ -14,7 +14,7 @@ export type MathTokenType = BaseTokenType |
 const KEYWORDS = [
     "function", "let", "if", "then", "else", "error", "return", "begin", "end",
     "while", "for", "to", "step",
-    "input", "print", "import", 
+    "input", "import", 
     "and", "or", "not"
 ];
 

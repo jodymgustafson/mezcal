@@ -42,7 +42,7 @@ async function readLineAsync(message): Promise<string> {
 (async () => {
     // REPL loop
     const mezcal = new Runtime();
-    console.log("Mezcal v1.0.0");
+    console.log("🚀 Mezcal v1.0.0");
     console.log("Type ':h' for more information.");
     let quit = false;
     while (!quit) {
@@ -68,7 +68,7 @@ async function readLineAsync(message): Promise<string> {
         }
     }
 
-    console.log("bye");
+    console.log("👋 bye");
     exit();
 })();
 

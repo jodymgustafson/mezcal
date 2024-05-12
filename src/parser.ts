@@ -64,7 +64,6 @@ export class Parser {
     private statement(): Stmt {
         if (this.match("FOR")) return this.forStatement();
         if (this.match("IF")) return this.ifStatement();
-        if (this.match("PRINT")) return this.printStatement();
         if (this.match("WHILE")) return this.whileStatement();
         if (this.match("BEGIN")) return new BlockStmt(this.block());
         return this.expressionStatement();
@@ -103,11 +102,6 @@ export class Parser {
         }
 
         return new IfStmt(condition, thenBranch, elseBranch);
-    }
-
-    private printStatement(): Stmt {
-        const value = this.expression();
-        return new PrintStmt(value);
     }
 
     private expressionStatement(): Stmt {

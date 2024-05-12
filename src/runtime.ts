@@ -1,4 +1,5 @@
 import { ScanError } from "./common/lexical-scanner";
+import { nativeFunctions } from "./internal/native-functions";
 import { Interpreter } from "./interpreter";
 import { InterpreterContext } from "./interpreter-context";
 import { Parser } from "./parser";
@@ -35,5 +36,3 @@ export class Runtime {
         return this.interpreter.interpret(ast);
     }
 }
-
-const nativeFunctions = {}

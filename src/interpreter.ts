@@ -13,7 +13,7 @@ export class RuntimeError extends Error {
 export interface Callable {
     isCallable: true;
     arity: number;
-    call(interpreter: Interpreter, args: any[]): any;
+    call(args: any[], interpreter: Interpreter): any;
 }
 
 /**
@@ -221,7 +221,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
             args.push(this.evaluate(argument));
         }
 
-        return fn.call(this, args);
+        return fn.call(args, this) ?? 0;
     }
 
     private isEqual(a: any, b: any): boolean {

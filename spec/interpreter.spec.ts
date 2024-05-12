@@ -181,11 +181,18 @@ describe("When use interpreter", () => {
         )).toBe(100);
     });
 
-    it("should interpret call function no args", () => {
+    it("should interpret function call no args", () => {
+        expect(execute(`
+            let time = pi()
+            time`
+        )).toEqual(Math.PI);
+    });
+
+    it("should interpret function call with args", () => {
         const now = Date.now();
         expect(execute(`
-            let time = clock()
-            time`
-        )).toBeGreaterThan(now);
+            let x = 1
+            2 * sin(x + 1) + 3`
+        )).toEqual(2 * Math.sin(2) + 3);
     });
 });
