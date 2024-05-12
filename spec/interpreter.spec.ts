@@ -180,4 +180,12 @@ describe("When use interpreter", () => {
             cnt`
         )).toBe(100);
     });
+
+    it("should interpret call function no args", () => {
+        const now = Date.now();
+        expect(execute(`
+            let time = clock()
+            time`
+        )).toBeGreaterThan(now);
+    });
 });

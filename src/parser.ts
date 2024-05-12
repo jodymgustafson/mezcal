@@ -1,8 +1,9 @@
 import { Token } from "./common/token";
-import { AssignExpr, BinaryExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
+import { AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, ForStmt, IfStmt, LetStmt, PrintStmt, Stmt, WhileStmt } from "./stmt";
 
+const MAX_FN_ARGS_COUNT = 255;
 /**
  * Parses tokens from the scanner into an abstract syntax tree
  */
@@ -227,7 +228,34 @@ export class Parser {
             return new UnaryExpr(operator, right);
         }
 
-        return this.primary();
+        return this.call();
+    }
+
+    private call(): Expr {
+        let expr = this.primary();
+
+        while (this.match("LEFT_PAREN")) {
+            expr = this.finishCall(expr);
+        }
+
+        return expr;
+    }
+
+    private finishCall(callee: Expr): Expr {
+        const args: Expr[] = [];
+        if (!this.check("RIGHT_PAREN")) {
+            do {
+                if (args.length >= MAX_FN_ARGS_COUNT) {
+                    this.error(this.peek(), "Can't have more than 255 arguments.");
+                }
+                args.push(this.expression());
+            }
+            while (this.match("COMMA"));
+        }
+
+        const paren = this.consume("RIGHT_PAREN", "Expect ')' after arguments.");
+
+        return new CallExpr(callee, paren, args);
     }
 
     private primary(): Expr {

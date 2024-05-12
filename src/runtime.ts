@@ -1,5 +1,6 @@
 import { ScanError } from "./common/lexical-scanner";
 import { Interpreter } from "./interpreter";
+import { InterpreterContext } from "./interpreter-context";
 import { Parser } from "./parser";
 import { Scanner } from "./scanner";
 
@@ -14,7 +15,7 @@ export class MezcalRuntimeError extends Error {
  * while keeping the state
  */
 export class Runtime {
-    constructor(readonly interpreter = new Interpreter()) {}
+    constructor(readonly interpreter = new Interpreter(new InterpreterContext(undefined, undefined, nativeFunctions))) {}
 
     evaluate(expr: string): number {
         const scanner = new Scanner(expr);
@@ -34,3 +35,5 @@ export class Runtime {
         return this.interpreter.interpret(ast);
     }
 }
+
+const nativeFunctions = {}

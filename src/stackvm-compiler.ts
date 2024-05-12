@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr, CallExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
@@ -106,7 +106,10 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
         console.log(value);
         return 0;
     }
-    
+
+    visitCallExpr(expr: CallExpr): string {
+        throw new Error("Method not implemented.");
+    }
     visitAssign(expr: VariableExpr): string {
         throw new Error("Method not implemented.");
     }

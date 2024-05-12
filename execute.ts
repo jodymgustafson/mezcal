@@ -3,6 +3,7 @@ import { Scanner } from "./src/scanner";
 import { Parser } from "./src/parser";
 import { Interpreter } from "./src/interpreter";
 import { InterpreterContext, InterpreterVariables } from "./src/interpreter-context";
+import { nativeFunctions } from "./src/internal/native-functions";
 
 const input = argv[2];
 if (input) {
@@ -36,7 +37,7 @@ export function execute(expr: string, variables?: InterpreterVariables): number 
         }
         else {
             // console.log(new AstPrinter().print(ast));
-            const int = new Interpreter(new InterpreterContext(undefined, variables));
+            const int = new Interpreter(new InterpreterContext(undefined, variables, nativeFunctions));
             return int.interpret(ast);
         }
     }

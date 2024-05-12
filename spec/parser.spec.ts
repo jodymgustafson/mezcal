@@ -263,4 +263,15 @@ describe("When use the mex parser", () => {
             `[{"name":{"type":"IDENTIFIER","lexeme":"cnt","line":2},"initializer":{"value":0}},{"initializer":{"name":"a","value":{"value":0}},"to":{"value":100},"body":{"statements":[{"expression":{"name":"cnt","value":{"left":{"name":"cnt"},"operator":{"type":"PLUS","lexeme":"+","line":4},"right":{"value":1}}}}]}}]`
         );
     });
+
+    it("should parse lexical tokens for\nlet time = clock()", () => {
+        const source = `
+            let time = clock()`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"time","line":2},"initializer":{"callee":{"name":"clock"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":2},"args":[]}}]`
+        );
+    });
 });

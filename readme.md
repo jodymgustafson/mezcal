@@ -50,8 +50,9 @@ comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term           → factor ( ( "-" | "+" ) factor )* ;
 factor         → base ( ( "/" | "*" ) base )* ;
 base           → unary ( "^" unary )*
-unary          → ( "+" | "-" ) unary
-               | primary ;
+unary          → ( "+" | "-" ) unary | call ;
+call           → primary ( "(" arguments? ")" )* ;
+arguments      → expression ( "," expression )* ;
 primary        → NUMBER | STRING | IDENTIFIER
                 | "(" expression ")"
                 | IDENTIFIER ;

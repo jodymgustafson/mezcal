@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr, CallExpr } from "./expr";
 
 /**
  * An implementation of Visitor used to print out an abstract syntax tree
@@ -34,6 +34,10 @@ export class AstPrinter implements ExprVisitor<string> {
 
     visitLogicalExpr(expr: LogicalExpr): string {
         return this.parenthesize(expr.operator.lexeme, expr.left, expr.right);
+    }
+
+    visitCallExpr(expr: CallExpr): string {
+        return (expr.callee as VariableExpr).name;
     }
 
     private parenthesize(name: string, ...exprs: Expr[]): string {

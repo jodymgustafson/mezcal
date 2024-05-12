@@ -333,4 +333,19 @@ describe("When run mex scanner", () => {
             { type: 'EOF', lexeme: '', line: 3, value: undefined },
         ]);
     });
+
+    it("should get correct tokens when calling a function:\nlet time = clock()", () => {
+        const source = `
+            let time = clock()`;
+        const tokens = new Scanner(source).scanTokens();
+        expect(tokens).toEqual([
+            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'time', line: 2, value: undefined },
+            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'clock', line: 2, value: undefined },
+            { type: 'LEFT_PAREN', lexeme: '(', line: 2, value: undefined },
+            { type: 'RIGHT_PAREN', lexeme: ')', line: 2, value: undefined },
+            { type: 'EOF', lexeme: '', line: 2, value: undefined },
+        ]);
+    });
 });

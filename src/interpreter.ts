@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, LogicalExpr } from "./expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, LogicalExpr, CallExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
@@ -10,12 +10,21 @@ export class RuntimeError extends Error {
     }
 }
 
+export interface Callable {
+    isCallable: true;
+    arity: number;
+    call(interpreter: Interpreter, args: any[]): any;
+}
 
 /**
  * Class used to interpret Mezcal code
  */
 export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
-    constructor(private context: InterpreterContext = new InterpreterContext()) { }
+    private readonly globals: InterpreterContext;
+
+    constructor(private context: InterpreterContext = new InterpreterContext()) {
+        this.globals = context;
+    }
 
     /**
      * Interprets the expression defined by the AST 
@@ -182,13 +191,37 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         return null;
     }
 
-    visitVariable(expr: VariableExpr) {
+    visitVariable(expr: VariableExpr): any {
         const v = this.context.getVariable(expr.name);
         if (v === undefined) {
             throw new RuntimeError(null, `Undefined variable "${expr.name}"`);
         }
 
         return v;
+    }
+
+    visitCallExpr(expr: CallExpr): any {
+        // const fn = this.evaluate(expr.callee) as Callable;
+        const fnName = (expr.callee as VariableExpr).name;
+        const fn = this.context.getFunction(fnName) as Callable;
+        if (!fn) {
+            throw new RuntimeError(null, `Undefined function "${fnName}"`);
+        }
+        if (!fn.isCallable) {
+            throw new RuntimeError(expr.paren, "Can only call functions");
+        }
+
+        if (expr.args.length !== fn.arity) {
+            throw new RuntimeError(expr.paren,
+                `Expected ${fn.arity} arguments but got ${expr.args.length}.`);
+        }
+
+        const args = [];
+        for (const argument of expr.args) {
+            args.push(this.evaluate(argument));
+        }
+
+        return fn.call(this, args);
     }
 
     private isEqual(a: any, b: any): boolean {
