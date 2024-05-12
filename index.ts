@@ -56,7 +56,8 @@ async function readLineAsync(message): Promise<string> {
             }
             else {
                 try {
-                    console.log(mezcal.evaluate(expr));
+                    const value = mezcal.evaluate(expr);
+                    console.log(JSON.stringify(value));
                 }
                 catch (err) {
                     console.error(err.message);

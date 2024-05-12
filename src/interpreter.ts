@@ -13,7 +13,7 @@ export class RuntimeError extends Error {
 export interface Callable {
     isCallable: true;
     arity: number;
-    call(args: any[], interpreter: Interpreter): any;
+    call(args?: any[], interpreter?: Interpreter): any;
 }
 
 /**
@@ -125,13 +125,15 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
 
     visitForStmt(stmt: ForStmt) {
         let value: any;
+        
+        const varName = (stmt.initializer as VariableExpr).name;
         let i = this.evaluate(stmt.initializer);
         const to = this.evaluate(stmt.to);
         const step = stmt.step ? this.evaluate(stmt.step) : (i <= to ? 1 : -1);
 
         while ((step > 0 && i <= to) || (step < 0 && i >= to)) {
             value = this.execute(stmt.body);
-            i += step;
+            this.context.setVariable(varName, i += step);
         }
 
         return value;
@@ -192,23 +194,30 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     }
 
     visitVariable(expr: VariableExpr): any {
-        const v = this.context.getVariable(expr.name);
-        if (v === undefined) {
+        const value = this.context.getVariable(expr.name);
+        if (value === undefined) {
             throw new RuntimeError(null, `Undefined variable "${expr.name}"`);
         }
 
-        return v;
+        // If it's a function with not arguments then it is treated as a constant
+        const c = value as Callable;
+        if (c.isCallable) {
+            if (c.arity === 0)
+                return c.call();
+            throw new RuntimeError(null, `Undefined variable "${expr.name}"`);
+        }
+
+        return value;
     }
 
     visitCallExpr(expr: CallExpr): any {
-        // const fn = this.evaluate(expr.callee) as Callable;
         const fnName = (expr.callee as VariableExpr).name;
-        const fn = this.context.getFunction(fnName) as Callable;
+        const fn = this.context.getVariable(fnName) as Callable;
         if (!fn) {
             throw new RuntimeError(null, `Undefined function "${fnName}"`);
         }
         if (!fn.isCallable) {
-            throw new RuntimeError(expr.paren, "Can only call functions");
+            throw new RuntimeError(expr.paren, `"${fnName}" is not a function.`);
         }
 
         if (expr.args.length !== fn.arity) {

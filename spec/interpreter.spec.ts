@@ -146,46 +146,47 @@ describe("When use interpreter", () => {
     it("should interpret for-step loop", () => {
         expect(execute(`
             let cnt = 0
-            for a = 1 to 100 step 2 cnt = cnt + 1
+            for a = 1 to 10 step 2 cnt = cnt + a
             cnt`
-        )).toBe(50);
+        )).toBe(25);
     });
 
     it("should interpret negative for-step loop", () => {
         expect(execute(`
             let cnt = 0
-            for a = 100 to 1 step -3 begin
-                cnt = cnt + 1
+            for a = 10 to 1 step -3 begin
+                cnt = cnt + a
             end
             cnt`
-        )).toBe(34);
+        )).toBe(22);
     });
 
     it("should interpret for loop no step", () => {
         expect(execute(`
             let cnt = 0
-            for a = 1 to 100 begin
-                cnt = cnt + 1
+            for a = 1 to 10 begin
+                cnt = cnt + a
             end
             cnt`
-        )).toBe(100);
+        )).toBe(55);
     });
 
     it("should interpret negative for loop no step", () => {
         expect(execute(`
             let cnt = 0
-            for a = 99 to 0 begin
-                cnt = cnt + 1
+            for a = 10 to 1 begin
+                cnt = cnt + a
             end
             cnt`
-        )).toBe(100);
+        )).toBe(55);
     });
 
     it("should interpret function call no args", () => {
-        expect(execute(`
-            let time = pi()
-            time`
-        )).toEqual(Math.PI);
+        expect(execute(`pi()`)).toEqual(Math.PI);
+    });
+
+    it("should interpret constant function call", () => {
+        expect(execute(`pi`)).toEqual(Math.PI);
     });
 
     it("should interpret function call with args", () => {
@@ -194,5 +195,20 @@ describe("When use interpreter", () => {
             let x = 1
             2 * sin(x + 1) + 3`
         )).toEqual(2 * Math.sin(2) + 3);
+    });
+
+    it("should get an error when undefined function", () => {
+        expect(() => execute(`foo()`)).toThrowError(`Undefined function "foo"`);
+    });
+
+    it("should get an error when wrong argument count to function", () => {
+        expect(() => execute(`sin(1, 2)`)).toThrowError(`Expected 1 arguments but got 2.`);
+    });
+
+    it("should get an error when try to execute non function", () => {
+        expect(() => execute(`
+            let x = "pi"
+            x()`
+        )).toThrowError(`"x" is not a function.`);
     });
 });
