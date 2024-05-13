@@ -6,6 +6,7 @@ export type InterpreterFunctions = Record<string, Callable>;
 
 export class InterpreterContext {
     private readonly vars: Record<string, VariableValue | Callable>;
+
     /**
      * Creates a new instance
      * @param enclosing The enclosing scope, undefined for top level
@@ -43,28 +44,4 @@ export class InterpreterContext {
         
         return value;
     }
-
-    // /**
-    //  * Adds a function definition
-    //  * @param name Name of the function
-    //  * @param def Definition of the function
-    //  */
-    // setFunction(name: string, def: Callable): void {
-    //     this.functions[name] = def;
-    // }
-
-    // /**
-    //  * Gets a function definition
-    //  * @param name Name of the function
-    //  * @returns The function definition or undefined if not exists
-    //  */
-    // getFunction(name: string): Callable | undefined {
-    //     let fn = this.functions[name];
-    //     if (fn === undefined && this.enclosing) {
-    //         // Check for it in the enclosing scope
-    //         fn = this.enclosing.getFunction(name);
-    //     }
-
-    //     return fn;
-    // }
 }

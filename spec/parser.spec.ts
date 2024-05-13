@@ -274,4 +274,16 @@ describe("When use the mex parser", () => {
             `[{"name":{"type":"IDENTIFIER","lexeme":"time","line":2},"initializer":{"callee":{"name":"clock"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":2},"args":[]}}]`
         );
     });
+
+    it("should parse lexical tokens for\nfunction add(a, b) begin a + b end\nadd(2, 3)", () => {
+        const source = `
+            function add(a, b) begin a + b end
+            add(2, 3)`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"add","line":2},"params":[{"type":"IDENTIFIER","lexeme":"a","line":2},{"type":"IDENTIFIER","lexeme":"b","line":2}],"body":[{"expression":{"left":{"name":"a"},"operator":{"type":"PLUS","lexeme":"+","line":2},"right":{"name":"b"}}}]},{"expression":{"callee":{"name":"add"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":3},"args":[{"value":2},{"value":3}]}}]`
+        );
+    });
 });

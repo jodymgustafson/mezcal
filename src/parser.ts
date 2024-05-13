@@ -1,7 +1,7 @@
 import { Token } from "./common/token";
 import { AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, ForStmt, IfStmt, LetStmt, PrintStmt, Stmt, WhileStmt } from "./stmt";
+import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, Stmt, WhileStmt } from "./stmt";
 
 const MAX_FN_ARGS_COUNT = 255;
 /**
@@ -41,6 +41,7 @@ export class Parser {
 
     private declaration(): Stmt {
         try {
+            if (this.match("FUNCTION")) return this.functionDeclaration();
             if (this.match("LET")) return this.letDeclaration();
             return this.statement();
         }
@@ -48,6 +49,28 @@ export class Parser {
             this.synchronize();
             throw err;
         }
+    }
+
+    private functionDeclaration(): FunctionStmt {
+        const name = this.consume("IDENTIFIER", "Expect function name.");
+        this.consume("LEFT_PAREN", "Expect '(' after function name.");
+        const params: Token[] = [];
+        if (!this.check("RIGHT_PAREN")) {
+            do {
+                if (params.length >= MAX_FN_ARGS_COUNT) {
+                    this.error(this.peek(), "Can't have more than 255 parameters.");
+                }
+
+                params.push(
+                    this.consume("IDENTIFIER", "Expect parameter name."));
+            }
+            while (this.match("COMMA"));
+        }
+        this.consume("RIGHT_PAREN", "Expect ')' after parameters.");
+
+        this.consume("BEGIN", "Expect 'begin' before function body.");
+        const body: Stmt[] = this.block();
+        return new FunctionStmt(name, params, body);
     }
 
     private letDeclaration(): Stmt {

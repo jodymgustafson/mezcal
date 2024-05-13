@@ -3,6 +3,7 @@ import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
 import { InterpreterContext } from "./interpreter-context";
+import { UserFunction } from "./user-function";
 
 export class RuntimeError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -20,7 +21,7 @@ export interface Callable {
  * Class used to interpret Mezcal code
  */
 export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
-    private readonly globals: InterpreterContext;
+    readonly globals: InterpreterContext;
 
     constructor(private context: InterpreterContext = new InterpreterContext()) {
         this.globals = context;
@@ -54,6 +55,12 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         return this.evaluate(stmt.expression);
     }
 
+    visitFunctionStmt(stmt: FunctionStmt): any {
+        const fn = new UserFunction(stmt);
+        this.context.setVariable(stmt.name.lexeme, fn);
+        return 0;
+    }
+
     visitIfStmt(stmt: IfStmt): any {
         if (this.isTruthy(this.evaluate(stmt.condition))) {
             this.execute(stmt.thenBranch);
@@ -76,10 +83,6 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
 
     visitBlockStmt(stmt: BlockStmt): any {
         return this.executeBlock(stmt.statements, new InterpreterContext(this.context))
-    }
-
-    visitFunctionStmt(stmt: FunctionStmt): any {
-        throw new Error("Method not implemented.");
     }
 
     visitReturnStmt(stmt: ReturnStmt): any {
@@ -129,7 +132,14 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         const varName = (stmt.initializer as VariableExpr).name;
         let i = this.evaluate(stmt.initializer);
         const to = this.evaluate(stmt.to);
+        // If not defined then step is set to either 1 or -1
         const step = stmt.step ? this.evaluate(stmt.step) : (i <= to ? 1 : -1);
+        if (step === 0) {
+            throw new RuntimeError(null, "Step in for loop cannot be 0.");
+        }
+        if ((i <= to && step < 0) || (i >= to && step > 0)) {
+            throw new RuntimeError(null, "Invalid step in for loop.");
+        }
 
         while ((step > 0 && i <= to) || (step < 0 && i >= to)) {
             value = this.execute(stmt.body);
@@ -245,7 +255,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         throw new RuntimeError(operator, "Operand must be a number.");
     }
 
-    private executeBlock(statements: Stmt[], context: InterpreterContext): any {
+    executeBlock(statements: Stmt[], context: InterpreterContext): any {
         const previous = this.context;
         let value = 0;
         try {

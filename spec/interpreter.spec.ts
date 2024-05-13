@@ -190,7 +190,6 @@ describe("When use interpreter", () => {
     });
 
     it("should interpret function call with args", () => {
-        const now = Date.now();
         expect(execute(`
             let x = 1
             2 * sin(x + 1) + 3`
@@ -210,5 +209,12 @@ describe("When use interpreter", () => {
             let x = "pi"
             x()`
         )).toThrowError(`"x" is not a function.`);
+    });
+
+    it("should interpret define function", () => {
+        expect(execute(`
+            function add(a, b) begin a + b end
+            add(2, 3)`
+        )).toEqual(5);
     });
 });

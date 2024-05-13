@@ -32,7 +32,9 @@ See test.mez for examples.
 
 ```
 program        → declaration* EOF ;
-declaration    → letDecl | statement ;
+declaration    → funDecl | letDecl | statement ;
+funDecl        → "function" IDENTIFIER "(" parameters? ")" block ;
+parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
 letDecl        → "let" IDENTIFIER ( "=" expression )? ;
 statement      → exprStmt | forStmt | ifStmt | printStmt | whileStmt | block ;
 exprStmt       → expression ;

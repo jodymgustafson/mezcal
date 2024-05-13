@@ -348,4 +348,33 @@ describe("When run mex scanner", () => {
             { type: 'EOF', lexeme: '', line: 2, value: undefined },
         ]);
     });
+
+    it("should get correct tokens when defining a function:\nfunction add(a, b) begin a + b end\nadd(2, 3)", () => {
+        const source = `
+            function add(a, b) begin a + b end
+            add(2, 3)`;
+        const tokens = new Scanner(source).scanTokens();
+        expect(tokens).toEqual([
+            { type: 'FUNCTION', lexeme: 'function', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'add', line: 2, value: undefined },
+            { type: 'LEFT_PAREN', lexeme: '(', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'COMMA', lexeme: ',', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'b', line: 2, value: undefined },
+            { type: 'RIGHT_PAREN', lexeme: ')', line: 2, value: undefined },
+            { type: 'BEGIN', lexeme: 'begin', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+            { type: 'PLUS', lexeme: '+', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'b', line: 2, value: undefined },
+            { type: 'END', lexeme: 'end', line: 2, value: undefined },
+
+            { type: 'IDENTIFIER', lexeme: 'add', line: 3, value: undefined },
+            { type: 'LEFT_PAREN', lexeme: '(', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '2', line: 3, value: 2 },
+            { type: 'COMMA', lexeme: ',', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '3', line: 3, value: 3 },
+            { type: 'RIGHT_PAREN', lexeme: ')', line: 3, value: undefined },
+            { type: 'EOF', lexeme: '', line: 3, value: undefined },
+        ]);
+    });
 });
