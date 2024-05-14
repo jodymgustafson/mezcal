@@ -18,8 +18,13 @@ export class MezcalRuntimeError extends Error {
 export class Runtime {
     constructor(readonly interpreter = new Interpreter(new InterpreterContext(undefined, undefined, nativeFunctions))) {}
 
-    evaluate(expr: string): number {
-        const scanner = new Scanner(expr);
+    /**
+     * Runs Mezcal source code in the interpreter
+     * @param source Mezcal source code
+     * @returns Result of the run
+     */
+    evaluate(source: string): number {
+        const scanner = new Scanner(source);
         const tokens = scanner.scanTokens();
         if (scanner.errors.length > 0) {
             throw new MezcalRuntimeError("There were scanner errors", scanner.errors);

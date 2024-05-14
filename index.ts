@@ -1,12 +1,3 @@
-// const program =`REM This is a program
-// start:
-//     s$ = "Hello World!"
-//     x = 23 + 1.5
-//     print s$;
-//     if x<=23 print x
-// end:`;
-//REM End of the program`;
-
 /*
  __  __  ____  ____  ___    __    __   
 (  \/  )( ___)(_   )/ __)  /__\  (  )  
@@ -21,22 +12,24 @@ ___  ___                  _
 \_|  |_/\___/___\___\__,_|_|
                             
 */
-
-import readline from 'readline';
+import fs from 'fs';
+import { readLineAsync } from "./src/internal/read-line";
 import { Runtime } from "./src/runtime";
 import { exit } from "process";
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-async function readLineAsync(message): Promise<string> {
-    return new Promise((resolve) => {
-        rl.question(message, (answer) => {
-            resolve(answer);
-        });
-    });
+if (process.argv.length > 2) {
+    const data = fs.readFileSync(process.argv[2], 'utf8');
+    if (data) {
+        const mezcal = new Runtime();
+        try {
+            const v = mezcal.evaluate(data);
+            console.log(JSON.stringify(v));    
+        }
+        catch (err) {
+            console.error(err.message);
+        }
+    }
+    exit();
 }
 
 (async () => {

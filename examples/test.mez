@@ -1,24 +1,31 @@
-define rFactorial(n):
+function rFactorial(n)
+begin
   if n < 0 then error "Invalid value" 
   if n == 0 then return 1
   return n * rFactorial(n - 1)
+end
 
-define factorial(n):
+function factorial(n)
+begin
   if n < 0 then error "Invalid value" 
   let result = 1;
   while n > 1
     result = result * n
     n = n - 1
-  wend
+  end
   return result
+end
 
 # Recursive fibonacci 
-define rFibonacci(n):
+function rFibonacci(n)
+begin
   if n < 0 then error "Invalid value" 
   if n = 0 then return 0
   return n + rFibonacci(n - 1)
+end
 
-function fibonacci(n):
+function fibonacci(n)
+begin
   if n < 0 then error "Invalid value" 
   let result = 0;
   while n > 0 begin
@@ -26,25 +33,24 @@ function fibonacci(n):
     n = n - 1
   end
   return result
+end
 
 # Converts celsius to fahrenheit
-define celsius2Fahr(c):
+function celsius2Fahr(c) begin
   return (c * 9) / 5 + 32
+end
 
 # Converts fahrenheit to celsius
-define fahr2Celsius(f):
+function fahr2Celsius(f) begin
  return (f - 32) * 5 / 9
+end
 
-input "Convert from fahrenheit or celsius (f/c)", a
+let a = input("Convert from fahrenheit or celsius (f/c)")
 if a == "c" then begin
-  input "Enter degrees celsius: ", c
-  print c ," celsius is ", fahr2Celsius(c)
+  c = input("Enter degrees celsius: ")
+  print(c ," celsius is ", fahr2Celsius(c))
 end
 if a == "f" then begin
-  input "Enter degrees fahrenheit: ", f
-  print f ," fahrenheit is ", celsius2Fahr(f)
-end
-
-for i = 1 to 10 step 3 begin
-  print i
+  f = input("Enter degrees fahrenheit: ")
+  print(f ," fahrenheit is ", celsius2Fahr(f))
 end

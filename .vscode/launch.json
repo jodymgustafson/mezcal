@@ -7,6 +7,20 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Run Program",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}\\index.ts",
+      "args": ["./examples/convert.mez"],
+      "cwd": "${workspaceFolder}",
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Execute",
       "skipFiles": [
         "<node_internals>/**"

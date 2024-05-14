@@ -1,5 +1,6 @@
 import { Callable } from "../interpreter";
 import { InterpreterFunctions } from "../interpreter-context";
+import { readLineAsync } from "./read-line";
 
 const fns: [string, number, Function][] = [
     ["clock", 0, Date.now],
@@ -21,6 +22,7 @@ const fns: [string, number, Function][] = [
     ["sqrt", 1, Math.sqrt],
     ["cbrt", 1, Math.cbrt],
     ["print", 1, (args) => console.log(args[0])],
+    ["input", 1, readLineAsync]
 ];
 
 export const nativeFunctions: InterpreterFunctions = fns.reduce((acc, cur) => {
@@ -31,3 +33,4 @@ export const nativeFunctions: InterpreterFunctions = fns.reduce((acc, cur) => {
     } as Callable;
     return acc;
 }, {} as InterpreterFunctions);
+
