@@ -4,6 +4,7 @@ import { MathTokenType } from "./scanner";
 import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
 import { InterpreterContext } from "./interpreter-context";
 import { UserFunction } from "./user-function";
+import { Return } from "./return";
 
 export class RuntimeError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -86,7 +87,11 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
     }
 
     visitReturnStmt(stmt: ReturnStmt): any {
-        throw new Error("Method not implemented.");
+        let value: any;
+        if (stmt.value != null) value = this.evaluate(stmt.value);
+
+        // This will unwind the stack and get us out of the current function
+        throw new Return(value);
     }
 
     visitLetStmt(stmt: LetStmt): any {
@@ -128,7 +133,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
 
     visitForStmt(stmt: ForStmt) {
         let value: any;
-        
+
         const varName = (stmt.initializer as VariableExpr).name;
         let i = this.evaluate(stmt.initializer);
         const to = this.evaluate(stmt.to);

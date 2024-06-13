@@ -1,7 +1,7 @@
 import { Token } from "./common/token";
 import { AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, Stmt, WhileStmt } from "./stmt";
+import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, WhileStmt } from "./stmt";
 
 const MAX_FN_ARGS_COUNT = 255;
 /**
@@ -87,9 +87,17 @@ export class Parser {
     private statement(): Stmt {
         if (this.match("FOR")) return this.forStatement();
         if (this.match("IF")) return this.ifStatement();
+        if (this.match("RETURN")) return this.returnStatement();
         if (this.match("WHILE")) return this.whileStatement();
         if (this.match("BEGIN")) return new BlockStmt(this.block());
         return this.expressionStatement();
+    }
+
+    private returnStatement(): Stmt {
+        const keyword = this.previous();
+        const value = this.expression();
+
+        return new ReturnStmt(keyword, value);
     }
 
     private whileStatement(): Stmt {

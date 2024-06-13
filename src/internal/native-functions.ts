@@ -2,6 +2,7 @@ import { Callable } from "../interpreter";
 import { InterpreterFunctions } from "../interpreter-context";
 import { readLineAsync } from "./read-line";
 
+// Format: [name, arity, function]
 const fns: [string, number, Function][] = [
     ["clock", 0, Date.now],
     ["pi", 0, () => Math.PI],

@@ -217,4 +217,24 @@ describe("When use interpreter", () => {
             add(2, 3)`
         )).toEqual(5);
     });
+
+    it("should use a return statement in a recursive factorial function", () => {
+        expect(execute(`
+            function fact(n) begin
+                if (n <= 1) then return 1
+                return n + fact(n - 1)
+            end
+            fact(4)`
+        )).toEqual(24);
+    });
+
+    it("should use a return statement in a fibonacci function", () => {
+        expect(execute(`
+            function fib(n) begin
+                if (n <= 1) then return n
+                return fib(n - 2) + fib(n - 1)
+            end
+            fib(7)`
+        )).toEqual(13);
+    });
 });

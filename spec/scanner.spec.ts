@@ -377,4 +377,39 @@ describe("When run mex scanner", () => {
             { type: 'EOF', lexeme: '', line: 3, value: undefined },
         ]);
     });
+
+    it("should get correct tokens when defining a function:\nfunction count(n) begin\nif(n == 0)then return n\nreturn count(n-1)\nend", () => {
+        const source = `
+            function count(n) begin
+                if (n == 0) then return n
+                return count(n - 1)
+            end`;
+        const tokens = new Scanner(source).scanTokens();
+        expect(tokens).toEqual([
+            { type: 'FUNCTION', lexeme: 'function', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'count', line: 2, value: undefined },
+            { type: 'LEFT_PAREN', lexeme: '(', line: 2, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'n', line: 2, value: undefined },
+            { type: 'RIGHT_PAREN', lexeme: ')', line: 2, value: undefined },
+            { type: 'BEGIN', lexeme: 'begin', line: 2, value: undefined },
+            { type: 'IF', lexeme: 'if', line: 3, value: undefined },
+            { type: 'LEFT_PAREN', lexeme: '(', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'n', line: 3, value: undefined },
+            { type: 'EQUAL_EQUAL', lexeme: '==', line: 3, value: undefined },
+            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+            { type: 'RIGHT_PAREN', lexeme: ')', line: 3, value: undefined },
+            { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
+            { type: 'RETURN', lexeme: 'return', line: 3, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'n', line: 3, value: undefined },
+            { type: 'RETURN', lexeme: 'return', line: 4, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'count', line: 4, value: undefined },
+            { type: 'LEFT_PAREN', lexeme: '(', line: 4, value: undefined },
+            { type: 'IDENTIFIER', lexeme: 'n', line: 4, value: undefined },
+            { type: 'MINUS', lexeme: '-', line: 4, value: undefined },
+            { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
+            { type: 'RIGHT_PAREN', lexeme: ')', line: 4, value: undefined },
+            { type: 'END', lexeme: 'end', line: 5, value: undefined },
+            { type: 'EOF', lexeme: '', line: 5, value: undefined },
+        ]);
+    });
 });

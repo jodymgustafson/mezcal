@@ -1,6 +1,7 @@
 import { Callable, Interpreter } from "./interpreter";
 import { InterpreterContext } from "./interpreter-context";
 import { FunctionStmt } from "./stmt";
+import { Return } from "./return"
 
 export class UserFunction implements Callable {
     readonly isCallable = true;
@@ -16,7 +17,16 @@ export class UserFunction implements Callable {
             context.setVariable(this.declaration.params[i].lexeme, args[i]);
         }
 
-        return interpreter.executeBlock(this.declaration.body, context);
+        try {
+            return interpreter.executeBlock(this.declaration.body, context);
+        }
+        catch (err) {
+            // This was thrown by a return statement, see Interpreter.visitReturnStmt
+            if (err instanceof Return) {
+                return err.value;
+            }
+            throw err;
+        }
     }
 
     toString(): string {

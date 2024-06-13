@@ -37,7 +37,7 @@ describe("When use the mex parser", () => {
             { type: 'POWER', lexeme: '^', line: 1, value: undefined },
             { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
-          ]);
+        ]);
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"expression":{"left":{"expr":{"left":{"value":2},"operator":{"type":"PLUS","lexeme":"+","line":1},"right":{"name":"x"}}},"operator":{"type":"STAR","lexeme":"*","line":1},"right":{"left":{"value":5},"operator":{"type":"POWER","lexeme":"^","line":1},"right":{"value":3}}}}]`);
     });
@@ -72,7 +72,7 @@ describe("When use the mex parser", () => {
             { type: 'EQUAL', lexeme: '=', line: 1, value: undefined },
             { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
-          ]);
+        ]);
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"name":{"type":"IDENTIFIER","lexeme":"z","line":1},"initializer":{"value":3}}]`);
     });
@@ -89,7 +89,7 @@ describe("When use the mex parser", () => {
             { type: 'POWER', lexeme: '^', line: 2, value: undefined },
             { type: 'NUMBER', lexeme: '2', line: 2, value: 2 },
             { type: 'EOF', lexeme: '', line: 2, value: undefined }
-          ]);
+        ]);
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"name":{"type":"IDENTIFIER","lexeme":"a","line":1},"initializer":{"value":3}},{"expression":{"name":"a","value":{"left":{"name":"a"},"operator":{"type":"POWER","lexeme":"^","line":2},"right":{"value":2}}}}]`);
     });
@@ -109,10 +109,10 @@ describe("When use the mex parser", () => {
             { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
             { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
             { type: 'EOF', lexeme: '', line: 3, value: undefined }
-          ]);
+        ]);
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"name":{"type":"IDENTIFIER","lexeme":"a","line":1},"initializer":{"value":3}},{"statements":[{"expression":{"name":"a","value":{"value":2}}}]},{"expression":{"name":"a","value":{"value":1}}}]`);
-    });    
+    });
 
     it("should parse lexical tokens for\nlet a = 3\nif a < 0 then begin\na = 0\nend\nelse a = 1", () => {
         const parser = new Parser([
@@ -135,12 +135,12 @@ describe("When use the mex parser", () => {
             { type: 'EQUAL', lexeme: '=', line: 6, value: undefined },
             { type: 'NUMBER', lexeme: '1', line: 6, value: 1 },
             { type: 'EOF', lexeme: '', line: 6, value: undefined },
-          ]);
+        ]);
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(
             `[{"name":{"type":"IDENTIFIER","lexeme":"a","line":2},"initializer":{"value":3}},{"condition":{"left":{"name":"a"},"operator":{"type":"LESS","lexeme":"<","line":3},"right":{"value":0}},"thenBranch":{"statements":[{"expression":{"name":"a","value":{"value":0}}}]},"elseBranch":{"expression":{"name":"a","value":{"value":1}}}}]`
         );
-    });    
+    });
 
     it("should get an error when if has no then", () => {
         const parser = new Parser([
@@ -275,15 +275,18 @@ describe("When use the mex parser", () => {
         );
     });
 
-    it("should parse lexical tokens for\nfunction add(a, b) begin a + b end\nadd(2, 3)", () => {
+    it("should parse lexical tokens for fib function", () => {
         const source = `
-            function add(a, b) begin a + b end
-            add(2, 3)`;
+            function fib(n) begin
+                if (n <= 1) then return n
+                return fib(n - 2) + fib(n - 1)
+            end
+            fib(3)`;
         const tokens = new Scanner(source).scanTokens();
         const parser = new Parser(tokens);
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(
-            `[{"name":{"type":"IDENTIFIER","lexeme":"add","line":2},"params":[{"type":"IDENTIFIER","lexeme":"a","line":2},{"type":"IDENTIFIER","lexeme":"b","line":2}],"body":[{"expression":{"left":{"name":"a"},"operator":{"type":"PLUS","lexeme":"+","line":2},"right":{"name":"b"}}}]},{"expression":{"callee":{"name":"add"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":3},"args":[{"value":2},{"value":3}]}}]`
+            `[{"name":{"type":"IDENTIFIER","lexeme":"fib","line":2},"params":[{"type":"IDENTIFIER","lexeme":"n","line":2}],"body":[{"condition":{"expr":{"left":{"name":"n"},"operator":{"type":"LESS_EQUAL","lexeme":"<=","line":3},"right":{"value":1}}},"thenBranch":{"keyword":{"type":"RETURN","lexeme":"return","line":3},"value":{"name":"n"}},"elseBranch":null},{"keyword":{"type":"RETURN","lexeme":"return","line":4},"value":{"left":{"callee":{"name":"fib"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":4},"args":[{"left":{"name":"n"},"operator":{"type":"MINUS","lexeme":"-","line":4},"right":{"value":2}}]},"operator":{"type":"PLUS","lexeme":"+","line":4},"right":{"callee":{"name":"fib"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":4},"args":[{"left":{"name":"n"},"operator":{"type":"MINUS","lexeme":"-","line":4},"right":{"value":1}}]}}}]},{"expression":{"callee":{"name":"fib"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":6},"args":[{"value":3}]}}]`
         );
     });
 });

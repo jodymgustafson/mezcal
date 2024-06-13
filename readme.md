@@ -12,7 +12,7 @@ See test.mez for examples.
 
 ## Keywords
 
-- "define": Defines a new function
+- "function": Defines a new function
 - "let": Defines a new variable
 - "if", "then", "else": Boolean logic
 - "begin", "end": Block operators
@@ -37,6 +37,7 @@ funDecl        → "function" IDENTIFIER "(" parameters? ")" block ;
 parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
 letDecl        → "let" IDENTIFIER ( "=" expression )? ;
 statement      → exprStmt | forStmt | ifStmt | printStmt | whileStmt | block ;
+returnStmt     → "return" expression? ;
 exprStmt       → expression ;
 forStmt        → "for" assignment "to" expression ( "step" expression )? ;  
 ifStmt         → "if" expression "then" statement ( "else" statement )? ;
@@ -113,10 +114,14 @@ Enter Mezcal code and/or mathematical expressions to evaluate. It supports the f
 For example you could run these lines of code:
 
 ```
-> let x = 3;
+> let x = 3
 3
 > let y = 2^x
 8
 > x * y
 24
+> function add(a,b) begin a + b end
+0
+> add(2, 3)
+5
 ```

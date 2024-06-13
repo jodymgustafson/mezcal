@@ -19,20 +19,8 @@ end
 # Recursive fibonacci 
 function rFibonacci(n)
 begin
-  if n < 0 then error "Invalid value" 
-  if n = 0 then return 0
-  return n + rFibonacci(n - 1)
-end
-
-function fibonacci(n)
-begin
-  if n < 0 then error "Invalid value" 
-  let result = 0;
-  while n > 0 begin
-    result = result + n
-    n = n - 1
-  end
-  return result
+  if n <= 1 then return n
+  return rFibonacci(n - 2) + rFibonacci(n - 1)
 end
 
 # Converts celsius to fahrenheit
