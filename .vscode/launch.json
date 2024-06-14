@@ -11,8 +11,10 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "program": "${workspaceFolder}\\index.ts",
-      "args": ["./examples/convert.mez"],
+      "program": "${workspaceFolder}\\mezcal.ts",
+      "args": [
+        "./examples/convert.mez"
+      ],
       "cwd": "${workspaceFolder}",
       "outFiles": [
         "${workspaceFolder}/dist/**/*.js"
@@ -26,7 +28,9 @@
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}\\execute.ts",
-      "args": ["print(\"hello\")"],
+      "args": [
+        "print(\"hello\")"
+      ],
       "preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": [
         "${workspaceFolder}/dist/**/*.js"
