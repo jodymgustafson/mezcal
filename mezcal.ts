@@ -23,10 +23,10 @@ import { exit } from "process";
 const mezcal = new Runtime();
 
 if (process.argv.length > 2) {
-    const data = fs.readFileSync(process.argv[2], 'utf8');
-    if (data) {
+    const source = fs.readFileSync(process.argv[2], 'utf8');
+    if (source) {
         try {
-            const v = mezcal.evaluate(data);
+            const v = mezcal.evaluate(source);
             console.log(JSON.stringify(v));
         }
         catch (err) {
@@ -83,7 +83,8 @@ function checkCommand(expr: string): string {
         quit = true;
     }
     else if (expr.startsWith(":l ") || expr.startsWith(":load ")) {
-        return loadFile(expr);
+        const filePath = expr.split(" ")[1];
+        return fs.readFileSync(filePath, 'utf8');
     }
     else if (expr === ":e" || expr === ":editor") {
         editMode = true;
@@ -105,9 +106,4 @@ function showHelp() {
     console.log(":l(oad) path/to/file => Loads a Mezcal file and executes it");
     console.log(":e(ditor) => Enter multiline edit mode");
     console.log(":b(reak) => Exit multiline edit mode");
-}
-
-function loadFile(expr: string): string {
-    const filePath = expr.split(" ")[1];
-    return fs.readFileSync(filePath, 'utf8');
 }
