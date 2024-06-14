@@ -29,9 +29,10 @@ export class Parser {
             return statements;
         }
         catch (err) {
-            if (err instanceof ParseError)
+            if (err instanceof ParseError) {
                 this.errors.push(err);
-            throw err;
+            }
+            else throw err;
         }
     }
 
@@ -137,6 +138,10 @@ export class Parser {
 
     private expressionStatement(): Stmt {
         const expr = this.expression();
+        if (!expr) {
+            const token = this.peek();
+            throw this.error(token, `Invalid token "${token.lexeme}"`);
+        }
         return new ExpressionStmt(expr);
     }
 

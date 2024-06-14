@@ -1,6 +1,6 @@
 import { Callable } from "../interpreter";
 import { InterpreterFunctions } from "../interpreter-context";
-import { readLineAsync } from "./read-line";
+import { readLineAsync, readLineSync } from "./read-line";
 
 // Format: [name, arity, function]
 const fns: [string, number, Function][] = [
@@ -22,8 +22,8 @@ const fns: [string, number, Function][] = [
     ["random", 0, Math.random],
     ["sqrt", 1, Math.sqrt],
     ["cbrt", 1, Math.cbrt],
-    ["print", 1, (args) => console.log(args[0])],
-    ["input", 1, readLineAsync]
+    ["print", 1, args => console.log(args[0])],
+    ["input", 1, args => readLineSync(args[0])]
 ];
 
 export const nativeFunctions: InterpreterFunctions = fns.reduce((acc, cur) => {

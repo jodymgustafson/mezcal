@@ -19,6 +19,8 @@ import fs from 'fs';
 import { readLineAsync } from "./src/internal/read-line";
 import { Runtime } from "./src/runtime";
 import { exit } from "process";
+import { RuntimeError } from './src/interpreter';
+import { Token } from './src/common/token';
 
 const mezcal = new Runtime();
 
@@ -30,7 +32,7 @@ if (process.argv.length > 2) {
             console.log(JSON.stringify(v));
         }
         catch (err) {
-            console.error(err.message);
+            logError(err);
         }
     }
     exit();
@@ -55,7 +57,7 @@ let prompt = ">";
                     console.log(JSON.stringify(value));
                 }
                 catch (err) {
-                    console.error(err.message);
+                    logError(err);
                 }
             }
         }
@@ -67,6 +69,21 @@ let prompt = ">";
     console.log("👋 bye");
     exit();
 })();
+
+function logError(err: any) {
+    if (err instanceof RuntimeError) {
+        const token = err.operator as Token;
+        console.error("ERROR", err.message, "On line", token.line, "near", token.lexeme);
+    }
+    else {
+        console.error("ERROR", err.message);
+        if (err.errors) {
+            for (const e of err.errors) {
+                console.error(e.message);
+            }
+        }
+    }
+}
 
 function checkCommand(expr: string): string {
     if (expr === ":b" || expr === ":break" || (editMode && expr === "")) {

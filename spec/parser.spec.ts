@@ -1,5 +1,5 @@
-import { LiteralExpr } from "../src/expr";
-import { Parser } from "../src/parser";
+import { Token } from "../src/common/token";
+import { ParseError, Parser } from "../src/parser";
 import { Scanner } from "../src/scanner";
 
 describe("When use the mex parser", () => {
@@ -142,6 +142,15 @@ describe("When use the mex parser", () => {
         );
     });
 
+    it("should throw an error when invalid token", () => {
+        const parser = new Parser([
+            { type: 'INPUT' as any, lexeme: 'input', line: 1, value: undefined },
+            { type: 'EOF', lexeme: '', line: 1, value: undefined },
+        ]);
+        parser.parse();
+        expect(parser.errors).toEqual([new ParseError({ type: "INPUT" } as Token, `Invalid token "input"`)]);
+    });
+
     it("should get an error when if has no then", () => {
         const parser = new Parser([
             { type: 'IF', lexeme: 'if', line: 3, value: undefined },
@@ -156,7 +165,8 @@ describe("When use the mex parser", () => {
             { type: 'END', lexeme: 'end', line: 5, value: undefined },
             { type: 'EOF', lexeme: '', line: 6, value: undefined },
         ]);
-        expect(() => parser.parse()).toThrowError("Expect 'then' after if condition.");
+        parser.parse();
+        expect(parser.errors).toEqual([new ParseError({ type: "THEN" } as Token, `Expect 'then' after if condition.`)]);
     });
 
     it("should parse lexical tokens for\nlet a = 0\if (a < 0 or a > 0) then a=1\nelse a=-1", () => {

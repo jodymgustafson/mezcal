@@ -412,4 +412,22 @@ describe("When run mex scanner", () => {
             { type: 'EOF', lexeme: '', line: 5, value: undefined },
         ]);
     });
+
+    it("should get correct tokens for an import", () => {
+        const tokens = new Scanner(`import "test.mez"`).scanTokens();
+        expect(tokens).toEqual([
+            { type: 'IMPORT', lexeme: 'import', line: 1, value: undefined },
+            { type: 'STRING', lexeme: '"test.mez"', line: 1, value: 'test.mez' },
+            { type: 'EOF', lexeme: '', line: 1, value: undefined },
+        ]);
+    });
+
+    // it("should get correct tokens for an input", () => {
+    //     const tokens = new Scanner(`a = input("Type something")`).scanTokens();
+    //     expect(tokens).toEqual([
+    //         { type: 'IMPORT', lexeme: 'import', line: 1, value: undefined },
+    //         { type: 'STRING', lexeme: '"test.mez"', line: 1, value: 'test.mez' },
+    //         { type: 'EOF', lexeme: '', line: 1, value: undefined },
+    //     ]);
+    // });
 });

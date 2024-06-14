@@ -156,10 +156,10 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
 
     visitBinary(expr: BinaryExpr): any {
         const left = this.evaluate(expr.left);
-        this.checkNumberOperand(expr.operator, left);
+        // this.checkNumberOperand(expr.operator, left);
 
         const right = this.evaluate(expr.right);
-        this.checkNumberOperand(expr.operator, right);
+        // this.checkNumberOperand(expr.operator, right);
 
         switch (expr.operator.type as MathTokenType) {
             case "PLUS":
@@ -252,7 +252,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         if (a == null && b == null) return true;
         if (a == null) return false;
 
-        return a === b;
+        return a == b;
     }
 
     private checkNumberOperand(operator: Token, operand: any): void {

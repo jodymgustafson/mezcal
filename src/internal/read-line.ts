@@ -1,4 +1,5 @@
 import readline from 'readline';
+const prompt = require("prompt-sync")();
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -11,4 +12,8 @@ export async function readLineAsync(message: string): Promise<string> {
             resolve(answer);
         });
     });
+}
+
+export function readLineSync(message: string): string {
+    return prompt(message + " ");
 }

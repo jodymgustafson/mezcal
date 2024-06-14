@@ -1,20 +1,20 @@
 import { BaseLexicalScanner, BaseTokenType } from "./common/lexical-scanner";
 
-export type MathTokenType = BaseTokenType | 
+export type MathTokenType = BaseTokenType |
     "FUNCTION" | "LET" | "IF" | "THEN" | "ELSE" | "ERROR" | "RETURN" | "BEGIN" | "END" |
     "WHILE" | "FOR" | "TO" | "STEP" |
-    "INPUT" | "IMPORT" |
+    "IMPORT" |
     "AND" | "OR" | "NOT" |
-    "LEFT_PAREN" | "RIGHT_PAREN"|
+    "LEFT_PAREN" | "RIGHT_PAREN" |
     "COMMA" | "DOT" | "MINUS" | "PLUS" | "SLASH" | "STAR" | "POWER" |
     "EQUAL" | "EQUAL_EQUAL" | "NOT_EQUAL" | "GREATER" | "GREATER_EQUAL" | "LESS" | "LESS_EQUAL" |
     "IDENTIFIER" | "STRING" | "NUMBER" | "ERROR"
-;
+    ;
 
 const KEYWORDS = [
     "function", "let", "if", "then", "else", "error", "return", "begin", "end",
     "while", "for", "to", "step",
-    "input", "import", 
+    "import",
     "and", "or", "not"
 ];
 
@@ -39,19 +39,19 @@ export class Scanner extends BaseLexicalScanner<MathTokenType> {
             case "^": this.addToken("POWER", char); break;
             case "(": this.addToken("LEFT_PAREN", char); break;
             case ")": this.addToken("RIGHT_PAREN", char); break;
-            case "=": 
+            case "=":
                 this.peek("=") ? this.addToken("EQUAL_EQUAL", char + this.next()) :
-                this.peek("<") ? this.addToken("LESS_EQUAL", char + this.next()) :
-                this.peek(">") ? this.addToken("GREATER_EQUAL", char + this.next()) :
-                this.addToken("EQUAL", char); break;
+                    this.peek("<") ? this.addToken("LESS_EQUAL", char + this.next()) :
+                        this.peek(">") ? this.addToken("GREATER_EQUAL", char + this.next()) :
+                            this.addToken("EQUAL", char); break;
             case "<":
                 this.peek("=") ? this.addToken("LESS_EQUAL", char + this.next()) :
-                this.peek(">") ? this.addToken("NOT_EQUAL", char + this.next()) :
-                this.addToken("LESS", char); break;
+                    this.peek(">") ? this.addToken("NOT_EQUAL", char + this.next()) :
+                        this.addToken("LESS", char); break;
             case ">":
                 this.peek("=") ? this.addToken("GREATER_EQUAL", char + this.next()) :
-                this.peek("<") ? this.addToken("NOT_EQUAL", char + this.next()) :
-                this.addToken("GREATER", char); break;
+                    this.peek("<") ? this.addToken("NOT_EQUAL", char + this.next()) :
+                        this.addToken("GREATER", char); break;
             case ".":
             case "0":
             case "1":
@@ -68,7 +68,7 @@ export class Scanner extends BaseLexicalScanner<MathTokenType> {
         }
     }
 
-    private addString() : void {
+    private addString(): void {
         for (let c = this.next(); c !== "\""; c = this.next()) {
             if (!c || c === "\n") {
                 this.addError("Unterminated string: " + this.getLexeme());

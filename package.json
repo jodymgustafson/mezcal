@@ -16,5 +16,8 @@
     "jasmine": "^5.1.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "prompt-sync": "^4.2.0"
   }
 }
