@@ -24,7 +24,8 @@ export class Parser {
         try {
             const statements: Stmt[] = [];
             while (!this.isAtEnd()) {
-                statements.push(this.declaration());
+                if (this.match("FUNCTION")) statements.push(this.functionDeclaration());
+                else statements.push(this.declaration());
             }
             return statements;
         }
@@ -42,7 +43,6 @@ export class Parser {
 
     private declaration(): Stmt {
         try {
-            if (this.match("FUNCTION")) return this.functionDeclaration();
             if (this.match("LET")) return this.letDeclaration();
             return this.statement();
         }

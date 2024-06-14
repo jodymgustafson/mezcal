@@ -31,8 +31,8 @@ See test.mez for examples.
 ## Grammar:
 
 ```
-program        → declaration* EOF ;
-declaration    → funDecl | letDecl | statement ;
+program        → (declaration | funDecl)* EOF ;
+declaration    → letDecl | statement ;
 funDecl        → "function" IDENTIFIER "(" parameters? ")" (block | returnStmt) ;
 parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
 letDecl        → "let" IDENTIFIER ( "=" expression )? ;

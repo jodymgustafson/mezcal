@@ -21,6 +21,7 @@ import { Runtime } from "./src/runtime";
 import { exit } from "process";
 import { RuntimeError } from './src/interpreter';
 import { Token } from './src/common/token';
+import { ParseError } from './src/parser';
 
 const mezcal = new Runtime();
 
@@ -72,14 +73,20 @@ let prompt = ">";
 
 function logError(err: any) {
     if (err instanceof RuntimeError) {
+        let msg = "ERROR " + err.message;
         const token = err.operator as Token;
-        console.error("ERROR", err.message, "On line", token.line, "near", token.lexeme);
+        if (token)
+            msg += "On line " + token.line + "near" + token.lexeme;
+        console.error(msg);
     }
     else {
         console.error("ERROR", err.message);
         if (err.errors) {
             for (const e of err.errors) {
-                console.error(e.message);
+                if (e instanceof ParseError)
+                    console.error(e.message, "On line", e.token.line);
+                else
+                    console.error(e.message, "On line", e.line);
             }
         }
     }
