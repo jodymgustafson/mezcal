@@ -20,7 +20,7 @@ else {
  * @param variables A map of variable names to values
  * @returns The result of the expression
  */
-export function execute(expr: string, variables?: InterpreterVariables): number {
+export function execute(expr: string, variables?: InterpreterVariables): number | string | boolean {
     const scanner = new Scanner(expr);
     const tokens = scanner.scanTokens();
     if (scanner.errors.length > 0) {

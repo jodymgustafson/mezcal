@@ -156,10 +156,12 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
 
     visitBinary(expr: BinaryExpr): any {
         const left = this.evaluate(expr.left);
-        // this.checkNumberOperand(expr.operator, left);
-
         const right = this.evaluate(expr.right);
-        // this.checkNumberOperand(expr.operator, right);
+
+        // Plus is valid for string concat
+        // const checkNumber = ["MINUS", "SLASH", "STAR", "POWER"].includes(expr.operator.type);
+        // if (checkNumber) this.checkNumberOperand(expr.operator, left);
+        // if (checkNumber) this.checkNumberOperand(expr.operator, right);
 
         switch (expr.operator.type as MathTokenType) {
             case "PLUS":

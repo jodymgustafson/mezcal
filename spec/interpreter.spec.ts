@@ -237,4 +237,23 @@ describe("When use interpreter", () => {
             fib(7)`
         )).toEqual(13);
     });
+
+    it("should compute a number and number as string", () => {
+        expect(execute(`10 * "2"`)).toEqual(20);
+        expect(execute(`10 / "2"`)).toEqual(5);
+        expect(execute(`10 ^ "2"`)).toEqual(100);
+        expect(execute(`10 - "2"`)).toEqual(8);
+    });
+
+    it("should concatenate a string", () => {
+        expect(execute(`10 + "a"`)).toEqual("10a");
+        expect(execute(`"a" + "b" + "c"`)).toEqual("abc");
+    });
+
+    it("should compare a string", () => {
+        expect(execute(`"a" == "b"`)).toEqual(false);
+        expect(execute(`"a" <> "b"`)).toEqual(true);
+        expect(execute(`"a" < "b"`)).toEqual(true);
+        expect(execute(`"1" < 2`)).toEqual(true);
+    });
 });
