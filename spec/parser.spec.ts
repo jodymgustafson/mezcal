@@ -299,4 +299,15 @@ describe("When use the mex parser", () => {
             `[{"name":{"type":"IDENTIFIER","lexeme":"fib","line":2},"params":[{"type":"IDENTIFIER","lexeme":"n","line":2}],"body":[{"condition":{"expr":{"left":{"name":"n"},"operator":{"type":"LESS_EQUAL","lexeme":"<=","line":3},"right":{"value":1}}},"thenBranch":{"keyword":{"type":"RETURN","lexeme":"return","line":3},"value":{"name":"n"}},"elseBranch":null},{"keyword":{"type":"RETURN","lexeme":"return","line":4},"value":{"left":{"callee":{"name":"fib"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":4},"args":[{"left":{"name":"n"},"operator":{"type":"MINUS","lexeme":"-","line":4},"right":{"value":2}}]},"operator":{"type":"PLUS","lexeme":"+","line":4},"right":{"callee":{"name":"fib"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":4},"args":[{"left":{"name":"n"},"operator":{"type":"MINUS","lexeme":"-","line":4},"right":{"value":1}}]}}}]},{"expression":{"callee":{"name":"fib"},"paren":{"type":"RIGHT_PAREN","lexeme":")","line":6},"args":[{"value":3}]}}]`
         );
     });
+
+    it("should parse lexical tokens for a bodyless function", () => {
+        const source = `
+            function add(a, b) return a + b`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"name":{"type":"IDENTIFIER","lexeme":"add","line":2},"params":[{"type":"IDENTIFIER","lexeme":"a","line":2},{"type":"IDENTIFIER","lexeme":"b","line":2}],"body":[{"keyword":{"type":"RETURN","lexeme":"return","line":2},"value":{"left":{"name":"a"},"operator":{"type":"PLUS","lexeme":"+","line":2},"right":{"name":"b"}}}]}]`
+        );
+    });
 });

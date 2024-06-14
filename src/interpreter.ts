@@ -158,7 +158,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         const left = this.evaluate(expr.left);
         const right = this.evaluate(expr.right);
 
-        // Plus is valid for string concat
+        // Some operators are invalid for strings
         // const checkNumber = ["MINUS", "SLASH", "STAR", "POWER"].includes(expr.operator.type);
         // if (checkNumber) this.checkNumberOperand(expr.operator, left);
         // if (checkNumber) this.checkNumberOperand(expr.operator, right);

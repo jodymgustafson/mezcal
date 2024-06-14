@@ -33,7 +33,7 @@ See test.mez for examples.
 ```
 program        → declaration* EOF ;
 declaration    → funDecl | letDecl | statement ;
-funDecl        → "function" IDENTIFIER "(" parameters? ")" block ;
+funDecl        → "function" IDENTIFIER "(" parameters? ")" (block | returnStmt) ;
 parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
 letDecl        → "let" IDENTIFIER ( "=" expression )? ;
 statement      → exprStmt | forStmt | ifStmt | printStmt | whileStmt | block ;
@@ -108,8 +108,11 @@ You can also run in REPL mode (command line) by running index.js.
 
 Enter Mezcal code and/or mathematical expressions to evaluate. It supports the following commands.
 
-- :h => Show help
-- :q => Quit
+- :h(elp) => Show help
+- :q(uit) => Quit
+- :e(ditor) => Enter multiline edit mode
+- :b(reak) => Exit multiline edit mode
+- :l(oad) path/to/file => Loads a Mezcal file and executes it
 
 For example you could run these lines of code:
 
@@ -120,8 +123,37 @@ For example you could run these lines of code:
 8
 > x * y
 24
-> function add(a,b) begin a + b end
+> function add(a,b) return a + b
 0
 > add(2, 3)
 5
+```
+
+## Programming Guide
+
+### Variables
+Define variables using the assignment operator. You can optionally use the let keyword.
+Variables can be set to numbers or strings.
+
+```
+let a = "A string"
+piOver2 = pi / 2
+```
+
+### Functions
+To create a function use the function keyword followed by a function body.
+For a simple one line body use a return statement.
+
+```
+function add(a, b) return a + b
+```
+
+If your function requires multiple lines use a begin and end block.
+
+```
+function rFibonacci(n)
+begin
+  if n <= 1 then return n
+  return rFibonacci(n - 2) + rFibonacci(n - 1)
+end
 ```

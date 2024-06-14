@@ -213,7 +213,7 @@ describe("When use interpreter", () => {
 
     it("should interpret define function", () => {
         expect(execute(`
-            function add(a, b) begin a + b end
+            function add(a, b) return a + b
             add(2, 3)`
         )).toEqual(5);
     });

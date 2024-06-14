@@ -62,16 +62,22 @@ export class Parser {
                     this.error(this.peek(), "Can't have more than 255 parameters.");
                 }
 
-                params.push(
-                    this.consume("IDENTIFIER", "Expect parameter name."));
+                params.push(this.consume("IDENTIFIER", "Expect parameter name."));
             }
             while (this.match("COMMA"));
         }
         this.consume("RIGHT_PAREN", "Expect ')' after parameters.");
 
-        this.consume("BEGIN", "Expect 'begin' before function body.");
-        const body: Stmt[] = this.block();
-        return new FunctionStmt(name, params, body);
+        if (this.check("RETURN")) {
+            this.consume("RETURN", "Expect 'return' before function body.");
+            const body: Stmt = this.returnStatement();
+            return new FunctionStmt(name, params, [body]);
+        }
+        else {
+            this.consume("BEGIN", "Expect 'begin' or 'return' before function body.");
+            const body: Stmt[] = this.block();
+            return new FunctionStmt(name, params, body);
+        }
     }
 
     private letDeclaration(): Stmt {

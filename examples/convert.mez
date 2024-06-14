@@ -1,25 +1,21 @@
 #import ./conversion.lib.mez
 # Converts celsius to fahrenheit
-function convert_c2f(c) begin
-  (c * 9) / 5 + 32
-end
+function convert_c2f(c) return (c * 9) / 5 + 32
 
 # Converts fahrenheit to celsius
-function convert_f2c(f) begin
-  (f - 32) * 5 / 9
-end
+function convert_f2c(f) return (f - 32) * 5 / 9
 
 let a = ""
 while (a <> "q") begin
-  a = input("Convert to celsius or fahrenheit or quit (c/f/q)?")
+  a = input("Convert from celsius or fahrenheit or quit (c/f/q)?")
 
   if (a == "f") then begin
-    let c = input("Fahrenheit:")
-    print("celsius is " + convert_f2c(c))
+    let f = input("Fahrenheit:")
+    print("Celsius is " + convert_f2c(f))
   end
   else if (a == "c") then begin
-    let f = input("Celsius:")
-    print("Fahrenheit is " + convert_c2f(f))
+    let c = input("Celsius:")
+    print("Fahrenheit is " + convert_c2f(c))
   end
 end
 

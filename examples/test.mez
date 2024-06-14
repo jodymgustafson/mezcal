@@ -24,14 +24,10 @@ begin
 end
 
 # Converts celsius to fahrenheit
-function celsius2Fahr(c) begin
-  return (c * 9) / 5 + 32
-end
+function celsius2Fahr(c) return (c * 9) / 5 + 32
 
 # Converts fahrenheit to celsius
-function fahr2Celsius(f) begin
- return (f - 32) * 5 / 9
-end
+function fahr2Celsius(f) return (f - 32) * 5 / 9
 
 let a = input("Convert from fahrenheit or celsius (f/c)")
 if a == "c" then begin
