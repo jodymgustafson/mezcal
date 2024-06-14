@@ -222,7 +222,7 @@ describe("When use interpreter", () => {
         expect(execute(`
             function fact(n) begin
                 if (n <= 1) then return 1
-                return n + fact(n - 1)
+                return n * fact(n - 1)
             end
             fact(4)`
         )).toEqual(24);
