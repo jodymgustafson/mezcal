@@ -1,0 +1,20 @@
+# Library of conversion functions
+# v1.0.0
+
+# Converts celsius to fahrenheit
+function convert_c2f(c) begin
+  (c * 9) / 5 + 32
+end
+
+# Converts fahrenheit to celsius
+function convert_f2c(f) begin
+  (f - 32) * 5 / 9
+end
+
+function convert_km2m(k) begin
+  k / 1.60934
+end
+
+function convert_m2km(m) begin
+  m * 1.60934
+end
