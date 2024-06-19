@@ -6,17 +6,18 @@ function convert_c2f(c) return (c * 9) / 5 + 32
 function convert_f2c(f) return (f - 32) * 5 / 9
 
 let a = ""
-while (a <> "q") begin
+while a <> "q" begin
   a = input("Convert from celsius or fahrenheit or quit (c/f/q)?")
 
-  if (a == "f") then begin
+  if a == "f" then begin
     let f = input("Fahrenheit:")
     print("Celsius is " + convert_f2c(f))
   end
-  else if (a == "c") then begin
+  else if a == "c" then begin
     let c = input("Celsius:")
     print("Fahrenheit is " + convert_c2f(c))
   end
+  else if a <> "q" then print("Invalid command: " + a)
 end
 
 print("Bye!")

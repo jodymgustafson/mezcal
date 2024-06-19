@@ -26,7 +26,7 @@ See test.mez for examples.
 
 ## Operators
 
-= == != < <= > >= + - * / ^
+= == <> < <= > >= + - * / ^
 
 ## Grammar:
 
@@ -130,6 +130,18 @@ For example you could run these lines of code:
 ```
 
 ## Programming Guide
+Mezcal is a simple programming language that can be used to create custom functions and run programs.
+
+### Mathematical operators
+You can use the following math operators.
+
+`+, -, *, /, ^`
+
+In addition you can use parenthesis to group expressions.
+
+```
+2 ^ ((x * pi) + 32)
+```
 
 ### Variables
 Define variables using the assignment operator. You can optionally use the let keyword.
@@ -140,6 +152,59 @@ let a = "A string"
 piOver2 = pi / 2
 ```
 
+### Conditionals
+Use `if`-`then`-`else` keywords to do conditional statements.
+The following logical operators are available.
+
+`==, <>, <, <=, >, >=`
+
+If your conditional code is more than one line wrap it in a `begin`-`end` block.
+
+```
+if command == "c" then begin
+  # handle c command...
+end
+else if command == "e" then begin
+  # handle e command...
+end
+else print("Invalid command" + command)
+```
+
+The following boolean operators are available.
+
+`and, or, not`
+
+```
+if a > 0 and a < 100 then # do something
+```
+
+Note that the number 0 is equivalent to false and any other number is true.
+
+### Loops
+Loops can be defined using `while` and `for` loops.
+Like conditional statements, If your code is more than one line wrap it in a `begin`-`end` block.
+
+
+```
+x = 1
+while x <= 10
+begin
+  print(x)
+  x = x + 1
+end
+```
+```
+for x = 1 to 10 print(x)
+```
+
+A `for` loop may also have a `step` defined.
+The step can be positive or negative.
+
+```
+# Count odd numbers
+for x = 1 to 10 step 2 print(x)
+```
+
 ### Functions
 To create a function use the function keyword followed by a function body.
 For a simple one line body use a return statement.
@@ -148,7 +213,7 @@ For a simple one line body use a return statement.
 function add(a, b) return a + b
 ```
 
-If your function requires multiple lines use a begin and end block.
+If your function requires multiple lines use a `begin`-`end` block.
 
 ```
 function rFibonacci(n)
@@ -156,4 +221,22 @@ begin
   if n <= 1 then return n
   return rFibonacci(n - 2) + rFibonacci(n - 1)
 end
+```
+
+Using a `return` statement is optional in a block.
+The last value evaluated will be returned from a function.
+
+The following built in functions are available.
+
+`clock, pi, e, sin, cos, tan, asin, acos, atan, abs, floor, ceil, log, ln, round, random, sqrt, cbrt, print, input`
+
+Constant values are defined by functions that don't take any parameters.
+You do not need to use parenthesis to call these kinds of functions.
+For example, you can use `pi()` or simply `pi`.
+
+### User input
+You can get user input from the command line using the `input` function.
+
+```
+let name = input("What is your name?")
 ```
