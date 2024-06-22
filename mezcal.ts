@@ -75,9 +75,9 @@ function logError(err: any) {
     if (err instanceof RuntimeError) {
         let msg = `ERROR "${err.message}"`;
         const token = err.operator as Token;
-        if (token) {
+        if (token && token.lexeme !== "error") {
             msg += ` On line ${token.line}`;
-            if (token.lexeme !== "error") {
+            if (token.lexeme) {
                 msg += ` near ${token.lexeme}`;
             }
         }
