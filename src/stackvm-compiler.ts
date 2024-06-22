@@ -1,7 +1,7 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr, CallExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
+import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
 
 export class CompilerError extends Error {
     constructor(readonly operator: Token, msg: string) {
@@ -40,7 +40,7 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
     private evaluate(expr: Expr): any {
         return expr.accept(this);
     }
-    
+
     visitLogicalExpr(expr: LogicalExpr): string {
         throw new Error("Method not implemented.");
     }
@@ -72,7 +72,7 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
                 this.code.push("cmp"); break;
             default:
                 throw new CompilerError(expr.operator, "Invalid operator: " + expr.operator.type);
-            }
+        }
     }
 
     visitGrouping(expr: GroupingExpr): any {
@@ -126,6 +126,9 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
         throw new Error("Method not implemented.");
     }
     visitReturnStmt(stmt: ReturnStmt): any {
+        throw new Error("Method not implemented.");
+    }
+    visitErrorStmt(stmt: ErrorStmt): string {
         throw new Error("Method not implemented.");
     }
     visitLetStmt(stmt: LetStmt): any {

@@ -73,13 +73,18 @@ let prompt = ">";
 
 function logError(err: any) {
     if (err instanceof RuntimeError) {
-        let msg = "ERROR " + err.message;
+        let msg = `ERROR "${err.message}"`;
         const token = err.operator as Token;
-        if (token)
-            msg += "On line " + token.line + "near" + token.lexeme;
+        if (token) {
+            msg += ` On line ${token.line}`;
+            if (token.lexeme !== "error") {
+                msg += ` near ${token.lexeme}`;
+            }
+        }
         console.error(msg);
     }
     else {
+        // Scanner or parser error
         console.error("ERROR", err.message);
         if (err.errors) {
             for (const e of err.errors) {

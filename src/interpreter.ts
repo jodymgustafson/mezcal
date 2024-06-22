@@ -1,7 +1,7 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, LogicalExpr, CallExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
+import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
 import { InterpreterContext } from "./interpreter-context";
 import { UserFunction } from "./user-function";
 import { Return } from "./return";
@@ -35,8 +35,15 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
      */
     interpret(statements: Stmt[]): number {
         let value = 0;
-        for (const stmt of statements) {
-            value = this.execute(stmt);
+        try {
+            for (const stmt of statements) {
+                value = this.execute(stmt);
+            }
+        }
+        catch (err) {
+            // Check for a top level return statement
+            if (err instanceof Return) value = err.value;
+            else throw err;
         }
         // const value = this.evaluate(ast);
         // console.log("Result:", value);
@@ -92,6 +99,12 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
 
         // This will unwind the stack and get us out of the current function
         throw new Return(value);
+    }
+
+    visitErrorStmt(stmt: ErrorStmt) {
+        let value: any;
+        if (stmt.value != null) value = this.evaluate(stmt.value);
+        throw new RuntimeError(stmt.keyword, value);
     }
 
     visitLetStmt(stmt: LetStmt): any {

@@ -12,8 +12,8 @@ export class MezcalRuntimeError<T = ScanError | ParseError> extends Error {
 }
 
 /**
- * Defines a class that has an interpreter that is used to execute any number of statements
- * while keeping the state
+ * The Mezcal runtime. This class that has an interpreter that is used to
+ * execute any number of statements while keeping track of state.
  */
 export class Runtime {
     constructor(readonly interpreter = new Interpreter(new InterpreterContext(undefined, undefined, nativeFunctions))) { }

@@ -310,4 +310,15 @@ describe("When use the mex parser", () => {
             `[{"name":{"type":"IDENTIFIER","lexeme":"add","line":2},"params":[{"type":"IDENTIFIER","lexeme":"a","line":2},{"type":"IDENTIFIER","lexeme":"b","line":2}],"body":[{"keyword":{"type":"RETURN","lexeme":"return","line":2},"value":{"left":{"name":"a"},"operator":{"type":"PLUS","lexeme":"+","line":2},"right":{"name":"b"}}}]}]`
         );
     });
+
+    it("should parse an error statement", () => {
+        const source = `
+            error "not implemented"`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(
+            `[{"keyword":{"type":"ERROR","lexeme":"error","line":2},"value":{"value":"not implemented"}}]`
+        );
+    });
 });

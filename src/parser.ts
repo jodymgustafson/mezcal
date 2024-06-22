@@ -1,9 +1,10 @@
 import { Token } from "./common/token";
 import { AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, WhileStmt } from "./stmt";
+import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, WhileStmt } from "./stmt";
 
 const MAX_FN_ARGS_COUNT = 255;
+
 /**
  * Parses tokens from the scanner into an abstract syntax tree
  */
@@ -24,8 +25,7 @@ export class Parser {
         try {
             const statements: Stmt[] = [];
             while (!this.isAtEnd()) {
-                if (this.match("FUNCTION")) statements.push(this.functionDeclaration());
-                else statements.push(this.declaration());
+                statements.push(this.declaration());
             }
             return statements;
         }
@@ -43,6 +43,7 @@ export class Parser {
 
     private declaration(): Stmt {
         try {
+            if (this.match("FUNCTION")) return this.functionDeclaration();
             if (this.match("LET")) return this.letDeclaration();
             return this.statement();
         }
@@ -92,6 +93,7 @@ export class Parser {
     }
 
     private statement(): Stmt {
+        if (this.match("ERROR")) return this.errorStatement();
         if (this.match("FOR")) return this.forStatement();
         if (this.match("IF")) return this.ifStatement();
         if (this.match("RETURN")) return this.returnStatement();
@@ -105,6 +107,13 @@ export class Parser {
         const value = this.expression();
 
         return new ReturnStmt(keyword, value);
+    }
+
+    private errorStatement(): Stmt {
+        const keyword = this.previous();
+        const value = this.expression();
+
+        return new ErrorStmt(keyword, value);
     }
 
     private whileStatement(): Stmt {

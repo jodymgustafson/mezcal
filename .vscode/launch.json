@@ -13,7 +13,7 @@
       ],
       "program": "${workspaceFolder}\\mezcal.ts",
       "args": [
-        "./examples/convert.mez"
+        "./examples/test.mez"
       ],
       "cwd": "${workspaceFolder}",
       "outFiles": [

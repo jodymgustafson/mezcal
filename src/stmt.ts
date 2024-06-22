@@ -8,6 +8,7 @@ export interface StmtVisitor<R> {
     visitIfStmt(stmt: IfStmt): R;
     visitPrintStmt(stmt: PrintStmt): R;
     visitReturnStmt(stmt: ReturnStmt): R;
+    visitErrorStmt(stmt: ErrorStmt): R;
     visitLetStmt(stmt: LetStmt): R;
     visitWhileStmt(stmt: WhileStmt): R;
     visitForStmt(stmt: ForStmt): R;
@@ -29,7 +30,7 @@ export class BlockStmt extends Stmt {
 
 export class ExpressionStmt extends Stmt {
     constructor(readonly expression: Expr) {
-      super();
+        super();
     }
 
     accept<R>(visitor: StmtVisitor<R>): R {
@@ -74,6 +75,16 @@ export class ReturnStmt extends Stmt {
 
     accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitReturnStmt(this);
+    }
+}
+
+export class ErrorStmt extends Stmt {
+    constructor(readonly keyword: Token, readonly value: Expr) {
+        super();
+    }
+
+    accept<R>(visitor: StmtVisitor<R>): R {
+        return visitor.visitErrorStmt(this);
     }
 }
 

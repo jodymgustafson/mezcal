@@ -238,6 +238,11 @@ describe("When use interpreter", () => {
         )).toEqual(13);
     });
 
+    it("should return a value at the top level", () => {
+        const v = execute(`return 23 * 2`);
+        expect(v).toEqual(46);
+    })
+
     it("should compute a number and number as string", () => {
         expect(execute(`10 * "2"`)).toEqual(20);
         expect(execute(`10 / "2"`)).toEqual(5);
@@ -256,4 +261,8 @@ describe("When use interpreter", () => {
         expect(execute(`"a" < "b"`)).toEqual(true);
         expect(execute(`"1" < 2`)).toEqual(true);
     });
+
+    it("should raise a user defined error", () => {
+        expect(() => execute(`error "not implemented"`)).toThrowError("not implemented");
+    })
 });
