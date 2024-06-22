@@ -144,11 +144,11 @@ describe("When use the mex parser", () => {
 
     it("should throw an error when invalid token", () => {
         const parser = new Parser([
-            { type: 'INPUT' as any, lexeme: 'input', line: 1, value: undefined },
+            { type: 'FOO' as any, lexeme: 'foo', line: 1, value: undefined },
             { type: 'EOF', lexeme: '', line: 1, value: undefined },
         ]);
         parser.parse();
-        expect(parser.errors).toEqual([new ParseError({ type: "INPUT" } as Token, `Invalid token "input"`)]);
+        expect(parser.errors).toEqual([new ParseError({ type: "FOO" } as Token, `Invalid token "foo"`)]);
     });
 
     it("should get an error when if has no then", () => {

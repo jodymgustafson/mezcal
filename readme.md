@@ -18,8 +18,6 @@ See test.mez for examples.
 - "begin", "end": Block operators
 - "error": Throws an error
 - "return": Returns a value from a function
-- "input": Gets input from the user
-- "print": Prints out a message
 - "import": Imports functions and variables from a file 
 - "and", "or", "not": Boolean operators
 - "while", "for": Loop operators
@@ -36,13 +34,12 @@ declaration    → letDecl | statement ;
 funDecl        → "function" IDENTIFIER "(" parameters? ")" (block | returnStmt) ;
 parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
 letDecl        → "let" IDENTIFIER ( "=" expression )? ;
-statement      → exprStmt | errorStmt | forStmt | ifStmt | printStmt | whileStmt | block ;
+statement      → exprStmt | errorStmt | forStmt | ifStmt | whileStmt | block ;
 returnStmt     → "return" expression? ;
 errorStmt      → "error" expression? ;
 exprStmt       → expression ;
 forStmt        → "for" assignment "to" expression ( "step" expression )? ;  
 ifStmt         → "if" expression "then" statement ( "else" statement )? ;
-printStmt      → "print" expression ;
 whileStmt      → "while" expression statement;
 block          → "begin" declaration* "end" ;
 expression     → assignment ;

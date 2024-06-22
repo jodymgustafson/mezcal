@@ -1,7 +1,7 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, LogicalExpr, CallExpr } from "./expr";
 import { Token } from "./common/token";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, PrintStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
+import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
 import { InterpreterContext } from "./interpreter-context";
 import { UserFunction } from "./user-function";
 import { Return } from "./return";
@@ -81,12 +81,6 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
 
     private isTruthy(value: any): boolean {
         return Boolean(value);
-    }
-
-    visitPrintStmt(stmt: PrintStmt): any {
-        const value = this.evaluate(stmt.expression);
-        console.log(value);
-        return 0;
     }
 
     visitBlockStmt(stmt: BlockStmt): any {

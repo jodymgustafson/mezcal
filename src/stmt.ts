@@ -6,7 +6,6 @@ export interface StmtVisitor<R> {
     visitExpressionStmt(stmt: ExpressionStmt): R;
     visitFunctionStmt(stmt: FunctionStmt): R;
     visitIfStmt(stmt: IfStmt): R;
-    visitPrintStmt(stmt: PrintStmt): R;
     visitReturnStmt(stmt: ReturnStmt): R;
     visitErrorStmt(stmt: ErrorStmt): R;
     visitLetStmt(stmt: LetStmt): R;
@@ -55,16 +54,6 @@ export class IfStmt extends Stmt {
 
     accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitIfStmt(this);
-    }
-}
-
-export class PrintStmt extends Stmt {
-    constructor(readonly expression: Expr) {
-        super();
-    }
-
-    accept<R>(visitor: StmtVisitor<R>): R {
-        return visitor.visitPrintStmt(this);
     }
 }
 
