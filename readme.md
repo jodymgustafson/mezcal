@@ -6,21 +6,22 @@ It also contains a simple scripting language for defining custom functions and s
 
 The package consists of a lexical scanner, a parser to create an abstract syntax tree, and an interpreter to evaluate the expression.
 
-There is also a compiler to compile to StackVM assembly language. Use this when you need to execute an expression many times, such as drawing a graph.
+There is also a compiler to compile to StackVM assembly language.
+Use this when you need to execute an expression many times, such as drawing a graph.
 
-See test.mez for examples.
+See [test.mez](./examples/test.mez) for examples.
 
 ## Keywords
 
 - "function": Defines a new function
 - "let": Defines a new variable
 - "if", "then", "else": Boolean logic
-- "begin", "end": Block operators
-- "error": Throws an error
-- "return": Returns a value from a function
-- "import": Imports functions and variables from a file 
 - "and", "or", "not": Boolean operators
+- "begin", "end": Block operators
+- "return": Returns a value from a function
 - "while", "for": Loop operators
+- "import": Imports functions and variables from a file 
+- "error": Throws an error
 
 ## Operators
 

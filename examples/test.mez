@@ -1,7 +1,6 @@
 # These are some examples of Mezcal code that can be used for testing
 
-import "./conversion.lib.mez"
-import "./maths.lib.mez"
+import "../libs/conversion.lib.mez"
 
 function convert() begin
   let a = input("Convert from fahrenheit or celsius (f/c)")

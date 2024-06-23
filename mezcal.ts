@@ -1,20 +1,16 @@
 /*
- __  __  ____  ____  ___    __    __   
-(  \/  )( ___)(_   )/ __)  /__\  (  )  
- )    (  )__)  / /_( (__  /(__)\  )(__ 
-(_/\/\_)(____)(____)\___)(__)(__)(____)
-
-___  ___                  _ 
-|  \/  |                 | |
-| .  . | ___ _______ __ _| |
-| |\/| |/ _ \_  / __/ _` | |
-| |  | |  __// / (_| (_| | |
-\_|  |_/\___/___\___\__,_|_|
-                            
-The Mezcal REPL.
-To run a program pass the path to a Mezcal program on the command line.
-Otherwise it will enter REPL mode.
+    ___  ___                  _ 
+    |  \/  |                 | |
+    | .  . | ___ _______ __ _| |
+    | |\/| |/ _ \_  / __/ _` | |
+    | |  | |  __// / (_| (_| | |
+    \_|  |_/\___/___\___\__,_|_|
+                                
+    The Mezcal command line and REPL.
+    - To run a program pass the path to a Mezcal program on the command line.
+    - Otherwise it will enter REPL mode.
 */
+
 import fs from 'fs';
 import { readLineAsync } from "./src/internal/read-line";
 import { Runtime } from "./src/runtime";
@@ -24,31 +20,27 @@ import { Token } from './src/common/token';
 import { ParseError } from './src/parser';
 import { ScanError } from "./src/common/lexical-scanner";
 
+const VERSION = require("../package.json").version;
+
 const runtime = new Runtime();
 
 if (process.argv.length > 2) {
-    const source = fs.readFileSync(process.argv[2], 'utf8');
-    if (source) {
-        try {
-            const v = runtime.evaluate(source);
-            console.log(JSON.stringify(v));
-        }
-        catch (err) {
-            logError(err);
-        }
-    }
+    runProgramFile(process.argv[2]);
     exit();
 }
+
+// Enter REPL mode
+const DEFAULT_PROMPT = "Mez> ";
+const EDIT_PROMPT = "... ";
 
 let quit = false;
 let editMode = false;
 let editorText = "";
-let prompt = "Mez> ";
-let basePath = ".";
+let prompt = DEFAULT_PROMPT;
 
 (async () => {
     // REPL loop
-    console.log("🚀 Mezcal v1.0.0");
+    showVersion();
     console.log("Type ':help' for more information.");
     while (!quit) {
         try {
@@ -57,6 +49,7 @@ let basePath = ".";
             if (expr) {
                 try {
                     const value = runtime.evaluate(expr);
+                    runtime.evaluate(`result=${value}`);
                     console.log(JSON.stringify(value));
                 }
                 catch (err) {
@@ -66,7 +59,6 @@ let basePath = ".";
         }
         catch (err) {
             logError(err);
-            // console.error(err.message);
         }
     }
 
@@ -104,34 +96,36 @@ function logError(err: any) {
 }
 
 function checkCommand(expr: string): string {
-    if (expr.startsWith(":")) {
-        if (expr === ":b" || expr === ":break" || (editMode && expr === "")) {
-            if (editMode) {
-                editMode = false;
-                prompt = ">";
-                return editorText;
-            }
+    if (expr === ":b" || expr === ":break" || expr === "") {
+        if (editMode) {
+            editMode = false;
+            prompt = DEFAULT_PROMPT;
+            return editorText;
         }
-        else if (editMode) {
-            editorText += "\n" + expr;
-        }
-        else if (expr === ":q" || expr === ":quit") {
-            quit = true;
-        }
-        else if (expr.startsWith(":l ") || expr.startsWith(":load ")) {
-            const filePath = expr.split(" ")[1];
-            console.log(runtime.load(filePath));
-            return "";
-        }
-        else if (expr === ":e" || expr === ":editor") {
-            editMode = true;
-            editorText = "";
-            prompt = "...";
-        }
-        else if (expr === ":h" || expr === ":help") {
-            showHelp();
-        }
-
+    }
+    else if (editMode) {
+        editorText += "\n" + expr;
+    }
+    else if (expr === ":q" || expr === ":quit") {
+        quit = true;
+    }
+    else if (expr.startsWith(":l ") || expr.startsWith(":load ")) {
+        const filePath = expr.split(" ")[1];
+        console.log(runtime.load(filePath));
+        return "";
+    }
+    else if (expr === ":e" || expr === ":editor") {
+        editMode = true;
+        editorText = "";
+        prompt = EDIT_PROMPT;
+    }
+    else if (expr === ":h" || expr === ":help") {
+        showHelp();
+    }
+    else if (expr === ":v" || expr === ":version") {
+        showVersion();
+    }
+    else if (expr.startsWith(":")) {
         console.error("Unknown command", expr);
     }
     else {
@@ -140,10 +134,29 @@ function checkCommand(expr: string): string {
     }
 }
 
-function showHelp() {
+function runProgramFile(filePath: string): void {
+    const source = fs.readFileSync(filePath, 'utf8');
+    if (source) {
+        try {
+            const v = runtime.evaluate(source);
+            console.log(JSON.stringify(v));
+        }
+        catch (err) {
+            logError(err);
+        }
+    }
+}
+
+function showHelp(): void {
     console.log(":h(elp) => Show help");
     console.log(":q(uit) => Quit");
     console.log(":l(oad) path/to/file => Loads a Mezcal file and executes it");
     console.log(":e(ditor) => Enter multiline edit mode");
     console.log(":b(reak) => Exit multiline edit mode");
+    console.log(":v(ersion) => Show version");
+    console.log("The 'result' variable will always be set to the result of the last evaluation.");
+}
+
+function showVersion(): void {
+    console.log("🐛 Mezcal v" + VERSION);
 }
