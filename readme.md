@@ -29,8 +29,9 @@ See test.mez for examples.
 ## Grammar:
 
 ```
-program        → (declaration | funDecl)* EOF ;
-declaration    → letDecl | statement ;
+program        → import* declaration* EOF ;
+import         → "import" STRING ;
+declaration    → funDecl | letDecl | statement ;
 funDecl        → "function" IDENTIFIER "(" parameters? ")" (block | returnStmt) ;
 parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
 letDecl        → "let" IDENTIFIER ( "=" expression )? ;

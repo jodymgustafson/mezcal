@@ -1,6 +1,6 @@
 import { Scanner } from "../src/scanner";
 
-describe("When run mex scanner", () => {
+describe("When run mezcal scanner", () => {
     it("Should get correct tokens for 2^3", () => {
         const source = "2^3";
         const tokens = new Scanner(source).scanTokens();
@@ -421,13 +421,4 @@ describe("When run mex scanner", () => {
             { type: 'EOF', lexeme: '', line: 1, value: undefined },
         ]);
     });
-
-    // it("should get correct tokens for an input", () => {
-    //     const tokens = new Scanner(`a = input("Type something")`).scanTokens();
-    //     expect(tokens).toEqual([
-    //         { type: 'IMPORT', lexeme: 'import', line: 1, value: undefined },
-    //         { type: 'STRING', lexeme: '"test.mez"', line: 1, value: 'test.mez' },
-    //         { type: 'EOF', lexeme: '', line: 1, value: undefined },
-    //     ]);
-    // });
 });

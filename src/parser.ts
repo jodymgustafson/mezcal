@@ -1,9 +1,17 @@
+import fs from "fs";
+import path from 'node:path';
 import { Token } from "./common/token";
 import { AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
-import { MathTokenType } from "./scanner";
+import { MathTokenType, Scanner } from "./scanner";
 import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, WhileStmt } from "./stmt";
 
 const MAX_FN_ARGS_COUNT = 255;
+
+export class ParseError extends Error {
+    constructor(readonly token: Token, message: string) {
+        super(message);
+    }
+}
 
 /**
  * Parses tokens from the scanner into an abstract syntax tree
@@ -19,11 +27,14 @@ export class Parser {
 
     /**
      * Parses the lexical tokens into an abstract syntax tree
+     * @param basePath Path to use as the base when resolving imports, defaults to current working directory
      * @returns Root element of the AST
      */
-    parse(): Stmt[] {
+    parse(basePath = "./"): Stmt[] {
         try {
             const statements: Stmt[] = [];
+            statements.push(...this.import(basePath));
+
             while (!this.isAtEnd()) {
                 statements.push(this.declaration());
             }
@@ -39,6 +50,28 @@ export class Parser {
 
     private synchronize(): void {
         // TODO
+    }
+
+    private import(basePath: string): Stmt[] {
+        const stmts = [];
+
+        if (!this.isAtEnd()) {
+            while (this.match("IMPORT")) {
+                const token = this.consume("STRING", "Import must be followed by a path.");
+                const filePath = path.join(basePath, token.value);
+                let source: string;
+                try {
+                    source = fs.readFileSync(filePath, "utf-8");
+                }
+                catch (err) {
+                    throw new ParseError(token, err.message);
+                }
+                const scanner = new Scanner(source);
+                stmts.push(...new Parser(scanner.scanTokens()).parse(path.dirname(filePath)));
+            }
+        }
+
+        return stmts;
     }
 
     private declaration(): Stmt {
@@ -342,6 +375,10 @@ export class Parser {
         return new ParseError(token, message);
     }
 
+    /**
+     * Checks if the next token is one of the specified token types
+     * and if so advances the pointer to the next token.
+     */
     private match(...types: MathTokenType[]): boolean {
         for (const type of types) {
             if (this.check(type)) {
@@ -373,11 +410,5 @@ export class Parser {
 
     private previous(): Token {
         return this.tokens[this.current - 1];
-    }
-}
-
-export class ParseError extends Error {
-    constructor(readonly token: Token, message: string) {
-        super(message);
     }
 }

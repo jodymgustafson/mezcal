@@ -1,0 +1,3 @@
+import "b/test.mez"
+
+function fna(a) return fnb(a + "-a")

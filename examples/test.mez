@@ -1,48 +1,17 @@
 # These are some examples of Mezcal code that can be used for testing
 
-# Recursive factorial function
-function rFactorial(n)
-begin
-  if n < 0 then error "Invalid value"
-  if n == 0 then return 1
-  return n * rFactorial(n - 1)
-end
-
-# Computes factorial
-function factorial(n)
-begin
-  if n < 0 then error "Invalid value " + n 
-  let result = 1
-  while n > 1
-  begin
-    result = result * n
-    n = n - 1
-  end
-  return result
-end
-
-# Recursive fibonacci 
-function rFibonacci(n)
-begin
-  if n <= 1 then return n
-  return rFibonacci(n - 2) + rFibonacci(n - 1)
-end
-
-# Converts celsius to fahrenheit
-function celsius2Fahr(c) return (c * 9) / 5 + 32
-
-# Converts fahrenheit to celsius
-function fahr2Celsius(f) return (f - 32) * 5 / 9
+import "./conversion.lib.mez"
+import "./maths.lib.mez"
 
 function convert() begin
   let a = input("Convert from fahrenheit or celsius (f/c)")
   if a == "c" then begin
     c = input("Enter degrees celsius: ")
-    print(c + " celsius is " + celsius2Fahr(c))
+    print(c + " celsius is " + convert_c2f(c) + " fahrenheit")
   end
   if a == "f" then begin
     f = input("Enter degrees fahrenheit: ")
-    print(f + " fahrenheit is " + fahr2Celsius(f))
+    print(f + " fahrenheit is " + convert_f2c(f) + " celsius")
   end
 end
 

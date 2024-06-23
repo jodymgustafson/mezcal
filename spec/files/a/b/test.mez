@@ -1,0 +1,1 @@
+function fnb(b) return b + "-b"

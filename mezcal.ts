@@ -22,14 +22,15 @@ import { exit } from "process";
 import { RuntimeError } from './src/interpreter';
 import { Token } from './src/common/token';
 import { ParseError } from './src/parser';
+import { ScanError } from "./src/common/lexical-scanner";
 
-const mezcal = new Runtime();
+const runtime = new Runtime();
 
 if (process.argv.length > 2) {
     const source = fs.readFileSync(process.argv[2], 'utf8');
     if (source) {
         try {
-            const v = mezcal.evaluate(source);
+            const v = runtime.evaluate(source);
             console.log(JSON.stringify(v));
         }
         catch (err) {
@@ -42,7 +43,8 @@ if (process.argv.length > 2) {
 let quit = false;
 let editMode = false;
 let editorText = "";
-let prompt = ">";
+let prompt = "Mez> ";
+let basePath = ".";
 
 (async () => {
     // REPL loop
@@ -50,11 +52,11 @@ let prompt = ">";
     console.log("Type ':help' for more information.");
     while (!quit) {
         try {
-            let expr = await readLineAsync(prompt + " ");
+            let expr = await readLineAsync(prompt);
             expr = checkCommand(expr);
             if (expr) {
                 try {
-                    const value = mezcal.evaluate(expr);
+                    const value = runtime.evaluate(expr);
                     console.log(JSON.stringify(value));
                 }
                 catch (err) {
@@ -63,7 +65,8 @@ let prompt = ">";
             }
         }
         catch (err) {
-            console.error(err.message);
+            logError(err);
+            // console.error(err.message);
         }
     }
 
@@ -72,6 +75,7 @@ let prompt = ">";
 })();
 
 function logError(err: any) {
+    // console.log(JSON.stringify(err))
     if (err instanceof RuntimeError) {
         let msg = `ERROR "${err.message}"`;
         const token = err.operator as Token;
@@ -90,38 +94,45 @@ function logError(err: any) {
             for (const e of err.errors) {
                 if (e instanceof ParseError)
                     console.error(e.message, "On line", e.token.line);
-                else
+                else if (e instanceof ScanError)
                     console.error(e.message, "On line", e.line);
+                else
+                    console.error(e.message);
             }
         }
     }
 }
 
 function checkCommand(expr: string): string {
-    if (expr === ":b" || expr === ":break" || (editMode && expr === "")) {
-        if (editMode) {
-            editMode = false;
-            prompt = ">";
-            return editorText;
+    if (expr.startsWith(":")) {
+        if (expr === ":b" || expr === ":break" || (editMode && expr === "")) {
+            if (editMode) {
+                editMode = false;
+                prompt = ">";
+                return editorText;
+            }
         }
-    }
-    else if (editMode) {
-        editorText += "\n" + expr;
-    }
-    else if (expr === ":q" || expr === ":quit") {
-        quit = true;
-    }
-    else if (expr.startsWith(":l ") || expr.startsWith(":load ")) {
-        const filePath = expr.split(" ")[1];
-        return fs.readFileSync(filePath, 'utf8');
-    }
-    else if (expr === ":e" || expr === ":editor") {
-        editMode = true;
-        editorText = "";
-        prompt = "...";
-    }
-    else if (expr === ":h" || expr === ":help") {
-        showHelp();
+        else if (editMode) {
+            editorText += "\n" + expr;
+        }
+        else if (expr === ":q" || expr === ":quit") {
+            quit = true;
+        }
+        else if (expr.startsWith(":l ") || expr.startsWith(":load ")) {
+            const filePath = expr.split(" ")[1];
+            console.log(runtime.load(filePath));
+            return "";
+        }
+        else if (expr === ":e" || expr === ":editor") {
+            editMode = true;
+            editorText = "";
+            prompt = "...";
+        }
+        else if (expr === ":h" || expr === ":help") {
+            showHelp();
+        }
+
+        console.error("Unknown command", expr);
     }
     else {
         // No command, evaluate the expression

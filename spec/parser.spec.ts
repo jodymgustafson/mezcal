@@ -2,7 +2,7 @@ import { Token } from "../src/common/token";
 import { ParseError, Parser } from "../src/parser";
 import { Scanner } from "../src/scanner";
 
-describe("When use the mex parser", () => {
+describe("When use the mezcal parser", () => {
     it("should parse lexical tokens for 2^3", () => {
         const parser = new Parser([
             { type: 'NUMBER', lexeme: '2', line: 1, value: 2 },

@@ -1,0 +1,28 @@
+
+# Recursive factorial function
+function rFactorial(n)
+begin
+  if n < 0 then error "Invalid value"
+  if n == 0 then return 1
+  return n * rFactorial(n - 1)
+end
+
+# Computes factorial
+function factorial(n)
+begin
+  if n < 0 then error "Invalid value " + n 
+  let result = 1
+  while n > 1
+  begin
+    result = result * n
+    n = n - 1
+  end
+  return result
+end
+
+# Recursive fibonacci 
+function rFibonacci(n)
+begin
+  if n <= 1 then return n
+  return rFibonacci(n - 2) + rFibonacci(n - 1)
+end

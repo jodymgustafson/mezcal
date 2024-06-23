@@ -1,8 +1,9 @@
 import { Token } from "./token";
 
-export type ScanError = {
-    message: string;
-    line: number;
+export class ScanError extends Error {
+    constructor(message: string, readonly line: number) {
+        super(message);
+    }
 };
 
 /** The token types that are common to all scanners */
@@ -18,7 +19,7 @@ export interface LexicalScanner<TT> {
 /**
  * A base class for lexical scanners that keeps track of scan position and tokens.
  */
-export abstract class BaseLexicalScanner<TT=BaseTokenType> implements LexicalScanner<TT> {
+export abstract class BaseLexicalScanner<TT = BaseTokenType> implements LexicalScanner<TT> {
     // Current character index in the source code
     private idx = 0;
     // Start of the current token
@@ -67,7 +68,7 @@ export abstract class BaseLexicalScanner<TT=BaseTokenType> implements LexicalSca
 
     /** Decrements the index and returns the char at that index  */
     protected back(): string {
-        return this.idx === 0 ? "" : this.source.charAt(--this.idx); 
+        return this.idx === 0 ? "" : this.source.charAt(--this.idx);
     }
 
     /** Gets the next char without advancing the index */
@@ -95,10 +96,7 @@ export abstract class BaseLexicalScanner<TT=BaseTokenType> implements LexicalSca
     }
 
     protected addError(message: string): void {
-        this.errors.push({
-            message,
-            line: this.line
-        });
+        this.errors.push(new ScanError(message, this.line));
     }
 
     protected isAlpha(char: string): boolean {
