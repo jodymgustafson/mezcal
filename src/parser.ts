@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from 'node:path';
-import { Token } from "./common/token";
-import { AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./expr";
+import { Token } from "./internal/token";
+import { AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./internal/expr";
 import { MathTokenType, Scanner } from "./scanner";
-import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, WhileStmt } from "./stmt";
+import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, WhileStmt } from "./internal/stmt";
 
 const MAX_FN_ARGS_COUNT = 255;
 

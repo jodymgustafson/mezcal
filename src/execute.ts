@@ -1,27 +1,18 @@
 import { argv } from "process";
-import { Scanner } from "./src/scanner";
-import { Parser } from "./src/parser";
-import { Interpreter } from "./src/interpreter";
-import { InterpreterContext, InterpreterVariables } from "./src/interpreter-context";
-import { nativeFunctions } from "./src/internal/native-functions";
-
-const input = argv[2];
-if (input) {
-    const code = execute(input);
-    console.log(JSON.stringify(code));
-}
-else {
-    console.log("Usage: execute [expr]");
-}
+import { Scanner } from "./scanner";
+import { Parser } from "./parser";
+import { Interpreter } from "./interpreter";
+import { InterpreterContext, InterpreterVariables } from "./internal/interpreter-context";
+import { nativeFunctions } from "./internal/native-functions";
 
 /**
- * Executes an expression
- * @param expr Mathematical expression
+ * Executes Mezcal code given an optional set of variables
+ * @param source Mezcal code
  * @param variables A map of variable names to values
- * @returns The result of the expression
+ * @returns The result of the execution
  */
-export function execute(expr: string, variables?: InterpreterVariables): number | string | boolean {
-    const scanner = new Scanner(expr);
+export function execute(source: string, variables?: InterpreterVariables): number | string | boolean {
+    const scanner = new Scanner(source);
     const tokens = scanner.scanTokens();
     if (scanner.errors.length > 0) {
         console.error("There were scanner errors:");

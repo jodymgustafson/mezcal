@@ -1,5 +1,5 @@
 import { Callable } from "../interpreter";
-import { InterpreterFunctions } from "../interpreter-context";
+import { InterpreterFunctions } from "./interpreter-context";
 import { readLineAsync, readLineSync } from "./read-line";
 
 // Format: [name, arity, function]

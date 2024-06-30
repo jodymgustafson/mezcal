@@ -1,4 +1,4 @@
-import { Token } from "../src/common/token";
+import { Token } from "../src/internal/token";
 import { ParseError, Parser } from "../src/parser";
 import { Scanner } from "../src/scanner";
 

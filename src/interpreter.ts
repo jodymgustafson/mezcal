@@ -1,10 +1,10 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, LogicalExpr, CallExpr } from "./expr";
-import { Token } from "./common/token";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, LogicalExpr, CallExpr } from "./internal/expr";
+import { Token } from "./internal/token";
 import { MathTokenType } from "./scanner";
-import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./stmt";
-import { InterpreterContext } from "./interpreter-context";
-import { UserFunction } from "./user-function";
-import { Return } from "./return";
+import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./internal/stmt";
+import { InterpreterContext } from "./internal/interpreter-context";
+import { UserFunction } from "./internal/user-function";
+import { Return } from "./internal/return";
 
 export class RuntimeError extends Error {
     constructor(readonly operator: Token, msg: string) {

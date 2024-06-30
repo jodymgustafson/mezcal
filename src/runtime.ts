@@ -1,7 +1,8 @@
-import { ScanError } from "./common/lexical-scanner";
+import { AstPrinter } from "./ast-printer";
+import { ScanError } from "./internal/lexical-scanner";
 import { nativeFunctions } from "./internal/native-functions";
 import { Interpreter } from "./interpreter";
-import { InterpreterContext } from "./interpreter-context";
+import { InterpreterContext } from "./internal/interpreter-context";
 import { ParseError, Parser } from "./parser";
 import { Scanner } from "./scanner";
 import fs from 'fs';
@@ -18,6 +19,8 @@ export class MezcalRuntimeError<T = Error | ScanError | ParseError> extends Erro
  * execute any number of statements while keeping track of state.
  */
 export class Runtime {
+    debug = false;
+
     constructor(readonly interpreter = new Interpreter(new InterpreterContext(undefined, undefined, nativeFunctions))) { }
 
     /**
@@ -32,14 +35,16 @@ export class Runtime {
         if (scanner.errors.length > 0) {
             throw new MezcalRuntimeError("There were scanner errors", scanner.errors);
         }
+        if (this.debug) console.log(JSON.stringify(tokens, null, 2));
 
-        // console.log(JSON.stringify(tokens, null, 2));
         const parser = new Parser(tokens);
         const ast = parser.parse(basePath);
         if (parser.errors.length > 0) {
             throw new MezcalRuntimeError("There were parser errors", parser.errors);
             // parser.errors.map(e => ({ message: e.message, line: e.token.line })));
         }
+        if (this.debug) console.log(JSON.stringify(ast, null, 2));
+        if (this.debug) console.log(new AstPrinter().print(ast[0]));
 
         return this.interpreter.interpret(ast);
     }

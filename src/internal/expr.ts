@@ -1,4 +1,4 @@
-import { Token } from "./common/token";
+import { Token } from "./token";
 import { Stmt } from "./stmt";
 
 export interface ExprVisitor<R> {

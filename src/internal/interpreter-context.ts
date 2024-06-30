@@ -1,4 +1,4 @@
-import { Callable } from "./interpreter";
+import { Callable } from "../interpreter";
 
 export type VariableValue = (number | string);
 export type InterpreterVariables = Record<string, VariableValue>;
@@ -41,7 +41,7 @@ export class InterpreterContext {
             // Check for it in the enclosing scope
             value = this.enclosing.getVariable(name);
         }
-        
+
         return value;
     }
 }

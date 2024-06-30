@@ -26,3 +26,8 @@ begin
   if n <= 1 then return n
   return rFibonacci(n - 2) + rFibonacci(n - 1)
 end
+
+function quadratic(a, b, c)
+begin
+  return (-b + sqrt(b^2 - 4 * a * c)) / (2 * a)
+end

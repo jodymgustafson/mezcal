@@ -1,4 +1,4 @@
-import { BaseLexicalScanner, BaseTokenType } from "./common/lexical-scanner";
+import { BaseLexicalScanner, BaseTokenType } from "./internal/lexical-scanner";
 
 export type MathTokenType = BaseTokenType |
     "FUNCTION" | "LET" | "IF" | "THEN" | "ELSE" | "ERROR" | "RETURN" | "BEGIN" | "END" |

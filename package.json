@@ -1,6 +1,6 @@
 {
   "name": "mezcal",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Mathematical Expression Calculator programming language interpreter",
   "main": "index.js",
   "scripts": {

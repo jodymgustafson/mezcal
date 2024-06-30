@@ -1,4 +1,4 @@
-import { Callable, Interpreter } from "./interpreter";
+import { Callable, Interpreter } from "../interpreter";
 import { InterpreterContext } from "./interpreter-context";
 import { FunctionStmt } from "./stmt";
 import { Return } from "./return"

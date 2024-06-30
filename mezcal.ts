@@ -6,7 +6,7 @@
     | |  | |  __// / (_| (_| | |
     \_|  |_/\___/___\___\__,_|_|
                                 
-    The Mezcal command line and REPL.
+    🐛 The Mezcal command line and REPL.
     - To run a program pass the path to a Mezcal program on the command line.
     - Otherwise it will enter REPL mode.
 */
@@ -16,16 +16,22 @@ import { readLineAsync } from "./src/internal/read-line";
 import { Runtime } from "./src/runtime";
 import { exit } from "process";
 import { RuntimeError } from './src/interpreter';
-import { Token } from './src/common/token';
+import { Token } from './src/internal/token';
 import { ParseError } from './src/parser';
-import { ScanError } from "./src/common/lexical-scanner";
+import { ScanError } from "./src/internal/lexical-scanner";
 
 const VERSION = require("../package.json").version;
 
 const runtime = new Runtime();
 
 if (process.argv.length > 2) {
-    runProgramFile(process.argv[2]);
+    const arg = process.argv[2];
+    if (arg === "-v") {
+        showVersion();
+    }
+    else {
+        runProgramFile(arg);
+    }
     exit();
 }
 
@@ -135,15 +141,11 @@ function checkCommand(expr: string): string {
 }
 
 function runProgramFile(filePath: string): void {
-    const source = fs.readFileSync(filePath, 'utf8');
-    if (source) {
-        try {
-            const v = runtime.evaluate(source);
-            console.log(JSON.stringify(v));
-        }
-        catch (err) {
-            logError(err);
-        }
+    try {
+        console.log(runtime.load(filePath));
+    }
+    catch (err) {
+        logError(err);
     }
 }
 

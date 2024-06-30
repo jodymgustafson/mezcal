@@ -1,4 +1,4 @@
-import { execute } from "../execute"
+import { execute } from "../src/execute"
 
 describe("When use interpreter", () => {
     it("should interpret 2 * (-3 + 1)^2", () => {

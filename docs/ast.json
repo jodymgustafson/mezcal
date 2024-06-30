@@ -1,0 +1,101 @@
+[
+  {
+    "expression": {
+      "name": "(-b + sqrt(b^2 - 4 * a * c)) / (2 * a)",
+      "left": {
+        "expr": {
+          "left": {
+            "operator": {
+              "type": "MINUS",
+              "lexeme": "-",
+              "line": 1
+            },
+            "right": {
+              "name": "b"
+            }
+          },
+          "operator": {
+            "type": "PLUS",
+            "lexeme": "+",
+            "line": 1
+          },
+          "right": {
+            "callee": {
+              "name": "sqrt"
+            },
+            "paren": {
+              "type": "RIGHT_PAREN",
+              "lexeme": ")",
+              "line": 1
+            },
+            "args": [
+              {
+                "left": {
+                  "left": {
+                    "name": "b"
+                  },
+                  "operator": {
+                    "type": "POWER",
+                    "lexeme": "^",
+                    "line": 1
+                  },
+                  "right": {
+                    "value": 2
+                  }
+                },
+                "operator": {
+                  "type": "MINUS",
+                  "lexeme": "-",
+                  "line": 1
+                },
+                "right": {
+                  "left": {
+                    "left": {
+                      "value": 4
+                    },
+                    "operator": {
+                      "type": "STAR",
+                      "lexeme": "*",
+                      "line": 1
+                    },
+                    "right": {
+                      "name": "a"
+                    }
+                  },
+                  "operator": {
+                    "type": "STAR",
+                    "lexeme": "*",
+                    "line": 1
+                  },
+                  "right": {
+                    "name": "c"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "operator": {
+        "type": "SLASH",
+        "lexeme": "/",
+        "line": 1
+      },
+      "right": {
+        "expr": {
+          "left": {
+            "value": 2
+          },
+          "operator": {
+            "type": "STAR",
+            "lexeme": "*",
+            "line": 1
+          },
+          "right": {
+            "name": "a"
+          }
+        }
+      }
+    }
+  }
+]
