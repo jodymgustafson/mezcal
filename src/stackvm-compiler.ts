@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr, CallExpr } from "./internal/expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr, CallExpr, AssignExpr } from "./internal/expr";
 import { Token } from "./internal/token";
 import { MathTokenType } from "./scanner";
 import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./internal/stmt";
@@ -14,15 +14,17 @@ export class CompilerError extends Error {
  */
 export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string> {
     private code: string[];
+    debug = true;
 
     compile(statements: Stmt[]): string[] {
         try {
             this.code = [":start"];
-            let value = 0;
             for (const stmt of statements) {
                 this.execute(stmt);
             }
             this.code.push("end");
+
+            if (this.debug) console.log(JSON.stringify(this.code));
             return this.code;
         }
         catch (error) {
@@ -102,13 +104,29 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
     }
 
     visitCallExpr(expr: CallExpr): string {
-        throw new Error("Method not implemented.");
+        for (const argument of expr.args) {
+            this.evaluate(argument);
+        }
+
+        const fnName = (expr.callee as VariableExpr).name;
+        this.code.push(`call ${fnName}`);
+        return fnName;
     }
-    visitAssign(expr: VariableExpr): string {
-        throw new Error("Method not implemented.");
+
+    visitAssign(expr: AssignExpr): any {
+        const value = this.evaluate(expr.value);
+        this.code.push(`put ${expr.name}`);
+        return value;
     }
-    visitVariable(expr: VariableExpr): string {
-        throw new Error("Method not implemented.");
+    visitVariable(expr: VariableExpr): any {
+        // Check for no param functions which don't need parens
+        if (expr.name === "pi") {
+            this.code.push(`call pi`);
+        }
+        else {
+            this.code.push(`get ${expr.name}`);
+        }
+        return expr.name;
     }
     visitBlockStmt(stmt: BlockStmt): any {
         throw new Error("Method not implemented.");
@@ -125,8 +143,14 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
     visitErrorStmt(stmt: ErrorStmt): string {
         throw new Error("Method not implemented.");
     }
-    visitLetStmt(stmt: LetStmt): any {
-        throw new Error("Method not implemented.");
+    visitLetStmt(stmt: LetStmt): string {
+        let value = null;
+        if (stmt.initializer) {
+            value = this.evaluate(stmt.initializer);
+        }
+
+        this.code.push(`put ${stmt.name.lexeme}`);
+        return value;
     }
     visitWhileStmt(stmt: WhileStmt): any {
         throw new Error("Method not implemented.");

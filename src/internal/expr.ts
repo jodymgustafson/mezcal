@@ -7,7 +7,7 @@ export interface ExprVisitor<R> {
     visitLiteral(expr: LiteralExpr): R;
     visitUnary(expr: UnaryExpr): R;
     visitVariable(expr: VariableExpr): R;
-    visitAssign(expr: VariableExpr): R;
+    visitAssign(expr: AssignExpr): R;
     visitLogicalExpr(expr: LogicalExpr): R;
     visitCallExpr(expr: CallExpr): R;
 };

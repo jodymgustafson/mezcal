@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr, CallExpr } from "./internal/expr";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr, CallExpr, AssignExpr } from "./internal/expr";
 import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./internal/stmt";
 
 /**
@@ -63,7 +63,7 @@ export class AstPrinter implements ExprVisitor<string>, StmtVisitor<string> {
         return expr.name;
     }
 
-    visitAssign(expr: VariableExpr): string {
+    visitAssign(expr: AssignExpr): string {
         return expr.name
     }
 
