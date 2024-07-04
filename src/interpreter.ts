@@ -269,6 +269,10 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         throw new RuntimeError(operator, "Operand must be a number.");
     }
 
+    /**
+     * Executes a block of code within a new context and reverts to the 
+     * previous context when finished. This is used to create closures.
+     */
     executeBlock(statements: Stmt[], context: InterpreterContext): any {
         const previous = this.context;
         let value = 0;

@@ -123,6 +123,9 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
         if (expr.name === "pi") {
             this.code.push(`call pi`);
         }
+        else if (expr.name === "e") {
+            this.code.push(`call e`);
+        }
         else {
             this.code.push(`get ${expr.name}`);
         }
@@ -134,9 +137,24 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
     visitFunctionStmt(stmt: FunctionStmt): any {
         throw new Error("Method not implemented.");
     }
+
+    /** Keeps a counter of labels for creating unique labels */
+    private labelCnt = 0;
+
     visitIfStmt(stmt: IfStmt): any {
-        throw new Error("Method not implemented.");
+        this.evaluate(stmt.condition);
+
+        const label = `__${++this.labelCnt}`;
+        this.code.push(`beq ${label}`);
+        this.execute(stmt.elseBranch);
+        this.code.push(`bra ${label}end`);
+        this.code.push(`${label}:`);
+        this.execute(stmt.thenBranch);
+        this.code.push(`${label}end:`);
+
+        return null;
     }
+
     visitReturnStmt(stmt: ReturnStmt): any {
         throw new Error("Method not implemented.");
     }

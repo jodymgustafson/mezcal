@@ -19,22 +19,6 @@
       "outFiles": [
         "${workspaceFolder}/dist/**/*.js"
       ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Execute",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "program": "${workspaceFolder}\\execute.ts",
-      "args": [
-        "print(\"hello\")"
-      ],
-      "preLaunchTask": "tsc: build - tsconfig.json",
-      "outFiles": [
-        "${workspaceFolder}/dist/**/*.js"
-      ]
     }
   ]
 }
