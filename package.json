@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jasmine",
     "clean": "tsc --build --clean",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/mezcal.js"
   },
   "author": "JM Gustafson",
   "license": "ISC",

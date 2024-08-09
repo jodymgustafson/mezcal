@@ -49,7 +49,7 @@ describe("When compile mezcal code to StackVM", () => {
         );
     });
 
-    it("should compile if x < 1 then pi else pi/2", () => {
+    it("should compile if x < 1 then pi else 2", () => {
         // console.log(JSON.stringify(compile("if x < 1 then 1 else 2")));
         expect(compile("if x < 1 then pi else 2")).toEqual(
             [":start", "get x", "push 1", "cmp", "blt __1", "push 2", "bra __1end", "__1:", "push 1", "__1end:", "end"]

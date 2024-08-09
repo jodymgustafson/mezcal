@@ -6,8 +6,8 @@ It also contains a simple scripting language for defining custom functions and s
 
 The package consists of a lexical scanner, a parser to create an abstract syntax tree, and an interpreter to evaluate the expression.
 
-There is also a compiler to compile to StackVM assembly language.
-Use this when you need to execute an expression many times, such as drawing a graph.
+_(work in progress): There is also a compiler to compile to StackVM assembly language.
+Use this when you need to execute an expression many times, such as drawing a graph._
 
 See [test.mez](./examples/test.mez) for examples.
 
@@ -102,9 +102,15 @@ const result = execute("2 * x^3");
 
 ## REPL
 
-You can also run in REPL mode (command line) by running index.js.
+You can also run in REPL mode (command line) by running mezcal.js.
 
-    node dist/index.js
+    node dist/mezcal.js
+
+Or run the npm command:
+
+    npm run start
+
+_Or_ run one of the batch files: `mezcal.bat` or `mezcal.ps`.
 
 Enter Mezcal code and/or mathematical expressions to evaluate. It supports the following commands.
 
@@ -206,7 +212,7 @@ for x = 1 to 10 step 2 print(x)
 ```
 
 ### Functions
-To create a function use the function keyword followed by a function body.
+To create a function use the `function` keyword followed by a function body.
 For a simple one line body use a return statement.
 
 ```
@@ -216,10 +222,11 @@ function add(a, b) return a + b
 If your function requires multiple lines use a `begin`-`end` block.
 
 ```
-function rFibonacci(n)
+function fibonacci(n)
 begin
+  if n < 0 then error "Invalid value"
   if n <= 1 then return n
-  return rFibonacci(n - 2) + rFibonacci(n - 1)
+  return fibonacci(n - 2) + fibonacci(n - 1)
 end
 ```
 
@@ -239,4 +246,20 @@ You can get user input from the command line using the `input` function.
 
 ```
 let name = input("What is your name?")
+```
+
+### Write output
+Use the `print` function to write text to the command line.
+
+```
+let f = convert_c2f(c)
+print(c + " celsius is " + roundDecimal(f, 1) + " fahrenheit")
+```
+
+### Throw errors
+When invalid input is provided you can throw an error using the `error` keyword followed by an error message.
+This will immediately stop execution and print the error message.
+
+```
+if n < 0 then error "Invalid value: " + n
 ```

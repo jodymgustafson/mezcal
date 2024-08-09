@@ -1,3 +1,5 @@
+#Title: Library of math functions
+#Version: v1.0.0
 
 # Recursive factorial function
 function rFactorial(n)
@@ -23,6 +25,7 @@ end
 # Recursive fibonacci 
 function rFibonacci(n)
 begin
+  if n < 0 then error "Invalid value"
   if n <= 1 then return n
   return rFibonacci(n - 2) + rFibonacci(n - 1)
 end

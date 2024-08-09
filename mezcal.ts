@@ -101,7 +101,12 @@ function logError(err: any) {
     }
 }
 
-function checkCommand(expr: string): string {
+/**
+ * Checks for a command input by user
+ * @param expr The expression entered
+ * @returns The expression to evaluate if the command should be evaluated, or undefined
+ */
+function checkCommand(expr: string): string | undefined {
     if (expr === ":b" || expr === ":break" || expr === "") {
         if (editMode) {
             editMode = false;
