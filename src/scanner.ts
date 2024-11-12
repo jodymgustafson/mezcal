@@ -1,6 +1,6 @@
 import { BaseLexicalScanner, BaseTokenType } from "./internal/lexical-scanner";
 
-export type MathTokenType = BaseTokenType |
+export type MezcalTokenType = BaseTokenType |
     "FUNCTION" | "LET" | "IF" | "THEN" | "ELSE" | "ERROR" | "RETURN" | "BEGIN" | "END" |
     "WHILE" | "FOR" | "TO" | "STEP" |
     "IMPORT" |
@@ -21,7 +21,7 @@ const KEYWORDS = [
 /**
  * A lexical scanner that parses Mezcal source code into an array of tokens
  */
-export class Scanner extends BaseLexicalScanner<MathTokenType> {
+export class Scanner extends BaseLexicalScanner<MezcalTokenType> {
     protected scanToken(char: string) {
         switch (char) {
             // whitespace
@@ -109,8 +109,8 @@ export class Scanner extends BaseLexicalScanner<MathTokenType> {
         }
     }
 
-    private getIdentifierType(lexeme: string): MathTokenType {
-        return KEYWORDS.indexOf(lexeme) >= 0 ? lexeme.toUpperCase() as MathTokenType : "IDENTIFIER";
+    private getIdentifierType(lexeme: string): MezcalTokenType {
+        return KEYWORDS.indexOf(lexeme) >= 0 ? lexeme.toUpperCase() as MezcalTokenType : "IDENTIFIER";
     }
 
     private addNumber(n: string): void {

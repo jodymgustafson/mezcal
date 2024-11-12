@@ -1,6 +1,6 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, LogicalExpr, CallExpr, AssignExpr } from "./internal/expr";
 import { Token } from "./internal/token";
-import { MathTokenType } from "./scanner";
+import { MezcalTokenType } from "./scanner";
 import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./internal/stmt";
 
 export class CompilerError extends Error {
@@ -54,7 +54,7 @@ export class StackVMCompiler implements ExprVisitor<string>, StmtVisitor<string>
         this.evaluate(expr.right);
         // this.checkNumberOperand(expr.operator, right);
 
-        switch (expr.operator.type as MathTokenType) {
+        switch (expr.operator.type as MezcalTokenType) {
             case "PLUS":
                 this.code.push("add"); break;
             case "MINUS":
