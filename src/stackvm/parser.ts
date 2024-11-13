@@ -3,8 +3,11 @@ import { MezcalTokenType } from "../scanner";
 import { Expression } from "./expression";
 import {
     AssignmentParselet,
+    BeginParselet,
     BinaryOperatorParselet,
+    ForParselet,
     GroupParselet,
+    IfParselet,
     InfixParselet,
     MethodCallParselet,
     NameParselet,
@@ -13,6 +16,7 @@ import {
     Precedence,
     PrefixOperatorParselet,
     PrefixParselet,
+    WhileParselet,
 } from "./parselet";
 
 export class Parser {
@@ -27,6 +31,10 @@ export class Parser {
         this.registerPrefix("IDENTIFIER", new NameParselet());
         this.registerPrefix("NUMBER", new NumberParselet());
         this.registerPrefix("LEFT_PAREN", new GroupParselet());
+        this.registerPrefix("BEGIN", new BeginParselet());
+        this.registerPrefix("IF", new IfParselet());
+        this.registerPrefix("WHILE", new WhileParselet());
+        this.registerPrefix("FOR", new ForParselet());
 
         this.registerInfix("LEFT_PAREN", new MethodCallParselet());
         this.registerInfix("EQUAL", new AssignmentParselet());
@@ -41,16 +49,28 @@ export class Parser {
         this.binary("SLASH", Precedence.PRODUCT);
         this.binary("POWER", Precedence.EXPONENT, true);
 
+        this.binary("LESS", Precedence.CONDITIONAL);
+        this.binary("LESS_EQUAL", Precedence.CONDITIONAL);
+        this.binary("GREATER", Precedence.CONDITIONAL);
+        this.binary("GREATER_EQUAL", Precedence.CONDITIONAL);
+        this.binary("EQUAL_EQUAL", Precedence.CONDITIONAL);
+        this.binary("NOT_EQUAL", Precedence.CONDITIONAL);
+
+        this.binary("AND", Precedence.BOOLEAN);
+        this.binary("OR", Precedence.BOOLEAN);
+
         this.tokens = tokens;
     }
 
-    parse(): Expression {
-        const ast = this.parseExpression();
-        const maybeEof = this.peek();
+    parse(): Expression[] {
+        const expressions: Expression[] = [];
 
-        if (maybeEof.type === "EOF") return ast;
+        while (!this.isAtEnd()) {
+            const ast = this.parseExpression();
+            expressions.push(ast);
+        }
 
-        throw new Error(`Expected EOF but instead found ${maybeEof.lexeme}.`);
+        return expressions;
     }
 
     parseExpression(precedence: number = 0): Expression {
@@ -63,7 +83,7 @@ export class Parser {
 
         const prefix = this.prefixParselets[token.type];
 
-        if (prefix === undefined) throw new Error(`Could not parse '${token.lexeme}' of type '${token.type}'.`);
+        if (prefix === undefined) throw new Error(`Could not parse ${JSON.stringify(token)}`);
 
         let left = prefix.parse(this, token);
 
@@ -75,6 +95,10 @@ export class Parser {
         }
 
         return left;
+    }
+
+    private isAtEnd(): boolean {
+        return this.peek().type === "EOF";
     }
 
     private binary(
@@ -121,25 +145,17 @@ export class Parser {
     getPrecedence(): number {
         const token = this.peek();
         const parselet = this.infixParselets[token.type];
-
-        if (parselet !== undefined) {
-            return parselet.getPrecedence();
-        }
-
-        return 0;
+        return parselet?.getPrecedence() ?? 0;
     }
 
-    match(tokenType: MezcalTokenType) {
-        // return this.peek().type === tokenType ? !!this.consume() : false
-
+    /**
+     * Checks if the next token matches the type and if so consumes it 
+     */
+    match(tokenType: MezcalTokenType): boolean {
         const isMatch = this.peek().type === tokenType;
-
-        if (!isMatch) {
-            return isMatch;
+        if (isMatch) {
+            this.consume();
         }
-
-        this.consume();
-
         return isMatch;
     }
 }

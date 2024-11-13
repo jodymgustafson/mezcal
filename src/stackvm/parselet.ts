@@ -1,12 +1,14 @@
 import { Token } from "../internal/token";
 import { MezcalTokenType } from "../scanner";
-import { AssignmentExpression, Expression, MethodCallExpression, NameExpression, NumberExpression, OperatorExpression, PostfixExpression, PrefixExpression } from "./expression";
+import { AssignmentExpression, Expression, ForExpression, IfExpression, MethodCallExpression, NameExpression, NumberExpression, OperatorExpression, PostfixExpression, PrefixExpression, WhileExpression } from "./expression";
 import { Parser } from "./parser";
 
 export enum Precedence {
-    NOTHINGBURGER,
+    NOTHING,
     ASSIGNMENT,
+    BOOLEAN,
     CONDITIONAL,
+    WHILE,
     SUM,
     PRODUCT,
     EXPONENT,
@@ -33,22 +35,58 @@ export class NumberParselet implements PrefixParselet {
     }
 }
 
+export class BeginParselet implements PrefixParselet {
+    parse(parser: Parser, token: Token): Expression {
+        const expression = parser.parseExpression(parser.getPrecedence());
+        parser.consume("END");
+        return expression;
+    }
+}
+
+export class IfParselet implements PrefixParselet {
+    parse(parser: Parser, token: Token): Expression {
+        const condition = parser.parseExpression(parser.getPrecedence());
+        parser.consume("THEN");
+        const thenExpr = parser.parseExpression(parser.getPrecedence());
+        let elseExpr: Expression;
+        if (parser.match("ELSE")) {
+            elseExpr = parser.parseExpression(parser.getPrecedence());
+        }
+
+        return new IfExpression(condition, thenExpr, elseExpr)
+    }
+}
+
+export class WhileParselet implements PrefixParselet {
+    parse(parser: Parser, token: Token): Expression {
+        const condition = parser.parseExpression(parser.getPrecedence());
+        return new WhileExpression(condition, parser.parseExpression(parser.getPrecedence()));
+    }
+}
+
+export class ForParselet implements PrefixParselet {
+    parse(parser: Parser, token: Token): Expression {
+        const fromExpr = parser.parseExpression(parser.getPrecedence());
+        parser.consume("TO");
+        const toExpr = parser.parseExpression(parser.getPrecedence());
+        let stepExpr: Expression;
+        if (parser.match("STEP")) {
+            stepExpr = parser.parseExpression(parser.getPrecedence());
+        }
+        return new ForExpression(fromExpr, toExpr, stepExpr, parser.parseExpression(parser.getPrecedence()));
+    }
+}
+
 export class PrefixOperatorParselet implements PrefixParselet {
+    constructor(readonly precedence: number) {
+        this.precedence = precedence;
+    }
+
     parse(parser: Parser, token: Token): Expression {
         return new PrefixExpression(
             token.type as MezcalTokenType,
             parser.parseExpression(this.precedence),
         );
-    }
-
-    getPrecedence(): number {
-        return this.precedence;
-    }
-
-    precedence: number;
-
-    constructor(precedence: number) {
-        this.precedence = precedence;
     }
 }
 
@@ -69,6 +107,11 @@ export interface InfixParselet {
 }
 
 export class BinaryOperatorParselet implements InfixParselet {
+    constructor(readonly precedence: number, readonly isRightAssociative: boolean) {
+        this.precedence = precedence;
+        this.isRightAssociative = isRightAssociative;
+    }
+
     parse(parser: Parser, left: Expression, token: Token): Expression {
         return new OperatorExpression(
             left,
@@ -81,14 +124,6 @@ export class BinaryOperatorParselet implements InfixParselet {
 
     getPrecedence(): number {
         return this.precedence;
-    }
-
-    precedence: number;
-    isRightAssociative: boolean;
-
-    constructor(precedence: number, isRightAssociative: boolean) {
-        this.precedence = precedence;
-        this.isRightAssociative = isRightAssociative;
     }
 }
 

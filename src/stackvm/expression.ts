@@ -42,12 +42,28 @@ export class PostfixExpression extends Expression {
     }
 }
 
-export class ConditionalExpression extends Expression {
+export class IfExpression extends Expression {
     constructor(
         readonly conditional: Expression,
-        readonly leftArm: Expression,
-        readonly rightArm: Expression,
+        readonly thenExpr: Expression,
+        readonly elseExpr: Expression,
     ) {
+        super();
+    }
+}
+
+export class WhileExpression extends Expression {
+    constructor(readonly conditional: Expression, readonly body: Expression) {
+        super();
+    }
+}
+
+export class ForExpression extends Expression {
+    constructor(
+        readonly fromExpr: Expression,
+        readonly toExpr: Expression,
+        readonly stepExpr: Expression,
+        readonly body: Expression) {
         super();
     }
 }
