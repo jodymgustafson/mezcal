@@ -68,6 +68,22 @@ export class ForExpression extends Expression {
     }
 }
 
+export class FunctionExpression extends Expression {
+    constructor(
+        readonly fnName: string,
+        readonly params: string[],
+        readonly body: Expression
+    ) {
+        super();
+    }
+}
+
+export class ReturnExpression extends Expression {
+    constructor(readonly expression) {
+        super();
+    }
+}
+
 export class AssignmentExpression extends Expression {
     readonly name = "ASSIGN";
     constructor(readonly left: Expression, readonly right: Expression) {

@@ -355,4 +355,64 @@ describe("When use stackvm parser", () => {
             }
         ]));
     });
+
+    it("should parse lexical tokens for\nlet time = clock()", () => {
+        const source = `
+            let time = clock()`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
+            "left":{"name":"time"},
+            "right":{"method":{"name":"clock"},"args":[]},
+            "name":"ASSIGN"
+        }]));
+    });
+
+    it("should parse lexical tokens for a bodyless function", () => {
+        const source = `
+            function add(a, b) return a + b`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
+            "fnName":"add",
+            "params":["a","b"],
+            "body":{
+                "left":{"name":"a"},
+                "operator":"PLUS",
+                "right":{"name":"b"}
+            }
+        }]));
+    });
+
+    it("should parse lexical tokens for a function with return", () => {
+        const source = `
+            function add(a, b) begin
+                return a + b
+            end`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
+            "fnName":"add",
+            "params":["a","b"],
+            "body":{
+                "expression":{"left":{"name":"a"},"operator":"PLUS","right":{"name":"b"}}
+            }
+        }]));
+    });
+
+    it("should parse lexical tokens for a function with multiple returns", () => {
+        const source = `
+            function fib(n) begin
+                if (n <= 1) then return n
+                return fib(n - 2) + fib(n - 1)
+            end
+            fib(3)`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(JSON.stringify([]));
+    });
 });

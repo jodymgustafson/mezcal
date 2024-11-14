@@ -6,6 +6,7 @@ import {
     BeginParselet,
     BinaryOperatorParselet,
     ForParselet,
+    FunctionParselet,
     GroupParselet,
     IfParselet,
     InfixParselet,
@@ -16,6 +17,7 @@ import {
     Precedence,
     PrefixOperatorParselet,
     PrefixParselet,
+    ReturnParselet,
     WhileParselet,
 } from "./parselet";
 
@@ -35,6 +37,8 @@ export class Parser {
         this.registerPrefix("IF", new IfParselet());
         this.registerPrefix("WHILE", new WhileParselet());
         this.registerPrefix("FOR", new ForParselet());
+        this.registerPrefix("FUNCTION", new FunctionParselet());
+        this.registerPrefix("RETURN", new ReturnParselet());
 
         this.registerInfix("LEFT_PAREN", new MethodCallParselet());
         this.registerInfix("EQUAL", new AssignmentParselet());
@@ -112,13 +116,13 @@ export class Parser {
         );
     }
 
-    consume(expectedType?: MezcalTokenType): Token {
+    consume(expectedType?: MezcalTokenType, errorMsg?: string): Token {
         const token = this.tokens[this.idx++];
 
         if (expectedType === undefined || token.type === expectedType) return token;
 
         throw new Error(
-            `Expected ${expectedType} but instead found ${token.lexeme}.`,
+            errorMsg ?? `Expected ${expectedType} but instead found ${token.lexeme}.`,
         );
     }
 

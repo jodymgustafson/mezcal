@@ -1,7 +1,9 @@
 import { Token } from "../internal/token";
 import { MezcalTokenType } from "../scanner";
-import { AssignmentExpression, Expression, ForExpression, IfExpression, MethodCallExpression, NameExpression, NumberExpression, OperatorExpression, PostfixExpression, PrefixExpression, WhileExpression } from "./expression";
+import { AssignmentExpression, Expression, ForExpression, FunctionExpression, IfExpression, MethodCallExpression, NameExpression, NumberExpression, OperatorExpression, PostfixExpression, PrefixExpression, ReturnExpression, WhileExpression } from "./expression";
 import { Parser } from "./parser";
+
+const MAX_FN_ARGS_COUNT = 255;
 
 export enum Precedence {
     NOTHING,
@@ -74,6 +76,46 @@ export class ForParselet implements PrefixParselet {
             stepExpr = parser.parseExpression(parser.getPrecedence());
         }
         return new ForExpression(fromExpr, toExpr, stepExpr, parser.parseExpression(parser.getPrecedence()));
+    }
+}
+
+export class FunctionParselet implements PrefixParselet {
+    parse(parser: Parser, token: Token): Expression {
+        const name = parser.consume("IDENTIFIER", "Expect function name.").lexeme;
+        parser.consume("LEFT_PAREN", "Expected '(' after function name.");
+        const params: string[] = [];
+        if (!parser.match("RIGHT_PAREN")) {
+            do {
+                if (params.length >= MAX_FN_ARGS_COUNT) {
+                    throw new Error("Can't have more than 255 parameters.");
+                }
+
+                params.push(parser.consume("IDENTIFIER", "Expected parameter name.").lexeme);
+            }
+            while (parser.match("COMMA"));
+        }
+        parser.consume("RIGHT_PAREN", "Expect ')' after parameters.");
+
+        // const body = parser.parseExpression(parser.getPrecedence());
+        // return new FunctionExpression(name, params, body);
+
+        if (parser.match("RETURN")) {
+            // parser.consume("RETURN", "Expect 'return' before function body.");
+            const body = parser.parseExpression(parser.getPrecedence());
+            return new FunctionExpression(name, params, body);
+        }
+        else {
+            parser.consume("BEGIN", "Expect 'begin' or 'return' before function body.");
+            const body = parser.parseExpression(parser.getPrecedence());
+            parser.consume("END");
+            return new FunctionExpression(name, params, body);
+        }
+    }
+}
+
+export class ReturnParselet implements PrefixParselet {
+    parse(parser: Parser, token: Token): Expression {
+        return new ReturnExpression(parser.parseExpression(parser.getPrecedence()));
     }
 }
 
