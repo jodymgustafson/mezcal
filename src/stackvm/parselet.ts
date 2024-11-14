@@ -83,6 +83,7 @@ export class FunctionParselet implements PrefixParselet {
     parse(parser: Parser, token: Token): Expression {
         const name = parser.consume("IDENTIFIER", "Expect function name.").lexeme;
         parser.consume("LEFT_PAREN", "Expected '(' after function name.");
+        
         const params: string[] = [];
         if (!parser.match("RIGHT_PAREN")) {
             do {
@@ -94,19 +95,19 @@ export class FunctionParselet implements PrefixParselet {
             }
             while (parser.match("COMMA"));
         }
+
         parser.consume("RIGHT_PAREN", "Expect ')' after parameters.");
 
-        // const body = parser.parseExpression(parser.getPrecedence());
-        // return new FunctionExpression(name, params, body);
-
         if (parser.match("RETURN")) {
-            // parser.consume("RETURN", "Expect 'return' before function body.");
             const body = parser.parseExpression(parser.getPrecedence());
-            return new FunctionExpression(name, params, body);
+            return new FunctionExpression(name, params, [body]);
         }
         else {
             parser.consume("BEGIN", "Expect 'begin' or 'return' before function body.");
-            const body = parser.parseExpression(parser.getPrecedence());
+            const body = [];
+            while (parser.peek().type !== "END") {
+                body.push(parser.parseExpression(parser.getPrecedence()));
+            }
             parser.consume("END");
             return new FunctionExpression(name, params, body);
         }

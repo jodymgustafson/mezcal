@@ -77,11 +77,11 @@ export class Parser {
         return expressions;
     }
 
-    parseExpression(precedence: number = 0): Expression {
+    parseExpression(precedence = 0): Expression {
         let token = this.consume();
 
         if (token.type === "LET") {
-            // ignore it
+            // ignore let
             return this.parseExpression();
         }
 
@@ -126,8 +126,25 @@ export class Parser {
         );
     }
 
-    private peek(offset: number = 0): Token {
+    peek(offset: number = 0): Token {
         return this.tokens[this.idx + offset];
+    }
+
+    /**
+     * Checks if the next token matches the type and if so consumes it 
+     */
+    match(tokenType: MezcalTokenType): boolean {
+        const isMatch = this.peek().type === tokenType;
+        if (isMatch) {
+            this.consume();
+        }
+        return isMatch;
+    }
+
+    getPrecedence(): number {
+        const token = this.peek();
+        const parselet = this.infixParselets[token.type];
+        return parselet?.getPrecedence() ?? 0;
     }
 
     private registerPrefix(tokenType: MezcalTokenType, prefixParselet: PrefixParselet): void {
@@ -144,22 +161,5 @@ export class Parser {
 
     private postfix(tokenType: MezcalTokenType, precedence: Precedence): void {
         this.registerInfix(tokenType, new PostfixOperatorParselet(precedence));
-    }
-
-    getPrecedence(): number {
-        const token = this.peek();
-        const parselet = this.infixParselets[token.type];
-        return parselet?.getPrecedence() ?? 0;
-    }
-
-    /**
-     * Checks if the next token matches the type and if so consumes it 
-     */
-    match(tokenType: MezcalTokenType): boolean {
-        const isMatch = this.peek().type === tokenType;
-        if (isMatch) {
-            this.consume();
-        }
-        return isMatch;
     }
 }

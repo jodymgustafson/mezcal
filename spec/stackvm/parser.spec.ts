@@ -378,11 +378,11 @@ describe("When use stackvm parser", () => {
         expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
             "fnName":"add",
             "params":["a","b"],
-            "body":{
+            "body":[{
                 "left":{"name":"a"},
                 "operator":"PLUS",
                 "right":{"name":"b"}
-            }
+            }]
         }]));
     });
 
@@ -397,9 +397,7 @@ describe("When use stackvm parser", () => {
         expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
             "fnName":"add",
             "params":["a","b"],
-            "body":{
-                "expression":{"left":{"name":"a"},"operator":"PLUS","right":{"name":"b"}}
-            }
+            "body":[{"expression":{"left":{"name":"a"},"operator":"PLUS","right":{"name":"b"}},"name":"RETURN"}]
         }]));
     });
 
@@ -413,6 +411,23 @@ describe("When use stackvm parser", () => {
         const tokens = new Scanner(source).scanTokens();
         const parser = new Parser(tokens);
         const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([]));
+        expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
+            "fnName":"fib",
+            "params":["n"],
+            "body":[
+                {"conditional":{
+                    "left":{"name":"n"},
+                    "operator":"LESS_EQUAL",
+                    "right":{"value":"1"}},
+                    "thenExpr":{"expression":{"name":"n"},"name":"RETURN"}},
+                {"expression":{
+                    "left":{"method":{"name":"fib"},"args":[{"left":{"name":"n"},"operator":"MINUS","right":{"value":"2"}}]},
+                    "operator":"PLUS",
+                    "right":{"method":{"name":"fib"},"args":[{"left":{"name":"n"},"operator":"MINUS","right":{"value":"1"}}]}},
+                    "name":"RETURN"
+                }
+            ]},
+            {"method":{"name":"fib"},"args":[{"value":"3"}]
+        }]));
     });
 });

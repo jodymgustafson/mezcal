@@ -72,13 +72,14 @@ export class FunctionExpression extends Expression {
     constructor(
         readonly fnName: string,
         readonly params: string[],
-        readonly body: Expression
+        readonly body: Expression[]
     ) {
         super();
     }
 }
 
 export class ReturnExpression extends Expression {
+    readonly name = "RETURN";
     constructor(readonly expression) {
         super();
     }
