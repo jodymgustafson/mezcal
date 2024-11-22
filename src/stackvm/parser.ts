@@ -1,6 +1,6 @@
 import { Token } from "../internal/token";
 import { MezcalTokenType } from "../scanner";
-import { Expression } from "./expression";
+import { Expression, OperatorExpression } from "./expression";
 import {
     AssignmentParselet,
     BeginParselet,
@@ -13,7 +13,6 @@ import {
     MethodCallParselet,
     NameParselet,
     NumberParselet,
-    PostfixOperatorParselet,
     Precedence,
     PrefixOperatorParselet,
     PrefixParselet,
@@ -21,49 +20,49 @@ import {
     WhileParselet,
 } from "./parselet";
 
+
+const prefixParselets: Partial<Record<MezcalTokenType, PrefixParselet>> = {
+    "IDENTIFIER": new NameParselet(),
+    "NUMBER": new NumberParselet(),
+    "LEFT_PAREN": new GroupParselet(),
+    "BEGIN": new BeginParselet(),
+    "IF": new IfParselet(),
+    "WHILE": new WhileParselet(),
+    "FOR": new ForParselet(),
+    "FUNCTION": new FunctionParselet(),
+    "RETURN": new ReturnParselet(),
+
+    "PLUS": new PrefixOperatorParselet(Precedence.PREFIX),
+    "MINUS": new PrefixOperatorParselet(Precedence.PREFIX),
+    "NOT": new PrefixOperatorParselet(Precedence.PREFIX),
+};
+
+const infixParselets: Partial<Record<MezcalTokenType, InfixParselet>> = {
+    "LEFT_PAREN": new MethodCallParselet(),
+    "EQUAL": new AssignmentParselet(),
+
+    "PLUS": new BinaryOperatorParselet(Precedence.SUM, false),
+    "MINUS": new BinaryOperatorParselet(Precedence.SUM, false),
+    "STAR": new BinaryOperatorParselet(Precedence.PRODUCT, false),
+    "SLASH": new BinaryOperatorParselet(Precedence.PRODUCT, false),
+    "POWER": new BinaryOperatorParselet(Precedence.EXPONENT, true),
+
+    "LESS": new BinaryOperatorParselet(Precedence.CONDITIONAL, false),
+    "LESS_EQUAL": new BinaryOperatorParselet(Precedence.CONDITIONAL, false),
+    "GREATER": new BinaryOperatorParselet(Precedence.CONDITIONAL, false),
+    "GREATER_EQUAL": new BinaryOperatorParselet(Precedence.CONDITIONAL, false),
+    "EQUAL_EQUAL": new BinaryOperatorParselet(Precedence.CONDITIONAL, false),
+    "NOT_EQUAL": new BinaryOperatorParselet(Precedence.CONDITIONAL, false),
+
+    "AND": new BinaryOperatorParselet(Precedence.BOOLEAN, false),
+    "OR": new BinaryOperatorParselet(Precedence.BOOLEAN, false),
+};
+
 export class Parser {
-    tokens: Token[];
-    idx: number = 0;
+    readonly instructions: string[] = [":start"];
+    private idx: number = 0;
 
-    prefixParselets: Partial<Record<MezcalTokenType, PrefixParselet>> = {};
-    infixParselets: Partial<Record<MezcalTokenType, InfixParselet>> = {};
-
-    constructor(tokens: Token[]) {
-        this.registerPrefix("FUNCTION", new NameParselet());
-        this.registerPrefix("IDENTIFIER", new NameParselet());
-        this.registerPrefix("NUMBER", new NumberParselet());
-        this.registerPrefix("LEFT_PAREN", new GroupParselet());
-        this.registerPrefix("BEGIN", new BeginParselet());
-        this.registerPrefix("IF", new IfParselet());
-        this.registerPrefix("WHILE", new WhileParselet());
-        this.registerPrefix("FOR", new ForParselet());
-        this.registerPrefix("FUNCTION", new FunctionParselet());
-        this.registerPrefix("RETURN", new ReturnParselet());
-
-        this.registerInfix("LEFT_PAREN", new MethodCallParselet());
-        this.registerInfix("EQUAL", new AssignmentParselet());
-
-        this.prefix("PLUS", Precedence.PREFIX);
-        this.prefix("MINUS", Precedence.PREFIX);
-        this.prefix("NOT", Precedence.PREFIX);
-
-        this.binary("PLUS", Precedence.SUM);
-        this.binary("MINUS", Precedence.SUM);
-        this.binary("STAR", Precedence.PRODUCT);
-        this.binary("SLASH", Precedence.PRODUCT);
-        this.binary("POWER", Precedence.EXPONENT, true);
-
-        this.binary("LESS", Precedence.CONDITIONAL);
-        this.binary("LESS_EQUAL", Precedence.CONDITIONAL);
-        this.binary("GREATER", Precedence.CONDITIONAL);
-        this.binary("GREATER_EQUAL", Precedence.CONDITIONAL);
-        this.binary("EQUAL_EQUAL", Precedence.CONDITIONAL);
-        this.binary("NOT_EQUAL", Precedence.CONDITIONAL);
-
-        this.binary("AND", Precedence.BOOLEAN);
-        this.binary("OR", Precedence.BOOLEAN);
-
-        this.tokens = tokens;
+    constructor(readonly tokens: Token[]) {
     }
 
     parse(): Expression[] {
@@ -74,6 +73,7 @@ export class Parser {
             expressions.push(ast);
         }
 
+        this.instructions.push("end");
         return expressions;
     }
 
@@ -85,17 +85,20 @@ export class Parser {
             return this.parseExpression();
         }
 
-        const prefix = this.prefixParselets[token.type];
-
-        if (prefix === undefined) throw new Error(`Could not parse ${JSON.stringify(token)}`);
+        const prefix = prefixParselets[token.type] as PrefixParselet;
+        if (!prefix) throw new Error(`Could not parse ${JSON.stringify(token)}`);
 
         let left = prefix.parse(this, token);
 
+        // This stops operators from being added multiple times
+        if (!(left as OperatorExpression).operator)
+            this.instructions.push(left.toStackVm());
+
         while (precedence < this.getPrecedence()) {
             token = this.consume();
-
-            const infix = this.infixParselets[token.type]!;
+            const infix = infixParselets[token.type]!;
             left = infix.parse(this, left, token);
+            this.instructions.push(left.toStackVm());
         }
 
         return left;
@@ -103,17 +106,6 @@ export class Parser {
 
     private isAtEnd(): boolean {
         return this.peek().type === "EOF";
-    }
-
-    private binary(
-        tokenType: MezcalTokenType,
-        precedence: Precedence,
-        isRightAssociative: boolean = false,
-    ) {
-        this.registerInfix(
-            tokenType,
-            new BinaryOperatorParselet(precedence, isRightAssociative),
-        );
     }
 
     consume(expectedType?: MezcalTokenType, errorMsg?: string): Token {
@@ -143,23 +135,7 @@ export class Parser {
 
     getPrecedence(): number {
         const token = this.peek();
-        const parselet = this.infixParselets[token.type];
+        const parselet = infixParselets[token.type];
         return parselet?.getPrecedence() ?? 0;
-    }
-
-    private registerPrefix(tokenType: MezcalTokenType, prefixParselet: PrefixParselet): void {
-        this.prefixParselets[tokenType] = prefixParselet;
-    }
-
-    private registerInfix(tokenType: MezcalTokenType, infixParselet: InfixParselet): void {
-        this.infixParselets[tokenType] = infixParselet;
-    }
-
-    private prefix(prefix: MezcalTokenType, precedence: number): void {
-        this.registerPrefix(prefix, new PrefixOperatorParselet(precedence));
-    }
-
-    private postfix(tokenType: MezcalTokenType, precedence: Precedence): void {
-        this.registerInfix(tokenType, new PostfixOperatorParselet(precedence));
     }
 }

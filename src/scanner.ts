@@ -22,7 +22,7 @@ const KEYWORDS = [
  * A lexical scanner that parses Mezcal source code into an array of tokens
  */
 export class Scanner extends BaseLexicalScanner<MezcalTokenType> {
-    protected scanToken(char: string) {
+    protected scanToken(char: string): void {
         switch (char) {
             // whitespace
             case "\t":

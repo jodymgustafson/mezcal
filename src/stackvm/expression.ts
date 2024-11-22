@@ -1,4 +1,5 @@
 import { MezcalTokenType } from "../scanner";
+import { isFunctionName } from "./is-function-name";
 
 export abstract class Expression {
     toStackVm(): string {
@@ -10,17 +11,33 @@ export class NameExpression extends Expression {
     constructor(readonly name: string) {
         super();
     }
+
+    toStackVm(): string {
+        // if (isFunctionName(this.name)) {
+        //     return `call ${this.name}`;
+        // }
+        return `get ${this.name}`
+    }
 }
 
 export class NumberExpression extends Expression {
     constructor(readonly value: string) {
         super();
     }
+
+    toStackVm(): string {
+        return "push " + this.value;
+    }
 }
 
 export class MethodCallExpression extends Expression {
     constructor(readonly method: Expression, readonly args: Expression[]) {
         super();
+    }
+
+    toStackVm(): string {
+        // return `${this.args.map(a => a.toStackVm())}`
+        return `${this.method.toStackVm()}`;
     }
 }
 
@@ -33,6 +50,17 @@ export class PrefixExpression extends Expression {
 export class OperatorExpression extends Expression {
     constructor(readonly left: Expression, readonly operator: MezcalTokenType, readonly right: Expression) {
         super();
+    }
+
+    toStackVm(): string {
+        switch (this.operator) {
+            case "PLUS": return "add";
+            case "MINUS": return "sub";
+            case "STAR": return "mul";
+            case "SLASH": return "div";
+            case "POWER": return "call pow";
+        }
+        return "nop";
     }
 }
 

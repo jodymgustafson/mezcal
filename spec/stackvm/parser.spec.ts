@@ -19,6 +19,7 @@ describe("When use stackvm parser", () => {
         ]);
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"left":{"value":"2"},"operator":"POWER","right":{"value":"3"}}]`);
+        expect(parser.instructions).toEqual([":start", "push 2", "push 3", "call pow", "end"]);
     });
 
     it("should parse lexical tokens for 2 + x", () => {
@@ -30,6 +31,7 @@ describe("When use stackvm parser", () => {
         ]);
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"left":{"value":"2"},"operator":"PLUS","right":{"name":"x"}}]`);
+        expect(parser.instructions).toEqual([":start", "push 2", "get x", "add", "end"]);
     });
 
     it("should parse lexical tokens for (2+x)*5^3", () => {
@@ -55,6 +57,31 @@ describe("When use stackvm parser", () => {
                 "left":{"value":"5"},"operator":"POWER","right":{"value":"3"}
             }
         }]));
+        expect(parser.instructions).toEqual([":start",
+            "push 2",
+            "get x",
+            "add",
+            "push 5",
+            "push 3",
+            "call pow",
+            "mul",
+            "end"]);
+    });
+
+    it("should parse lexical tokens for\nsin(pi)", () => {
+        const source = `sin(pi())`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        const ast = parser.parse();
+        expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
+            "method":{"name":"sin"},"args":[
+                {"method":{"name":"pi"},"args":[]}
+            ]
+        }]));
+        expect(parser.instructions).toEqual([":start",
+            "call pi",
+            "call sin",
+            "end"]);
     });
 
     it("should parse lexical tokens for sin(2*pi/x) * (3^x)", () => {
@@ -88,6 +115,18 @@ describe("When use stackvm parser", () => {
             "operator":"STAR",
             "right":{"left":{"value":"3"},"operator":"POWER","right":{"name":"x"}}
         }]));
+        expect(parser.instructions).toEqual([":start",
+            "push 2",
+            "call pi",
+            "mul",
+            "get x",
+            "div",
+            "call sin",
+            "push 3",
+            "get x",
+            "call pow",
+            "mul",
+            "end"]);
     });
 
     it("should parse lexical tokens for let z = 3", () => {
