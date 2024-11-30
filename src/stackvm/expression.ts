@@ -2,8 +2,14 @@ import { MezcalTokenType } from "../scanner";
 import { isFunctionName } from "./is-function-name";
 
 export abstract class Expression {
+    isEmitted = false;
     toStackVm(): string {
         return "";
+    }
+    toJSON() {
+        const copy = { ...this };
+        delete copy.isEmitted;
+        return copy;
     }
 }
 
@@ -13,9 +19,9 @@ export class NameExpression extends Expression {
     }
 
     toStackVm(): string {
-        // if (isFunctionName(this.name)) {
-        //     return `call ${this.name}`;
-        // }
+        if (isFunctionName(this.name)) {
+            return `call ${this.name}`;
+        }
         return `get ${this.name}`
     }
 }
@@ -36,7 +42,6 @@ export class MethodCallExpression extends Expression {
     }
 
     toStackVm(): string {
-        // return `${this.args.map(a => a.toStackVm())}`
         return `${this.method.toStackVm()}`;
     }
 }
@@ -117,5 +122,12 @@ export class AssignmentExpression extends Expression {
     readonly name = "ASSIGN";
     constructor(readonly left: Expression, readonly right: Expression) {
         super();
+    }
+
+    toStackVm(): string {
+        // if (this.isEmitted) return super.toStackVm();
+        // this.isEmitted = true;
+
+        return `set ${(this.left as NameExpression).name}`;
     }
 }

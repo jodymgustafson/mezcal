@@ -91,12 +91,17 @@ export class Parser {
         let left = prefix.parse(this, token);
 
         // This stops operators from being added multiple times
-        if (!(left as OperatorExpression).operator)
+        // And the last expression of a block from being added
+        if (!(left instanceof OperatorExpression || token.type === "BEGIN"))
             this.instructions.push(left.toStackVm());
 
         while (precedence < this.getPrecedence()) {
             token = this.consume();
             const infix = infixParselets[token.type]!;
+            if (infix instanceof MethodCallParselet || infix instanceof AssignmentParselet) {
+                // remove the NameExpression that was the name of the function
+                this.instructions.pop();
+            }
             left = infix.parse(this, left, token);
             this.instructions.push(left.toStackVm());
         }

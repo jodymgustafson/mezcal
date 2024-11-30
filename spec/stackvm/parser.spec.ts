@@ -68,7 +68,7 @@ describe("When use stackvm parser", () => {
             "end"]);
     });
 
-    it("should parse lexical tokens for\nsin(pi)", () => {
+    it("should parse lexical tokens for\nsin(pi())", () => {
         const source = `sin(pi())`;
         const tokens = new Scanner(source).scanTokens();
         const parser = new Parser(tokens);
@@ -139,6 +139,10 @@ describe("When use stackvm parser", () => {
         ]);
         const ast = parser.parse();
         expect(JSON.stringify(ast)).toEqual(`[{"left":{"name":"z"},"right":{"value":"3"},"name":"ASSIGN"}]`);
+        expect(parser.instructions).toEqual([":start",
+            "push 3",
+            "set z",
+            "end"]);
     });
 
     it("should parse lexical tokens for 'let a = 3\\na = a^2'", () => {
@@ -161,6 +165,14 @@ describe("When use stackvm parser", () => {
                 "left":{"name":"a"},"operator":"POWER","right":{"value":"2"}
             },"name":"ASSIGN"
         }]));
+        expect(parser.instructions).toEqual([":start",
+            "push 3",
+            "set a",
+            "get a",
+            "push 2",
+            "call pow",
+            "set a",
+            "end"]);
     });
 
     it("should parse lexical tokens for\nlet a = 3\nbegin a = 2 end\n a = 1", () => {
@@ -185,6 +197,14 @@ describe("When use stackvm parser", () => {
             {"left":{"name":"a"},"right":{"value":"2"},"name":"ASSIGN"},
             {"left":{"name":"a"},"right":{"value":"1"},"name":"ASSIGN"}
         ]));
+        expect(parser.instructions).toEqual([":start",
+            "push 3",
+            "set a",
+            "push 2",
+            "set a",
+            "push 1",
+            "set a",
+            "end"]);
     });
 
     it("should parse lexical tokens for\nlet a = 3\nif a < 0 then begin\na = 0\nend\nelse a = 1", () => {
@@ -218,6 +238,21 @@ describe("When use stackvm parser", () => {
                 "elseExpr":{"left":{"name":"a"},"right":{"value":"1"},"name":"ASSIGN"}
             }
         ]));
+        expect(parser.instructions).toEqual([":start",
+            "push 3",
+            "set a",
+            "get a",
+            "push 0",
+            "cmp",
+            "blt _1",
+            "push 1",
+            "set a",
+            "bra :_2",
+            ":_1",
+            "push 0",
+            "set a",
+            ":_2",
+            "end"]);
     });
 
     it("should get an error when if has no then", () => {
