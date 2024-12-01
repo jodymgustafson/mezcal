@@ -1,4 +1,5 @@
 import { BaseLexicalScanner, BaseTokenType } from "./internal/lexical-scanner";
+import { Token } from "./internal/token";
 
 export type MezcalTokenType = BaseTokenType |
     "FUNCTION" | "LET" | "IF" | "THEN" | "ELSE" | "ERROR" | "RETURN" | "BEGIN" | "END" |
@@ -10,6 +11,8 @@ export type MezcalTokenType = BaseTokenType |
     "EQUAL" | "EQUAL_EQUAL" | "NOT_EQUAL" | "GREATER" | "GREATER_EQUAL" | "LESS" | "LESS_EQUAL" |
     "IDENTIFIER" | "STRING" | "NUMBER" | "ERROR"
     ;
+
+export type MezcalToken<T = any> = Token<MezcalTokenType, T>;
 
 const KEYWORDS = [
     "function", "let", "if", "then", "else", "error", "return", "begin", "end",

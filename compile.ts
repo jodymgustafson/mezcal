@@ -38,4 +38,6 @@ export function compile(expr: string): string[] {
             return compiler.compile(ast);
         }
     }
+
+    return [];
 }

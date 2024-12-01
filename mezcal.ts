@@ -104,9 +104,9 @@ function logError(err: any) {
 /**
  * Checks for a command input by user
  * @param expr The expression entered
- * @returns The expression to evaluate if the command should be evaluated, or undefined
+ * @returns The expression to evaluate if the command should be evaluated, or empty string
  */
-function checkCommand(expr: string): string | undefined {
+function checkCommand(expr: string): string {
     if (expr === ":b" || expr === ":break" || expr === "") {
         if (editMode) {
             editMode = false;
@@ -143,6 +143,8 @@ function checkCommand(expr: string): string | undefined {
         // No command, evaluate the expression
         return expr;
     }
+
+    return "";
 }
 
 function runProgramFile(filePath: string): void {
