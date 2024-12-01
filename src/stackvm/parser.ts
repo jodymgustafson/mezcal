@@ -61,8 +61,13 @@ const infixParselets: Partial<Record<MezcalTokenType, InfixParselet>> = {
 export class Parser {
     readonly instructions: string[] = [":start"];
     private idx: number = 0;
+    private labelCnt = 0;
 
     constructor(readonly tokens: Token[]) {
+    }
+
+    getLabel(): string {
+        return `__${this.labelCnt++}`;
     }
 
     parse(): Expression[] {
@@ -93,17 +98,17 @@ export class Parser {
         // This stops operators from being added multiple times
         // And the last expression of a block from being added
         if (!(left instanceof OperatorExpression || token.type === "BEGIN"))
-            this.instructions.push(left.toStackVm());
+            this.instructions.push(...left.toStackVm(this));
 
         while (precedence < this.getPrecedence()) {
             token = this.consume();
             const infix = infixParselets[token.type]!;
             if (infix instanceof MethodCallParselet || infix instanceof AssignmentParselet) {
-                // remove the NameExpression that was the name of the function
+                // Remove the identifier that was the name of the function or variable
                 this.instructions.pop();
             }
             left = infix.parse(this, left, token);
-            this.instructions.push(left.toStackVm());
+            this.instructions.push(...left.toStackVm(this));
         }
 
         return left;

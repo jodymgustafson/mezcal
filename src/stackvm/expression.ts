@@ -1,15 +1,10 @@
 import { MezcalTokenType } from "../scanner";
 import { isFunctionName } from "./is-function-name";
+import { Parser } from "./parser";
 
 export abstract class Expression {
-    isEmitted = false;
-    toStackVm(): string {
-        return "";
-    }
-    toJSON() {
-        const copy = { ...this };
-        delete copy.isEmitted;
-        return copy;
+    toStackVm(parser: Parser): string[] {
+        return [""];
     }
 }
 
@@ -18,11 +13,11 @@ export class NameExpression extends Expression {
         super();
     }
 
-    toStackVm(): string {
+    toStackVm(): string[] {
         if (isFunctionName(this.name)) {
-            return `call ${this.name}`;
+            return [`call ${this.name}`];
         }
-        return `get ${this.name}`
+        return [`get ${this.name}`];
     }
 }
 
@@ -31,8 +26,8 @@ export class NumberExpression extends Expression {
         super();
     }
 
-    toStackVm(): string {
-        return "push " + this.value;
+    toStackVm(): string[] {
+        return [`push ${this.value}`];
     }
 }
 
@@ -41,8 +36,8 @@ export class MethodCallExpression extends Expression {
         super();
     }
 
-    toStackVm(): string {
-        return `${this.method.toStackVm()}`;
+    toStackVm(parser: Parser): string[] {
+        return [`${this.method.toStackVm(parser)}`];
     }
 }
 
@@ -57,15 +52,19 @@ export class OperatorExpression extends Expression {
         super();
     }
 
-    toStackVm(): string {
+    toStackVm(parser: Parser): string[] {
         switch (this.operator) {
-            case "PLUS": return "add";
-            case "MINUS": return "sub";
-            case "STAR": return "mul";
-            case "SLASH": return "div";
-            case "POWER": return "call pow";
+            case "PLUS": return ["add"];
+            case "MINUS": return ["sub"];
+            case "STAR": return ["mul"];
+            case "SLASH": return ["div"];
+            case "POWER": return ["call pow"];
+            case "LESS": return ["cmp", `bge ${parser.getLabel()}`, "pop"];
+            case "GREATER": return ["cmp", `ble ${parser.getLabel()}`, "pop"];
+            case "LESS_EQUAL": return ["cmp", `bgt ${parser.getLabel()}`, "pop"];
+            case "GREATER_EQUAL": return ["cmp", `blt ${parser.getLabel()}`, "pop"];;
         }
-        return "nop";
+        return ["nop"];
     }
 }
 
@@ -82,6 +81,10 @@ export class IfExpression extends Expression {
         readonly elseExpr: Expression,
     ) {
         super();
+    }
+
+    toStackVm(): string[] {
+        return ["cmp"];
     }
 }
 
@@ -124,10 +127,7 @@ export class AssignmentExpression extends Expression {
         super();
     }
 
-    toStackVm(): string {
-        // if (this.isEmitted) return super.toStackVm();
-        // this.isEmitted = true;
-
-        return `set ${(this.left as NameExpression).name}`;
+    toStackVm(): string[] {
+        return [`put ${(this.left as NameExpression).name}`, "pop"];
     }
 }

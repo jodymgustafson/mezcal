@@ -141,7 +141,8 @@ describe("When use stackvm parser", () => {
         expect(JSON.stringify(ast)).toEqual(`[{"left":{"name":"z"},"right":{"value":"3"},"name":"ASSIGN"}]`);
         expect(parser.instructions).toEqual([":start",
             "push 3",
-            "set z",
+            "put z",
+            "pop",
             "end"]);
     });
 
@@ -167,11 +168,13 @@ describe("When use stackvm parser", () => {
         }]));
         expect(parser.instructions).toEqual([":start",
             "push 3",
-            "set a",
+            "put a",
+            "pop",
             "get a",
             "push 2",
             "call pow",
-            "set a",
+            "put a",
+            "pop",
             "end"]);
     });
 
@@ -199,11 +202,14 @@ describe("When use stackvm parser", () => {
         ]));
         expect(parser.instructions).toEqual([":start",
             "push 3",
-            "set a",
+            "put a",
+            "pop",
             "push 2",
-            "set a",
+            "put a",
+            "pop",
             "push 1",
-            "set a",
+            "put a",
+            "pop",
             "end"]);
     });
 
@@ -240,18 +246,23 @@ describe("When use stackvm parser", () => {
         ]));
         expect(parser.instructions).toEqual([":start",
             "push 3",
-            "set a",
+            "put a",
+            "pop",
             "get a",
             "push 0",
             "cmp",
-            "blt _1",
-            "push 1",
-            "set a",
-            "bra :_2",
-            ":_1",
+            "bge __0",
+            "pop",
             "push 0",
-            "set a",
-            ":_2",
+            "put a",
+            "pop",
+            "bra :__1",
+            ":__0",
+            "pop",
+            "push 1",
+            "put a",
+            "pop",
+            ":__1",
             "end"]);
     });
 
