@@ -204,7 +204,7 @@ describe("When use stack-vm parser", () => {
             "push 0",
             "put a",
             "pop",
-            "bra :__1",
+            "bra __1",
             ":__0",
             "pop",
             "push 1",
@@ -258,21 +258,26 @@ describe("When use stack-vm parser", () => {
             { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
             { type: 'EOF', lexeme: '', line: 4, value: undefined },
         ]);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([
-            {"left":{"name":"a"},"right":{"value":"0"},"name":"ASSIGN"},
-            {"conditional":{
-                "left":{
-                    "left":{"name":"a"},"operator":"LESS","right":{"value":"0"}
-                },
-                "operator":"OR",
-                "right":{
-                    "left":{"name":"a"},"operator":"GREATER","right":{"value":"0"}
-                }},
-                "thenExpr":{"left":{"name":"a"},"right":{"value":"1"},"name":"ASSIGN"},
-                "elseExpr":{"left":{"name":"a"},"right":{"operator":"MINUS","expression":{"value":"1"}},"name":"ASSIGN"}
-            }
-        ]));
+        expect(parser.parse()).toEqual([":start",
+            "push 0",
+            "put a",
+            "pop",
+            "get a",
+            "push 0",
+            "cmp",
+            "bge __0",
+            "pop",
+            "push 1",
+            "put a",
+            "pop",
+            "bra __1",
+            ":__0",
+            "pop",
+            "push 1",
+            "put a",
+            "pop",
+            ":__1",
+            "end"]);
     });
 
     it("should parse lexical tokens for\nlet a = 0\nlet b = a or 2", () => {

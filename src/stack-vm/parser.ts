@@ -73,6 +73,10 @@ export class Parser {
         return `__${this.labelCnt++}`;
     }
 
+    peekLabel(offset = 0): string {
+        return `__${this.labelCnt + offset}`;
+    }
+
     parse(): string[] {
         while (!this.isAtEnd()) {
             const ast = this.parseExpression();

@@ -53,15 +53,22 @@ export class BeginParselet implements PrefixParselet {
 
 export class IfParselet implements PrefixParselet {
     parse(parser: Parser, token: MezcalToken): void {
+        const label1 = parser.peekLabel();
+        const label2 = parser.peekLabel(1);
+
         // condition
         parser.parseExpression(parser.getPrecedence());
 
         parser.consume("THEN");
         parser.parseExpression(parser.getPrecedence());
 
+        parser.addInstructions(`bra ${label2}`, `:${label1}`, "pop");
+
         if (parser.match("ELSE")) {
             parser.parseExpression(parser.getPrecedence());
         }
+
+        parser.addInstructions(`:${label2}`);
     }
 }
 
