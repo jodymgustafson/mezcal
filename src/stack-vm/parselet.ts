@@ -74,10 +74,17 @@ export class IfParselet implements PrefixParselet {
 
 export class WhileParselet implements PrefixParselet {
     parse(parser: Parser, token: MezcalToken): void {
+        const label1 = parser.peekLabel();
+        const label2 = parser.peekLabel(1);
+
+        parser.addInstructions(`${label2}:`);
+
         // condition
         parser.parseExpression(parser.getPrecedence());
         // body
         parser.parseExpression(parser.getPrecedence());
+
+        parser.addInstructions(`bra ${label2}`, `${label1}:`, "pop");
     }
 }
 
@@ -85,8 +92,10 @@ export class ForParselet implements PrefixParselet {
     parse(parser: Parser, token: MezcalToken): void {
         // from
         parser.parseExpression(parser.getPrecedence());
+
         parser.consume("TO");
         parser.parseExpression(parser.getPrecedence());
+        
         let stepExpr: void;
         if (parser.match("STEP")) {
             stepExpr = parser.parseExpression(parser.getPrecedence());
@@ -174,6 +183,9 @@ export class BinaryOperatorParselet implements InfixParselet {
             case "STAR": parser.addInstructions("mul"); break;
             case "SLASH": parser.addInstructions("div"); break;
             case "POWER": parser.addInstructions("call pow"); break;
+            case "OR": parser.addInstructions("or"); break;
+            case "AND": parser.addInstructions("and"); break;
+            case "NOT": parser.addInstructions("not"); break;
             case "LESS": parser.addInstructions("cmp", `bge ${parser.getLabel()}`, "pop"); break;
             case "GREATER": parser.addInstructions("cmp", `ble ${parser.getLabel()}`, "pop"); break;
             case "LESS_EQUAL": parser.addInstructions("cmp", `bgt ${parser.getLabel()}`, "pop"); break;

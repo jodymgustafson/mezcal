@@ -259,24 +259,29 @@ describe("When use stack-vm parser", () => {
             { type: 'EOF', lexeme: '', line: 4, value: undefined },
         ]);
         expect(parser.parse()).toEqual([":start",
-            "push 0",
+            "push 0", // a=0
             "put a",
             "pop",
-            "get a",
+            "get a", // a < 0
             "push 0",
             "cmp",
             "bge __0",
             "pop",
-            "push 1",
+            "get a", // or a > 0
+            "push 0",
+            "cmp",
+            "ble __0",
+            "pop",
+            "push 1", // a=1
             "put a",
             "pop",
             "bra __1",
-            ":__0",
+            "__0:",
             "pop",
-            "push 1",
+            "push -1", // a=-1
             "put a",
             "pop",
-            ":__1",
+            "__1:",
             "end"]);
     });
 
@@ -294,13 +299,16 @@ describe("When use stack-vm parser", () => {
             { type: 'NUMBER', lexeme: '2', line: 3, value: 2 },
             { type: 'EOF', lexeme: '', line: 3, value: undefined },
         ]);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([
-            {"left":{"name":"a"},"right":{"value":"0"},"name":"ASSIGN"},
-            {"left":{"name":"b"},"right":{
-                "left":{"name":"a"},"operator":"OR","right":{"value":"2"}
-            },"name":"ASSIGN"}
-        ]));
+        expect(parser.parse()).toEqual([":start",
+            "push 0", // a=0
+            "put a",
+            "pop",
+            "get a", // b=a or 2
+            "push 2",
+            "or",
+            "put b",
+            "pop",
+            "end"]);
     });
 
     it("should parse lexical tokens for\nlet a = 0\nwhile a < 100 begin\na = a + 1\nend", () => {
@@ -311,20 +319,26 @@ describe("When use stack-vm parser", () => {
             end`;
         const tokens = new Scanner(source).scanTokens();
         const parser = new Parser(tokens);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([
-            {"left":{"name":"a"},"right":{"value":"0"},"name":"ASSIGN"},
-            {
-                "conditional":{"left":{"name":"a"},"operator":"LESS","right":{"value":"100"}},
-                "body":{
-                    "left":{"name":"a"},
-                    "right":{
-                        "left":{"name":"a"},"operator":"PLUS","right":{"value":"1"}
-                    },"name":"ASSIGN"
-                }
-            }
-        ]));
-    });
+        expect(parser.parse()).toEqual([":start",
+            "push 0", // a=0
+            "put a",
+            "pop",
+            "__1:", // while
+            "get a",
+            "push 100",
+            "cmp", // a<100
+            "bge __0",
+            "pop",
+            "get a", // a=a+1
+            "push 1",
+            "add",
+            "put a",
+            "pop",
+            "bra __1", // wend
+            "__0:",
+            "pop",
+            "end"]);
+        });
 
     it("should parse lexical tokens for\nlet a = 0\nwhile a < 100 a = a + 1", () => {
         const source = `
@@ -332,19 +346,25 @@ describe("When use stack-vm parser", () => {
             while a < 100 a = a + 1`;
         const tokens = new Scanner(source).scanTokens();
         const parser = new Parser(tokens);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([
-            {"left":{"name":"a"},"right":{"value":"0"},"name":"ASSIGN"},
-            {
-                "conditional":{"left":{"name":"a"},"operator":"LESS","right":{"value":"100"}},
-                "body":{
-                    "left":{"name":"a"},
-                    "right":{
-                        "left":{"name":"a"},"operator":"PLUS","right":{"value":"1"}
-                    },"name":"ASSIGN"
-                }
-            }
-        ]));
+        expect(parser.parse()).toEqual([":start",
+            "push 0", // a=0
+            "put a",
+            "pop",
+            "__1:", // while
+            "get a",
+            "push 100",
+            "cmp", // a<100
+            "bge __0",
+            "pop",
+            "get a", // a=a+1
+            "push 1",
+            "add",
+            "put a",
+            "pop",
+            "bra __1", // wend
+            "__0:",
+            "pop",
+            "end"]);
     });
 
     it("should parse lexical tokens for\nlet cnt = 0\nfor a = 0 to 100 step 1 cnt = cnt + 1", () => {
