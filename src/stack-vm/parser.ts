@@ -19,7 +19,6 @@ import {
     WhileParselet,
 } from "./parselet";
 
-
 const prefixParselets: Partial<Record<MezcalTokenType, PrefixParselet>> = {
     "IDENTIFIER": new NameParselet(),
     "NUMBER": new NumberParselet(),

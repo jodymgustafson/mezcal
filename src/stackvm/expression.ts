@@ -123,7 +123,7 @@ export class ReturnExpression extends Expression {
 
 export class AssignmentExpression extends Expression {
     readonly name = "ASSIGN";
-    constructor(readonly left: Expression, readonly right: Expression) {
+    constructor(readonly left: NameExpression, readonly right: Expression) {
         super();
     }
 

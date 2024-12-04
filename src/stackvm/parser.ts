@@ -1,5 +1,5 @@
 import { Token } from "../internal/token";
-import { MezcalTokenType } from "../scanner";
+import { MezcalToken, MezcalTokenType } from "../scanner";
 import { Expression, OperatorExpression } from "./expression";
 import {
     AssignmentParselet,
@@ -63,14 +63,22 @@ export class Parser {
     private idx: number = 0;
     private labelCnt = 0;
 
-    constructor(readonly tokens: Token[]) {
+    constructor(readonly tokens: MezcalToken[]) {
+    }
+
+    addInstructions(...instrs: string[]): void {
+        this.instructions.push(...instrs);
     }
 
     getLabel(): string {
         return `__${this.labelCnt++}`;
     }
 
-    parse(): Expression[] {
+    peekLabel(offset = 0): string {
+        return `__${this.labelCnt + offset}`;
+    }
+
+    parse(): string[] {
         const expressions: Expression[] = [];
 
         while (!this.isAtEnd()) {
@@ -79,10 +87,10 @@ export class Parser {
         }
 
         this.instructions.push("end");
-        return expressions;
+        return this.instructions;
     }
 
-    parseExpression(precedence = 0): Expression {
+    parseExpression<T extends Expression>(precedence = 0): T {
         let token = this.consume();
 
         if (token.type === "LET") {
@@ -95,30 +103,20 @@ export class Parser {
 
         let left = prefix.parse(this, token);
 
-        // This stops operators from being added multiple times
-        // And the last expression of a block from being added
-        if (!(left instanceof OperatorExpression || token.type === "BEGIN"))
-            this.instructions.push(...left.toStackVm(this));
-
         while (precedence < this.getPrecedence()) {
             token = this.consume();
             const infix = infixParselets[token.type]!;
-            if (infix instanceof MethodCallParselet || infix instanceof AssignmentParselet) {
-                // Remove the identifier that was the name of the function or variable
-                this.instructions.pop();
-            }
             left = infix.parse(this, left, token);
-            this.instructions.push(...left.toStackVm(this));
         }
 
-        return left;
+        return left as T;
     }
 
     private isAtEnd(): boolean {
         return this.peek().type === "EOF";
     }
 
-    consume(expectedType?: MezcalTokenType, errorMsg?: string): Token {
+    consume(expectedType?: MezcalTokenType, errorMsg?: string): MezcalToken {
         const token = this.tokens[this.idx++];
 
         if (expectedType === undefined || token.type === expectedType) return token;
@@ -128,7 +126,7 @@ export class Parser {
         );
     }
 
-    peek(offset: number = 0): Token {
+    peek(offset: number = 0): MezcalToken {
         return this.tokens[this.idx + offset];
     }
 
