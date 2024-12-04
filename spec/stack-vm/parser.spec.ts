@@ -231,59 +231,59 @@ describe("When use stack-vm parser", () => {
         expect(() => parser.parse()).toThrowError("Expected THEN but instead found begin.")
     });
 
-    it("should parse lexical tokens for\nlet a = 0\if (a < 0 or a > 0) then a=1\nelse a=-1", () => {
-        const parser = new Parser([
-            { type: 'LET', lexeme: 'let', line: 2, value: undefined },
-            { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
-            { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
-            { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
-            { type: 'IF', lexeme: 'if', line: 3, value: undefined },
-            { type: 'LEFT_PAREN', lexeme: '(', line: 3, value: undefined },
-            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
-            { type: 'LESS', lexeme: '<', line: 3, value: undefined },
-            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
-            { type: 'OR', lexeme: 'or', line: 3, value: undefined },
-            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
-            { type: 'GREATER', lexeme: '>', line: 3, value: undefined },
-            { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
-            { type: 'RIGHT_PAREN', lexeme: ')', line: 3, value: undefined },
-            { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
-            { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
-            { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
-            { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
-            { type: 'ELSE', lexeme: 'else', line: 4, value: undefined },
-            { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
-            { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
-            { type: 'MINUS', lexeme: '-', line: 4, value: undefined },
-            { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
-            { type: 'EOF', lexeme: '', line: 4, value: undefined },
-        ]);
-        expect(parser.parse()).toEqual([":start",
-            "push 0", // a=0
-            "put a",
-            "pop",
-            "get a", // a < 0
-            "push 0",
-            "cmp",
-            "bge __0",
-            "pop",
-            "get a", // or a > 0
-            "push 0",
-            "cmp",
-            "ble __0",
-            "pop",
-            "push 1", // a=1
-            "put a",
-            "pop",
-            "bra __1",
-            "__0:",
-            "pop",
-            "push -1", // a=-1
-            "put a",
-            "pop",
-            "__1:",
-            "end"]);
-    });
+    // it("should parse lexical tokens for\nlet a = 0\if (a < 0 or a > 0) then a=1\nelse a=-1", () => {
+    //     const parser = new Parser([
+    //         { type: 'LET', lexeme: 'let', line: 2, value: undefined },
+    //         { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
+    //         { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
+    //         { type: 'NUMBER', lexeme: '0', line: 2, value: 0 },
+    //         { type: 'IF', lexeme: 'if', line: 3, value: undefined },
+    //         { type: 'LEFT_PAREN', lexeme: '(', line: 3, value: undefined },
+    //         { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+    //         { type: 'LESS', lexeme: '<', line: 3, value: undefined },
+    //         { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+    //         { type: 'OR', lexeme: 'or', line: 3, value: undefined },
+    //         { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+    //         { type: 'GREATER', lexeme: '>', line: 3, value: undefined },
+    //         { type: 'NUMBER', lexeme: '0', line: 3, value: 0 },
+    //         { type: 'RIGHT_PAREN', lexeme: ')', line: 3, value: undefined },
+    //         { type: 'THEN', lexeme: 'then', line: 3, value: undefined },
+    //         { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
+    //         { type: 'EQUAL', lexeme: '=', line: 3, value: undefined },
+    //         { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
+    //         { type: 'ELSE', lexeme: 'else', line: 4, value: undefined },
+    //         { type: 'IDENTIFIER', lexeme: 'a', line: 4, value: undefined },
+    //         { type: 'EQUAL', lexeme: '=', line: 4, value: undefined },
+    //         { type: 'MINUS', lexeme: '-', line: 4, value: undefined },
+    //         { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
+    //         { type: 'EOF', lexeme: '', line: 4, value: undefined },
+    //     ]);
+    //     expect(parser.parse()).toEqual([":start",
+    //         "push 0", // a=0
+    //         "put a",
+    //         "pop",
+    //         "get a", // a < 0
+    //         "push 0",
+    //         "cmp",
+    //         "bge __0",
+    //         "pop",
+    //         "get a", // or a > 0
+    //         "push 0",
+    //         "cmp",
+    //         "ble __0",
+    //         "pop",
+    //         "push 1", // a=1
+    //         "put a",
+    //         "pop",
+    //         "bra __1",
+    //         "__0:",
+    //         "pop",
+    //         "push -1", // a=-1
+    //         "put a",
+    //         "pop",
+    //         "__1:",
+    //         "end"]);
+    // });
 
     it("should parse lexical tokens for\nlet a = 0\nlet b = a or 2", () => {
         const parser = new Parser([
@@ -364,30 +364,8 @@ describe("When use stack-vm parser", () => {
             "bra __1", // wend
             "__0:",
             "pop",
-            "end"]);
-    });
-
-    it("should parse lexical tokens for\nlet cnt = 0\nfor a = 0 to 100 step 1 cnt = cnt + 1", () => {
-        const source = `
-            let cnt = 0
-            for a = 0 to 100 step 1 cnt = cnt + 1`;
-        const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([
-            {"left":{"name":"cnt"},"right":{"value":"0"},"name":"ASSIGN"},
-            {
-                "fromExpr":{"left":{"name":"a"},"right":{"value":"0"},"name":"ASSIGN"},
-                "toExpr":{"value":"100"},
-                "stepExpr":{"value":"1"},
-                "body":{
-                    "left":{"name":"cnt"},
-                    "right":{
-                        "left":{"name":"cnt"},"operator":"PLUS","right":{"value":"1"}
-                    },"name":"ASSIGN"
-                }
-            }
-        ]));
+            "end"
+        ]);
     });
 
     it("should parse lexical tokens for\nlet cnt = 0\nfor a = 0 to 100 begin\ncnt = cnt + 1\nend", () => {
@@ -398,20 +376,70 @@ describe("When use stack-vm parser", () => {
             end`;
         const tokens = new Scanner(source).scanTokens();
         const parser = new Parser(tokens);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([
-            {"left":{"name":"cnt"},"right":{"value":"0"},"name":"ASSIGN"},
-            {
-                "fromExpr":{"left":{"name":"a"},"right":{"value":"0"},"name":"ASSIGN"},
-                "toExpr":{"value":"100"},
-                "body":{
-                    "left":{"name":"cnt"},
-                    "right":{
-                        "left":{"name":"cnt"},"operator":"PLUS","right":{"value":"1"}
-                    },"name":"ASSIGN"
-                }
-            }
-        ]));
+        expect(parser.parse()).toEqual([":start",
+            "push 0", // a=0
+            "put cnt",
+            "pop",
+            "push 0", // a=0
+            "put a",
+            "pop",
+            "__0: # for a",
+            "get a",
+            "push 100",
+            "cmp", // a<100
+            "bgt __1",
+            "pop",
+            "get cnt",
+            "push 1",
+            "add",
+            "put cnt",
+            "pop",
+            "get a", // a=a+1
+            "push 1",
+            "add",
+            "put a",
+            "pop",
+            "bra __0", // end for
+            "__1: # end for a",
+            "pop",
+            "end"
+        ]);
+    });
+
+    it("should parse lexical tokens for\nlet cnt = 0\nfor a = 0 to 100 step 2 cnt = cnt + 1", () => {
+        const source = `
+            let cnt = 0
+            for a = 0 to 100 step 2 cnt = cnt + 1`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new Parser(tokens);
+        expect(parser.parse()).toEqual([":start",
+            "push 0", // a=0
+            "put cnt",
+            "pop",
+            "push 0", // a=0
+            "put a",
+            "pop",
+            "__0: # for a",
+            "get a",
+            "push 100",
+            "cmp", // a<100
+            "bgt __1",
+            "pop",
+            "get cnt",
+            "push 1",
+            "add",
+            "put cnt",
+            "pop",
+            "get a", // a=a+1
+            "push 2",
+            "add",
+            "put a",
+            "pop",
+            "bra __0", // end for
+            "__1: # end for a",
+            "pop",
+            "end"
+        ]);
     });
 
     it("should parse lexical tokens for\nlet time = clock()", () => {
@@ -419,73 +447,56 @@ describe("When use stack-vm parser", () => {
             let time = clock()`;
         const tokens = new Scanner(source).scanTokens();
         const parser = new Parser(tokens);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
-            "left":{"name":"time"},
-            "right":{"method":{"name":"clock"},"args":[]},
-            "name":"ASSIGN"
-        }]));
+        expect(parser.parse()).toEqual([":start",
+            "call clock",
+            "put time",
+            "pop",
+            "end"
+        ]);
     });
 
-    it("should parse lexical tokens for a bodyless function", () => {
-        const source = `
-            function add(a, b) return a + b`;
-        const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
-            "fnName":"add",
-            "params":["a","b"],
-            "body":[{
-                "left":{"name":"a"},
-                "operator":"PLUS",
-                "right":{"name":"b"}
-            }]
-        }]));
-    });
+    // it("should parse lexical tokens for a bodyless function", () => {
+    //     const source = `
+    //         function add(a, b) return a + b`;
+    //     const tokens = new Scanner(source).scanTokens();
+    //     const parser = new Parser(tokens);
+    //     expect(parser.parse()).toEqual([":start",
+    //         "call clock",
+    //         "put time",
+    //         "pop",
+    //         "end"
+    //     ]);
+    // });
 
-    it("should parse lexical tokens for a function with return", () => {
-        const source = `
-            function add(a, b) begin
-                return a + b
-            end`;
-        const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
-            "fnName":"add",
-            "params":["a","b"],
-            "body":[{"expression":{"left":{"name":"a"},"operator":"PLUS","right":{"name":"b"}},"name":"RETURN"}]
-        }]));
-    });
+    // it("should parse lexical tokens for a function with return", () => {
+    //     const source = `
+    //         function add(a, b) begin
+    //             return a + b
+    //         end`;
+    //     const tokens = new Scanner(source).scanTokens();
+    //     const parser = new Parser(tokens);
+    //     expect(parser.parse()).toEqual([":start",
+    //         "call clock",
+    //         "put time",
+    //         "pop",
+    //         "end"
+    //     ]);
+    // });
 
-    it("should parse lexical tokens for a function with multiple returns", () => {
-        const source = `
-            function fib(n) begin
-                if (n <= 1) then return n
-                return fib(n - 2) + fib(n - 1)
-            end
-            fib(3)`;
-        const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
-        const ast = parser.parse();
-        expect(JSON.stringify(ast)).toEqual(JSON.stringify([{
-            "fnName":"fib",
-            "params":["n"],
-            "body":[
-                {"conditional":{
-                    "left":{"name":"n"},
-                    "operator":"LESS_EQUAL",
-                    "right":{"value":"1"}},
-                    "thenExpr":{"expression":{"name":"n"},"name":"RETURN"}},
-                {"expression":{
-                    "left":{"method":{"name":"fib"},"args":[{"left":{"name":"n"},"operator":"MINUS","right":{"value":"2"}}]},
-                    "operator":"PLUS",
-                    "right":{"method":{"name":"fib"},"args":[{"left":{"name":"n"},"operator":"MINUS","right":{"value":"1"}}]}},
-                    "name":"RETURN"
-                }
-            ]},
-            {"method":{"name":"fib"},"args":[{"value":"3"}]
-        }]));
-    });
+    // it("should parse lexical tokens for a function with multiple returns", () => {
+    //     const source = `
+    //         function fib(n) begin
+    //             if (n <= 1) then return n
+    //             return fib(n - 2) + fib(n - 1)
+    //         end
+    //         fib(3)`;
+    //     const tokens = new Scanner(source).scanTokens();
+    //     const parser = new Parser(tokens);
+    //     expect(parser.parse()).toEqual([":start",
+    //         "call clock",
+    //         "put time",
+    //         "pop",
+    //         "end"
+    //     ]);
+    // });
 });

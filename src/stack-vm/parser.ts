@@ -105,7 +105,6 @@ export class Parser {
             const infix = infixParselets[token.type]! as InfixParselet;
             infix.parse(this, token);
         }
-
     }
 
     private isAtEnd(): boolean {

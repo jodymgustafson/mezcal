@@ -90,18 +90,38 @@ export class WhileParselet implements PrefixParselet {
 
 export class ForParselet implements PrefixParselet {
     parse(parser: Parser, token: MezcalToken): void {
+        const label1 = parser.getLabel();
+        const label2 = parser.getLabel();
+        const varName = parser.peek().lexeme;
+
         // from
         parser.parseExpression(parser.getPrecedence());
 
+        parser.addInstructions(`${label1}: # for ${varName}`, `get ${varName}`);
+
         parser.consume("TO");
         parser.parseExpression(parser.getPrecedence());
-        
-        let stepExpr: void;
+
+        parser.addInstructions("cmp", `bgt ${label2}`, "pop");
+
+        let stepInstr = "push 1";
         if (parser.match("STEP")) {
-            stepExpr = parser.parseExpression(parser.getPrecedence());
+            parser.parseExpression(parser.getPrecedence());
+            stepInstr = parser.instructions.pop();
         }
+
         // body
         parser.parseExpression(parser.getPrecedence());
+
+        parser.addInstructions(
+            `get ${varName}`,
+            stepInstr,
+            "add",
+            `put ${varName}`,
+            "pop",
+            `bra ${label1}`,
+            `${label2}: # end for ${varName}`,
+            "pop");
     }
 }
 
