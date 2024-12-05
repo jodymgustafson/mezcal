@@ -1,23 +1,13 @@
 import { MezcalTokenType } from "../scanner";
 import { isFunctionName } from "./is-function-name";
-import { Parser } from "./parser";
-
+import { StackVmCompiler } from "./parser";
 export abstract class Expression {
-    toStackVm(parser: Parser): string[] {
-        return [""];
-    }
+
 }
 
 export class NameExpression extends Expression {
     constructor(readonly name: string) {
         super();
-    }
-
-    toStackVm(): string[] {
-        if (isFunctionName(this.name)) {
-            return [`call ${this.name}`];
-        }
-        return [`get ${this.name}`];
     }
 }
 
@@ -25,19 +15,17 @@ export class NumberExpression extends Expression {
     constructor(readonly value: string) {
         super();
     }
+}
 
-    toStackVm(): string[] {
-        return [`push ${this.value}`];
+export class StringExpression extends Expression {
+    constructor(readonly value: string) {
+        super();
     }
 }
 
-export class MethodCallExpression extends Expression {
+export class FunctionCallExpression extends Expression {
     constructor(readonly method: Expression, readonly args: Expression[]) {
         super();
-    }
-
-    toStackVm(parser: Parser): string[] {
-        return [`${this.method.toStackVm(parser)}`];
     }
 }
 
@@ -50,21 +38,6 @@ export class PrefixExpression extends Expression {
 export class OperatorExpression extends Expression {
     constructor(readonly left: Expression, readonly operator: MezcalTokenType, readonly right: Expression) {
         super();
-    }
-
-    toStackVm(parser: Parser): string[] {
-        switch (this.operator) {
-            case "PLUS": return ["add"];
-            case "MINUS": return ["sub"];
-            case "STAR": return ["mul"];
-            case "SLASH": return ["div"];
-            case "POWER": return ["call pow"];
-            case "LESS": return ["cmp", `bge ${parser.getLabel()}`, "pop"];
-            case "GREATER": return ["cmp", `ble ${parser.getLabel()}`, "pop"];
-            case "LESS_EQUAL": return ["cmp", `bgt ${parser.getLabel()}`, "pop"];
-            case "GREATER_EQUAL": return ["cmp", `blt ${parser.getLabel()}`, "pop"];;
-        }
-        return ["nop"];
     }
 }
 
@@ -81,10 +54,6 @@ export class IfExpression extends Expression {
         readonly elseExpr: Expression,
     ) {
         super();
-    }
-
-    toStackVm(): string[] {
-        return ["cmp"];
     }
 }
 

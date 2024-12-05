@@ -1,0 +1,92 @@
+stackvm:
+  version: "0.0.0"
+  name: examples/stackvm/test.mez
+  functions:
+  - name: main
+    description: Entry function
+    definition: |
+      start:
+      push ""
+      put a
+      pop
+      __0: # while
+      get a
+      push "q"
+      call str.compare
+      beq __1
+      pop
+      push "Convert from celsius or fahrenheit or quit (c/f/q)?"
+      call writeln
+      pop
+      call readln
+      put a
+      pop
+      # begin if
+      get a
+      push "f"
+      call str.compare
+      bne __2
+      pop
+      push "Fahrenheit:"
+      call writeln
+      pop
+      call readln
+      put f
+      pop
+      get f
+      call f2c
+      put c
+      pop
+      push "Celsius: "
+      get c
+      call str.concat
+      call writeln
+      pop
+      bra __3
+      __2: # else
+      pop
+      # begin if
+      get a
+      push "c"
+      call str.compare
+      bne __3
+      pop
+      push "Celsius:"
+      call writeln
+      pop
+      call readln
+      put c
+      pop
+      get c
+      call c2f
+      put f
+      pop
+      push "Fahrenheit: "
+      get f
+      call str.concat
+      call writeln
+      pop
+      bra __4
+      __3: # else
+      pop
+      # begin if
+      get a
+      push "q"
+      call str.compare
+      beq __4
+      pop
+      push "Invalid command: "
+      get a
+      call str.concat
+      call writeln
+      pop
+      pop
+      __4: # end if
+      __3: # end if
+      bra __0
+      __1: # while end
+      pop
+      push "Bye!"
+      call writeln
+      pop
+      end

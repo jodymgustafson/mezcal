@@ -7,13 +7,29 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Run Program",
+      "name": "Mezcal REPL",
       "skipFiles": [
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}\\mezcal.ts",
       "args": [
         "./examples/test.mez"
+      ],
+      "cwd": "${workspaceFolder}",
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Mezcal Compiler",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}\\compile.ts",
+      "args": [
+        "./examples/stackvm/test.mez"
       ],
       "cwd": "${workspaceFolder}",
       "outFiles": [

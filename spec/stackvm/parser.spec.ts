@@ -1,9 +1,9 @@
 import { Scanner } from "../../src/scanner";
-import { Parser } from "../../src/stackvm/parser";
+import { StackVmCompiler } from "../../src/stackvm/parser";
 
 describe("When use stackvm parser", () => {
     it("should throw an error when invalid token", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'FOO' as any, lexeme: 'foo', line: 1, value: undefined },
             { type: 'EOF', lexeme: '', line: 1, value: undefined },
         ]);
@@ -11,29 +11,29 @@ describe("When use stackvm parser", () => {
     });
 
     it("should compile 2^3", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'NUMBER', lexeme: '2', line: 1, value: 2 },
             { type: 'POWER', lexeme: '^', line: 1, value: undefined },
             { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
         parser.parse();
-        expect(parser.instructions).toEqual([":start", "push 2", "push 3", "call pow", "end"]);
+        expect(parser.instructions).toEqual(["start:", "push 2", "push 3", "call pow", "end"]);
     });
 
     it("should compile 2 + x", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'NUMBER', lexeme: '2', line: 1, value: 2 },
             { type: 'PLUS', lexeme: '+', line: 1, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'x', line: 1, value: undefined },
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
         parser.parse();
-        expect(parser.instructions).toEqual([":start", "push 2", "get x", "add", "end"]);
+        expect(parser.instructions).toEqual(["start:", "push 2", "get x", "add", "end"]);
     });
 
     it("should compile (2+x)*5^3", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'LEFT_PAREN', lexeme: '(', line: 1, value: undefined },
             { type: 'NUMBER', lexeme: '2', line: 1, value: 2 },
             { type: 'PLUS', lexeme: '+', line: 1, value: undefined },
@@ -46,7 +46,7 @@ describe("When use stackvm parser", () => {
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
         parser.parse();
-        expect(parser.instructions).toEqual([":start",
+        expect(parser.instructions).toEqual(["start:",
             "push 2",
             "get x",
             "add",
@@ -60,16 +60,16 @@ describe("When use stackvm parser", () => {
     it("should compile\nsin(pi())", () => {
         const source = `sin(pi())`;
         const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
+        const parser = new StackVmCompiler(tokens);
         parser.parse();
-        expect(parser.instructions).toEqual([":start",
+        expect(parser.instructions).toEqual(["start:",
             "call pi",
             "call sin",
             "end"]);
     });
 
     it("should compile sin(2*pi/x) * (3^x)", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'IDENTIFIER', lexeme: 'sin', line: 1, value: undefined },
             // { type: 'STAR', lexeme: '*', line: 1, value: undefined },
             { type: 'LEFT_PAREN', lexeme: '(', line: 1, value: undefined },
@@ -87,7 +87,7 @@ describe("When use stackvm parser", () => {
             { type: 'RIGHT_PAREN', lexeme: ')', line: 1, value: undefined },
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
-        expect(parser.parse()).toEqual([":start",
+        expect(parser.parse()).toEqual(["start:",
             "push 2",
             "call pi",
             "mul",
@@ -102,14 +102,14 @@ describe("When use stackvm parser", () => {
     });
 
     it("should compile let z = 3", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'LET', lexeme: 'let', line: 1, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'z', line: 1, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 1, value: undefined },
             { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
             { type: 'EOF', lexeme: '', line: 1, value: undefined }
         ]);
-        expect(parser.parse()).toEqual([":start",
+        expect(parser.parse()).toEqual(["start:",
             "push 3",
             "put z",
             "pop",
@@ -117,7 +117,7 @@ describe("When use stackvm parser", () => {
     });
 
     it("should compile 'let a = 3\\na = a^2'", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'LET', lexeme: 'let', line: 1, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 1, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 1, value: undefined },
@@ -129,7 +129,7 @@ describe("When use stackvm parser", () => {
             { type: 'NUMBER', lexeme: '2', line: 2, value: 2 },
             { type: 'EOF', lexeme: '', line: 2, value: undefined }
         ]);
-        expect(parser.parse()).toEqual([":start",
+        expect(parser.parse()).toEqual(["start:",
             "push 3",
             "put a",
             "pop",
@@ -142,7 +142,7 @@ describe("When use stackvm parser", () => {
     });
 
     it("should compile\nlet a = 3\nbegin a = 2 end\n a = 1", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'LET', lexeme: 'let', line: 1, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 1, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 1, value: undefined },
@@ -157,7 +157,7 @@ describe("When use stackvm parser", () => {
             { type: 'NUMBER', lexeme: '1', line: 3, value: 1 },
             { type: 'EOF', lexeme: '', line: 3, value: undefined }
         ]);
-        expect(parser.parse()).toEqual([":start",
+        expect(parser.parse()).toEqual(["start:",
             "push 3",
             "put a",
             "pop",
@@ -171,7 +171,7 @@ describe("When use stackvm parser", () => {
     });
 
     it("should compile\nlet a = 3\nif a < 0 then begin\na = 0\nend\nelse a = 1", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'LET', lexeme: 'let', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
@@ -192,10 +192,11 @@ describe("When use stackvm parser", () => {
             { type: 'NUMBER', lexeme: '1', line: 6, value: 1 },
             { type: 'EOF', lexeme: '', line: 6, value: undefined },
         ]);
-        expect(parser.parse()).toEqual([":start",
+        expect(parser.parse()).toEqual(["start:",
             "push 3",
             "put a",
             "pop",
+            "# begin if",
             "get a",
             "push 0",
             "cmp",
@@ -205,17 +206,17 @@ describe("When use stackvm parser", () => {
             "put a",
             "pop",
             "bra __1",
-            ":__0",
+            "__0: # else",
             "pop",
             "push 1",
             "put a",
             "pop",
-            ":__1",
+            "__1: # end if",
             "end"]);
     });
 
     it("should get an error when if has no then", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'IF', lexeme: 'if', line: 3, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 3, value: undefined },
             { type: 'LESS', lexeme: '<', line: 3, value: undefined },
@@ -228,7 +229,7 @@ describe("When use stackvm parser", () => {
             { type: 'END', lexeme: 'end', line: 5, value: undefined },
             { type: 'EOF', lexeme: '', line: 6, value: undefined },
         ]);
-        expect(() => parser.parse()).toThrowError("Expected THEN but instead found begin.")
+        expect(() => parser.parse()).toThrowError("Line 3: Expected THEN but instead found begin.")
     });
 
     // it("should compile\nlet a = 0\if (a < 0 or a > 0) then a=1\nelse a=-1", () => {
@@ -258,7 +259,7 @@ describe("When use stackvm parser", () => {
     //         { type: 'NUMBER', lexeme: '1', line: 4, value: 1 },
     //         { type: 'EOF', lexeme: '', line: 4, value: undefined },
     //     ]);
-    //     expect(parser.parse()).toEqual([":start",
+    //     expect(parser.parse()).toEqual(["start:",
     //         "push 0", // a=0
     //         "put a",
     //         "pop",
@@ -286,7 +287,7 @@ describe("When use stackvm parser", () => {
     // });
 
     it("should compile\nlet a = 0\nlet b = a or 2", () => {
-        const parser = new Parser([
+        const parser = new StackVmCompiler([
             { type: 'LET', lexeme: 'let', line: 2, value: undefined },
             { type: 'IDENTIFIER', lexeme: 'a', line: 2, value: undefined },
             { type: 'EQUAL', lexeme: '=', line: 2, value: undefined },
@@ -299,7 +300,7 @@ describe("When use stackvm parser", () => {
             { type: 'NUMBER', lexeme: '2', line: 3, value: 2 },
             { type: 'EOF', lexeme: '', line: 3, value: undefined },
         ]);
-        expect(parser.parse()).toEqual([":start",
+        expect(parser.parse()).toEqual(["start:",
             "push 0", // a=0
             "put a",
             "pop",
@@ -318,24 +319,24 @@ describe("When use stackvm parser", () => {
                 a = a + 1
             end`;
         const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
-        expect(parser.parse()).toEqual([":start",
+        const parser = new StackVmCompiler(tokens);
+        expect(parser.parse()).toEqual(["start:",
             "push 0", // a=0
             "put a",
             "pop",
-            "__1:", // while
+            "__0: # while",
             "get a",
             "push 100",
             "cmp", // a<100
-            "bge __0",
+            "bge __1",
             "pop",
             "get a", // a=a+1
             "push 1",
             "add",
             "put a",
             "pop",
-            "bra __1", // wend
-            "__0:",
+            "bra __0",
+            "__1: # while end",
             "pop",
             "end"]);
         });
@@ -345,38 +346,39 @@ describe("When use stackvm parser", () => {
             let a = 0
             while a < 100 a = a + 1`;
         const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
-        expect(parser.parse()).toEqual([":start",
+        const parser = new StackVmCompiler(tokens);
+        expect(parser.parse()).toEqual(["start:",
             "push 0", // a=0
             "put a",
             "pop",
-            "__1:", // while
+            "__0: # while",
             "get a",
             "push 100",
             "cmp", // a<100
-            "bge __0",
+            "bge __1",
             "pop",
             "get a", // a=a+1
             "push 1",
             "add",
             "put a",
             "pop",
-            "bra __1", // wend
-            "__0:",
+            "bra __0", // wend
+            "__1: # while end",
             "pop",
             "end"
         ]);
     });
 
-    it("should compile\nlet cnt = 0\nfor a = 0 to 100 begin\ncnt = cnt + 1\nend", () => {
+    it("should compile\nlet cnt = 0\nfor a = 0 to 100 begin\ncnt = cnt + 1\nclock()\nend", () => {
         const source = `
             let cnt = 0
             for a = 0 to 100 begin
                 cnt = cnt + 1
+                clock()
             end`;
         const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
-        expect(parser.parse()).toEqual([":start",
+        const parser = new StackVmCompiler(tokens);
+        expect(parser.parse()).toEqual(["start:",
             "push 0", // a=0
             "put cnt",
             "pop",
@@ -394,6 +396,7 @@ describe("When use stackvm parser", () => {
             "add",
             "put cnt",
             "pop",
+            "call clock",
             "get a", // a=a+1
             "push 1",
             "add",
@@ -411,8 +414,8 @@ describe("When use stackvm parser", () => {
             let cnt = 0
             for a = 0 to 100 step 2 cnt = cnt + 1`;
         const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
-        expect(parser.parse()).toEqual([":start",
+        const parser = new StackVmCompiler(tokens);
+        expect(parser.parse()).toEqual(["start:",
             "push 0", // a=0
             "put cnt",
             "pop",
@@ -446,8 +449,8 @@ describe("When use stackvm parser", () => {
         const source = `
             let time = clock()`;
         const tokens = new Scanner(source).scanTokens();
-        const parser = new Parser(tokens);
-        expect(parser.parse()).toEqual([":start",
+        const parser = new StackVmCompiler(tokens);
+        expect(parser.parse()).toEqual(["start:",
             "call clock",
             "put time",
             "pop",
@@ -460,7 +463,7 @@ describe("When use stackvm parser", () => {
     //         function add(a, b) return a + b`;
     //     const tokens = new Scanner(source).scanTokens();
     //     const parser = new Parser(tokens);
-    //     expect(parser.parse()).toEqual([":start",
+    //     expect(parser.parse()).toEqual(["start:",
     //         "call clock",
     //         "put time",
     //         "pop",
@@ -475,7 +478,7 @@ describe("When use stackvm parser", () => {
     //         end`;
     //     const tokens = new Scanner(source).scanTokens();
     //     const parser = new Parser(tokens);
-    //     expect(parser.parse()).toEqual([":start",
+    //     expect(parser.parse()).toEqual(["start:",
     //         "call clock",
     //         "put time",
     //         "pop",
@@ -492,11 +495,46 @@ describe("When use stackvm parser", () => {
     //         fib(3)`;
     //     const tokens = new Scanner(source).scanTokens();
     //     const parser = new Parser(tokens);
-    //     expect(parser.parse()).toEqual([":start",
+    //     expect(parser.parse()).toEqual(["start:",
     //         "call clock",
     //         "put time",
     //         "pop",
     //         "end"
     //     ]);
     // });
+
+    
+    it(`should compile\nlet a = "a"\nif a == "a" then print(a + "Answer is " + a + "!")`, () => {
+        const source = `
+            let a = "a"
+            if a == "a" then print("Answer is " + a + "!")`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new StackVmCompiler(tokens);
+        expect(parser.parse()).toEqual(["start:",
+            "push \"a\"", // a=0
+            "put a",
+            "pop",
+            "# begin if",
+            "get a",
+            "push \"a\"",
+            "call str.compare", // a=="a"
+            "bne __0",
+            "pop",
+            "get a",
+            `push "Answer is "`,
+            "call str.concat",
+            "get a",
+            "call str.concat",
+            `push "!"`,
+            "call str.concat",
+            "call writeln",
+            "pop",
+            "bra __1",
+            "__0: # else",
+            "pop",
+            "__1: # end if",
+            "end"
+        ]);
+    });
+
 });

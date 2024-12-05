@@ -1,8 +1,8 @@
 import { Token } from "../internal/token";
 import { MezcalToken, MezcalTokenType } from "../scanner";
-import { AssignmentExpression, Expression, ForExpression, FunctionExpression, IfExpression, MethodCallExpression, NameExpression, NumberExpression, OperatorExpression, PostfixExpression, PrefixExpression, ReturnExpression, WhileExpression } from "./expression";
+import { AssignmentExpression, Expression, ForExpression, FunctionExpression, IfExpression, FunctionCallExpression, NameExpression, NumberExpression, OperatorExpression, PostfixExpression, PrefixExpression, ReturnExpression, StringExpression, WhileExpression } from "./expression";
 import { isFunctionName } from "./is-function-name";
-import { Parser } from "./parser";
+import { StackVmCompiler } from "./parser";
 
 const MAX_FN_ARGS_COUNT = 255;
 
@@ -23,16 +23,20 @@ export enum Precedence {
 /** -- Prefix -- **/
 
 export interface PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression;
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression;
 }
 
 export class NameParselet implements PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
         if (isFunctionName(token.lexeme)) {
+            // Check for parameterless function call
             if (parser.peek().type !== "LEFT_PAREN") {
                 const fnName = token.lexeme;
                 parser.addInstructions(`call ${fnName}`);
             }
+        }
+        else if (parser.peek().type === "LEFT_PAREN") {
+            // do nothing            
         }
         else if (parser.peek().type !== "EQUAL") {
             parser.addInstructions(`get ${token.lexeme}`);
@@ -43,61 +47,79 @@ export class NameParselet implements PrefixParselet {
 }
 
 export class NumberParselet implements PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
         parser.addInstructions(`push ${token.lexeme}`);
         return new NumberExpression(token.lexeme);
     }
 }
 
+export class StringParselet implements PrefixParselet {
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
+        parser.addInstructions(`push ${token.lexeme}`);
+        return new StringExpression(token.lexeme);
+    }
+}
+
 export class BeginParselet implements PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression {
-        const expression = parser.parseExpression(parser.getPrecedence());
-        parser.consume("END");
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
+        let expression: Expression;
+        while (!parser.match("END")) {
+            expression = parser.parseExpression(parser.getPrecedence());
+        }
+        // parser.consume("END");
         return expression;
     }
 }
 
 export class IfParselet implements PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
+        // The first label will be created by the condition expression
         const label1 = parser.peekLabel();
-        const label2 = parser.peekLabel(1);
 
+        parser.addInstructions("# begin if")
         const condition = parser.parseExpression(parser.getPrecedence());
 
         parser.consume("THEN");
         const thenExpr = parser.parseExpression(parser.getPrecedence());
 
-        parser.addInstructions(`bra ${label2}`, `:${label1}`, "pop");
-
+        let label2: string;
         let elseExpr: Expression;
         if (parser.match("ELSE")) {
+            label2 = parser.peekLabel();
+            parser.addInstructions(`bra ${label2}`, `${label1}: # else`, "pop");
             elseExpr = parser.parseExpression(parser.getPrecedence());
         }
+        else {
+            parser.addInstructions("pop");
+        }
 
-        parser.addInstructions(`:${label2}`);
+        if (label2) {
+            parser.addInstructions(`${label2}: # end if`);
+        }
 
         return new IfExpression(condition, thenExpr, elseExpr)
     }
 }
 
 export class WhileParselet implements PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression {
-        const label1 = parser.peekLabel();
-        const label2 = parser.peekLabel(1);
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
+        const label1 = parser.getLabel();
+        // The second label will be created by the condition expression
+        const label2 = parser.peekLabel();
 
-        parser.addInstructions(`${label2}:`);
+        parser.addInstructions(`${label1}: # while`);
 
         const condition = parser.parseExpression(parser.getPrecedence());
         const body = parser.parseExpression(parser.getPrecedence());
 
-        parser.addInstructions(`bra ${label2}`, `${label1}:`, "pop");
+        parser.addInstructions(`bra ${label1}`, `${label2}: # while end`, "pop");
 
         return new WhileExpression(condition, body);
     }
 }
 
 export class ForParselet implements PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
         const label1 = parser.getLabel();
         const label2 = parser.getLabel();
 
@@ -135,7 +157,7 @@ export class ForParselet implements PrefixParselet {
 }
 
 export class FunctionParselet implements PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
         const name = parser.consume("IDENTIFIER", "Expect function name.").lexeme;
         parser.consume("LEFT_PAREN", "Expected '(' after function name.");
         
@@ -170,7 +192,7 @@ export class FunctionParselet implements PrefixParselet {
 }
 
 export class ReturnParselet implements PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
         return new ReturnExpression(parser.parseExpression(parser.getPrecedence()));
     }
 }
@@ -180,7 +202,7 @@ export class PrefixOperatorParselet implements PrefixParselet {
         this.precedence = precedence;
     }
 
-    parse(parser: Parser, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
         return new PrefixExpression(
             token.type as MezcalTokenType,
             parser.parseExpression(this.precedence),
@@ -189,7 +211,7 @@ export class PrefixOperatorParselet implements PrefixParselet {
 }
 
 export class GroupParselet implements PrefixParselet {
-    parse(parser: Parser, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, token: MezcalToken): Expression {
         const expression = parser.parseExpression(parser.getPrecedence());
         parser.consume("RIGHT_PAREN");
 
@@ -200,7 +222,7 @@ export class GroupParselet implements PrefixParselet {
 /** -- Infix -- **/
 
 export interface InfixParselet {
-    parse(parser: Parser, left: Expression, token: MezcalToken): Expression;
+    parse(parser: StackVmCompiler, left: Expression, token: MezcalToken): Expression;
     getPrecedence(): number;
 }
 
@@ -210,11 +232,14 @@ export class BinaryOperatorParselet implements InfixParselet {
         this.isRightAssociative = isRightAssociative;
     }
 
-    parse(parser: Parser, left: Expression, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, left: Expression, token: MezcalToken): Expression {
         const right = parser.parseExpression(this.precedence - (this.isRightAssociative ? 1 : 0));
 
+        const isString = left instanceof StringExpression || right instanceof StringExpression;
+        const compare = isString ? "call str.compare" : "cmp";
+
         switch (token.type) {
-            case "PLUS": parser.addInstructions("add"); break;
+            case "PLUS": isString ? parser.addInstructions("call str.concat") : parser.addInstructions("add"); break;
             case "MINUS": parser.addInstructions("sub"); break;
             case "STAR": parser.addInstructions("mul"); break;
             case "SLASH": parser.addInstructions("div"); break;
@@ -222,10 +247,12 @@ export class BinaryOperatorParselet implements InfixParselet {
             case "OR": parser.addInstructions("or"); break;
             case "AND": parser.addInstructions("and"); break;
             case "NOT": parser.addInstructions("not"); break;
-            case "LESS": parser.addInstructions("cmp", `bge ${parser.getLabel()}`, "pop"); break;
-            case "GREATER": parser.addInstructions("cmp", `ble ${parser.getLabel()}`, "pop"); break;
-            case "LESS_EQUAL": parser.addInstructions("cmp", `bgt ${parser.getLabel()}`, "pop"); break;
-            case "GREATER_EQUAL": parser.addInstructions("cmp", `blt ${parser.getLabel()}`, "pop"); break;
+            case "LESS": parser.addInstructions(compare, `bge ${parser.getLabel()}`, "pop"); break;
+            case "GREATER": parser.addInstructions(compare, `ble ${parser.getLabel()}`, "pop"); break;
+            case "LESS_EQUAL": parser.addInstructions(compare, `bgt ${parser.getLabel()}`, "pop"); break;
+            case "GREATER_EQUAL": parser.addInstructions(compare, `blt ${parser.getLabel()}`, "pop"); break;
+            case "NOT_EQUAL": parser.addInstructions(compare, `beq ${parser.getLabel()}`, "pop"); break;
+            case "EQUAL_EQUAL": parser.addInstructions(compare, `bne ${parser.getLabel()}`, "pop"); break;
             default: parser.addInstructions("nop"); break;
         }
 
@@ -241,8 +268,8 @@ export class BinaryOperatorParselet implements InfixParselet {
     }
 }
 
-export class MethodCallParselet implements InfixParselet {
-    parse(parser: Parser, left: NameExpression, token: MezcalToken): Expression {
+export class FunctionCallParselet implements InfixParselet {
+    parse(parser: StackVmCompiler, left: NameExpression, token: MezcalToken): Expression {
         const args: Expression[] = [];
 
         while (!parser.match("RIGHT_PAREN")) {
@@ -253,9 +280,17 @@ export class MethodCallParselet implements InfixParselet {
         }
 
         const fnName = left.name;
-        parser.addInstructions(`call ${fnName}`);
+        if (fnName === "input") {
+            parser.addInstructions("call writeln", "pop", "call readln");
+        }
+        else if (fnName === "print") {
+            parser.addInstructions("call writeln", "pop");
+        }
+        else {
+            parser.addInstructions(`call ${fnName}`);
+        }
 
-        return new MethodCallExpression(left, args);
+        return new FunctionCallExpression(left, args);
     }
 
     getPrecedence(): number {
@@ -264,7 +299,7 @@ export class MethodCallParselet implements InfixParselet {
 }
 
 export class AssignmentParselet implements InfixParselet {
-    parse(parser: Parser, left: NameExpression, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, left: NameExpression, token: MezcalToken): Expression {
         const fnName = (left as NameExpression).name;
         const right = parser.parseExpression(Precedence.ASSIGNMENT - 1);
 
@@ -284,7 +319,7 @@ export class AssignmentParselet implements InfixParselet {
 /** -- Postfix -- **/
 
 export class PostfixOperatorParselet implements InfixParselet {
-    parse(parser: Parser, left: Expression, token: MezcalToken): Expression {
+    parse(parser: StackVmCompiler, left: Expression, token: MezcalToken): Expression {
         return new PostfixExpression(left, token.type as MezcalTokenType);
     }
 

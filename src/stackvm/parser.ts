@@ -10,13 +10,14 @@ import {
     GroupParselet,
     IfParselet,
     InfixParselet,
-    MethodCallParselet,
+    FunctionCallParselet,
     NameParselet,
     NumberParselet,
     Precedence,
     PrefixOperatorParselet,
     PrefixParselet,
     ReturnParselet,
+    StringParselet,
     WhileParselet,
 } from "./parselet";
 
@@ -24,6 +25,7 @@ import {
 const prefixParselets: Partial<Record<MezcalTokenType, PrefixParselet>> = {
     "IDENTIFIER": new NameParselet(),
     "NUMBER": new NumberParselet(),
+    "STRING": new StringParselet(),
     "LEFT_PAREN": new GroupParselet(),
     "BEGIN": new BeginParselet(),
     "IF": new IfParselet(),
@@ -38,7 +40,7 @@ const prefixParselets: Partial<Record<MezcalTokenType, PrefixParselet>> = {
 };
 
 const infixParselets: Partial<Record<MezcalTokenType, InfixParselet>> = {
-    "LEFT_PAREN": new MethodCallParselet(),
+    "LEFT_PAREN": new FunctionCallParselet(),
     "EQUAL": new AssignmentParselet(),
 
     "PLUS": new BinaryOperatorParselet(Precedence.SUM, false),
@@ -58,8 +60,8 @@ const infixParselets: Partial<Record<MezcalTokenType, InfixParselet>> = {
     "OR": new BinaryOperatorParselet(Precedence.BOOLEAN, false),
 };
 
-export class Parser {
-    readonly instructions: string[] = [":start"];
+export class StackVmCompiler {
+    readonly instructions: string[] = ["start:"];
     private idx: number = 0;
     private labelCnt = 0;
 
@@ -79,11 +81,11 @@ export class Parser {
     }
 
     parse(): string[] {
-        const expressions: Expression[] = [];
+        // const expressions: Expression[] = [];
 
         while (!this.isAtEnd()) {
             const ast = this.parseExpression();
-            expressions.push(ast);
+            // expressions.push(ast);
         }
 
         this.instructions.push("end");
@@ -122,7 +124,7 @@ export class Parser {
         if (expectedType === undefined || token.type === expectedType) return token;
 
         throw new Error(
-            errorMsg ?? `Expected ${expectedType} but instead found ${token.lexeme}.`,
+            errorMsg ?? `Line ${token.line}: Expected ${expectedType} but instead found ${token.lexeme}.`,
         );
     }
 
