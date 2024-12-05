@@ -237,10 +237,15 @@ export class BinaryOperatorParselet implements InfixParselet {
         this.isRightAssociative = isRightAssociative;
     }
 
+    private isString(expr: Expression): boolean {
+        return expr instanceof StringExpression ||
+            (expr instanceof NameExpression && expr.name.endsWith("$"));
+    }
+
     parse(parser: StackVmCompiler, left: Expression, token: MezcalToken): Expression {
         const right = parser.parseExpression(this.precedence - (this.isRightAssociative ? 1 : 0));
 
-        const isString = left instanceof StringExpression || right instanceof StringExpression;
+        const isString = this.isString(left) || this.isString(right);
         const compare = isString ? ["call str.compare", "push 0", "cmp"] : ["cmp"];
 
         switch (token.type) {

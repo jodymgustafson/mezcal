@@ -493,35 +493,35 @@ describe("When use stackvm parser", () => {
     // });
 
     
-    it(`should compile\nlet a = "a"\nif a == "a" then print(a + "Answer is " + a + "!")`, () => {
+    it(`should compile\nlet a$ = "a"\nif a$ == "a" then print(a$ + "Answer is " + a$ + "!")`, () => {
         const source = `
-            let a = "a"
-            if a == "a" then print("Answer is " + a + "!")`;
+            let a$ = "a"
+            if a$ == "a" then print(a$ + "Answer is " + a$ + "!")`;
         const tokens = new Scanner(source).scanTokens();
         const parser = new StackVmCompiler(tokens);
         expect(parser.parse()).toEqual(["start:",
             "push \"a\"", // a=0
-            "put a",
+            "put a$",
             "pop",
             "# begin if",
-            "get a",
+            "get a$",
             "push \"a\"",
             "call str.compare", // a=="a"
+            "push 0",
+            "cmp",
             "bne __0",
             "pop",
-            "get a",
+            "get a$",
             `push "Answer is "`,
             "call str.concat",
-            "get a",
+            "get a$",
             "call str.concat",
             `push "!"`,
             "call str.concat",
             "call writeln",
             "pop",
-            "bra __1",
-            "__0: # else",
+            "__0: # end if",
             "pop",
-            "__1: # end if",
             "end"
         ]);
     });
