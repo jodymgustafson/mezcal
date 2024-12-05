@@ -85,12 +85,12 @@ export class IfParselet implements PrefixParselet {
         let label2: string;
         let elseExpr: Expression;
         if (parser.match("ELSE")) {
-            label2 = parser.peekLabel();
+            label2 = parser.getLabel();
             parser.addInstructions(`bra ${label2}`, `${label1}: # else`, "pop");
             elseExpr = parser.parseExpression(parser.getPrecedence());
         }
         else {
-            parser.addInstructions("pop");
+            parser.addInstructions(`${label1}: # end if`, "pop");
         }
 
         if (label2) {
@@ -203,9 +203,14 @@ export class PrefixOperatorParselet implements PrefixParselet {
     }
 
     parse(parser: StackVmCompiler, token: MezcalToken): Expression {
+        if (token.type === "MINUS") {
+            const next = parser.peek();
+            next.lexeme = `-${next.lexeme}`;
+        }
+
         return new PrefixExpression(
             token.type as MezcalTokenType,
-            parser.parseExpression(this.precedence),
+            parser.parseExpression(parser.getPrecedence()),
         );
     }
 }
@@ -236,7 +241,7 @@ export class BinaryOperatorParselet implements InfixParselet {
         const right = parser.parseExpression(this.precedence - (this.isRightAssociative ? 1 : 0));
 
         const isString = left instanceof StringExpression || right instanceof StringExpression;
-        const compare = isString ? "call str.compare" : "cmp";
+        const compare = isString ? ["call str.compare", "push 0", "cmp"] : ["cmp"];
 
         switch (token.type) {
             case "PLUS": isString ? parser.addInstructions("call str.concat") : parser.addInstructions("add"); break;
@@ -247,12 +252,12 @@ export class BinaryOperatorParselet implements InfixParselet {
             case "OR": parser.addInstructions("or"); break;
             case "AND": parser.addInstructions("and"); break;
             case "NOT": parser.addInstructions("not"); break;
-            case "LESS": parser.addInstructions(compare, `bge ${parser.getLabel()}`, "pop"); break;
-            case "GREATER": parser.addInstructions(compare, `ble ${parser.getLabel()}`, "pop"); break;
-            case "LESS_EQUAL": parser.addInstructions(compare, `bgt ${parser.getLabel()}`, "pop"); break;
-            case "GREATER_EQUAL": parser.addInstructions(compare, `blt ${parser.getLabel()}`, "pop"); break;
-            case "NOT_EQUAL": parser.addInstructions(compare, `beq ${parser.getLabel()}`, "pop"); break;
-            case "EQUAL_EQUAL": parser.addInstructions(compare, `bne ${parser.getLabel()}`, "pop"); break;
+            case "LESS": parser.addInstructions(...compare, `bge ${parser.getLabel()}`, "pop"); break;
+            case "GREATER": parser.addInstructions(...compare, `ble ${parser.getLabel()}`, "pop"); break;
+            case "LESS_EQUAL": parser.addInstructions(...compare, `bgt ${parser.getLabel()}`, "pop"); break;
+            case "GREATER_EQUAL": parser.addInstructions(...compare, `blt ${parser.getLabel()}`, "pop"); break;
+            case "NOT_EQUAL": parser.addInstructions(...compare, `beq ${parser.getLabel()}`, "pop"); break;
+            case "EQUAL_EQUAL": parser.addInstructions(...compare, `bne ${parser.getLabel()}`, "pop"); break;
             default: parser.addInstructions("nop"); break;
         }
 

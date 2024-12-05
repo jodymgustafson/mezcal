@@ -32,22 +32,12 @@ describe("When use stackvm parser", () => {
         expect(parser.instructions).toEqual(["start:", "push 2", "get x", "add", "end"]);
     });
 
-    it("should compile (2+x)*5^3", () => {
-        const parser = new StackVmCompiler([
-            { type: 'LEFT_PAREN', lexeme: '(', line: 1, value: undefined },
-            { type: 'NUMBER', lexeme: '2', line: 1, value: 2 },
-            { type: 'PLUS', lexeme: '+', line: 1, value: undefined },
-            { type: 'IDENTIFIER', lexeme: 'x', line: 1, value: undefined },
-            { type: 'RIGHT_PAREN', lexeme: ')', line: 1, value: undefined },
-            { type: 'STAR', lexeme: '*', line: 1, value: undefined },
-            { type: 'NUMBER', lexeme: '5', line: 1, value: 5 },
-            { type: 'POWER', lexeme: '^', line: 1, value: undefined },
-            { type: 'NUMBER', lexeme: '3', line: 1, value: 3 },
-            { type: 'EOF', lexeme: '', line: 1, value: undefined }
-        ]);
-        parser.parse();
-        expect(parser.instructions).toEqual(["start:",
-            "push 2",
+    it("should compile (-2+x)*5^3", () => {
+        const source = `(-2+x)*5^3`;
+        const tokens = new Scanner(source).scanTokens();
+        const parser = new StackVmCompiler(tokens);
+        expect(parser.parse()).toEqual(["start:",
+            "push -2",
             "get x",
             "add",
             "push 5",
@@ -61,8 +51,7 @@ describe("When use stackvm parser", () => {
         const source = `sin(pi())`;
         const tokens = new Scanner(source).scanTokens();
         const parser = new StackVmCompiler(tokens);
-        parser.parse();
-        expect(parser.instructions).toEqual(["start:",
+        expect(parser.parse()).toEqual(["start:",
             "call pi",
             "call sin",
             "end"]);

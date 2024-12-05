@@ -13,6 +13,8 @@ stackvm:
       get a
       push "q"
       call str.compare
+      push 0
+      cmp
       beq __1
       pop
       push "Convert from celsius or fahrenheit or quit (c/f/q)?"
@@ -25,6 +27,8 @@ stackvm:
       get a
       push "f"
       call str.compare
+      push 0
+      cmp
       bne __2
       pop
       push "Fahrenheit:"
@@ -49,7 +53,9 @@ stackvm:
       get a
       push "c"
       call str.compare
-      bne __3
+      push 0
+      cmp
+      bne __4
       pop
       push "Celsius:"
       call writeln
@@ -66,22 +72,25 @@ stackvm:
       call str.concat
       call writeln
       pop
-      bra __4
-      __3: # else
+      bra __5
+      __4: # else
       pop
       # begin if
       get a
       push "q"
       call str.compare
-      beq __4
+      push 0
+      cmp
+      beq __6
       pop
       push "Invalid command: "
       get a
       call str.concat
       call writeln
       pop
+      __6: # end if
       pop
-      __4: # end if
+      __5: # end if
       __3: # end if
       bra __0
       __1: # while end
