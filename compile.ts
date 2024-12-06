@@ -14,18 +14,21 @@ import { Scanner } from "./src/scanner";
 import { StackVmCompiler, StackVmCompilerOutput } from "./src/stackvm/stackvm-compiler";
 import fs from 'fs';
 import path from 'node:path';
+import { optimizeOutput } from "./src/stackvm/tree-shaker";
 const readline = require('readline');
 
 (async () => {
     try {
         const filePath = argv[2];
+        const toPath = argv[3] || filePath + ".yml";
         if (filePath) {
             const source = await load(filePath);
             const code = compile(source);
-            writeSVMFile(code, filePath);
+            writeSVMFile(filePath, optimizeOutput(code), toPath);
+            console.log("Completed successfully.")
         }
         else {
-            console.log("Usage: compile [file]");
+            console.log("Usage: compile [file] [to-file]?");
         }
     }
     catch (err) {
@@ -47,7 +50,7 @@ export function compile(source: string): StackVmCompilerOutput {
         console.error(JSON.stringify(scanner.errors));
     }
     else {
-        console.log("compiling source");//, JSON.stringify(tokens));
+        console.log("Compiling source...");//, JSON.stringify(tokens));
         const compiler = new StackVmCompiler(tokens);
         const instrs = compiler.parse();
         // console.log(JSON.stringify(instrs, null, 2));
@@ -79,6 +82,7 @@ async function load(filePath: string, basePath = "./"): Promise<string> {
         for await (const line of rl) {
             if (/^\s*import\s+".+"$/.test(line)) {
                 const importPath = line.split("import")[1].trim().slice(1, -1);
+                console.log("Importing file", importPath);
                 contents += await load(importPath, filePath);
             }
             else {
@@ -86,7 +90,7 @@ async function load(filePath: string, basePath = "./"): Promise<string> {
             }
         };
 
-        console.log(contents);
+        // console.log(contents);
         return contents;
     }
     catch (err) {
@@ -95,11 +99,11 @@ async function load(filePath: string, basePath = "./"): Promise<string> {
     }
 }
 
-function writeSVMFile(code: StackVmCompilerOutput, filePath: string): void {
+function writeSVMFile(appName: string, code: StackVmCompilerOutput, filePath: string): void {
     const s = [
         "stackvm:",
         `  version: "0.0.0"`,
-        `  name: ${filePath}`,
+        `  name: ${appName}`,
         "  functions:",
     ];
 
@@ -111,6 +115,6 @@ function writeSVMFile(code: StackVmCompilerOutput, filePath: string): void {
         code[fn].forEach(c => s.push(`      ${c}`));
     });
 
-    console.log("Writing StackVM file...");
-    fs.writeFileSync(filePath + ".yml", s.join("\n"));
+    console.log("Writing StackVM file:", filePath);
+    fs.writeFileSync(filePath, s.join("\n"));
 }
