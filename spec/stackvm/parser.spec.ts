@@ -1,5 +1,5 @@
 import { Scanner } from "../../src/scanner";
-import { StackVmCompiler } from "../../src/stackvm/parser";
+import { StackVmCompiler } from "../../src/stackvm/stackvm-compiler";
 
 describe("When use stackvm parser", () => {
     it("should throw an error when invalid token", () => {

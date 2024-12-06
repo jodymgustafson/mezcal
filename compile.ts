@@ -11,33 +11,36 @@
 
 import { argv } from "process";
 import { Scanner } from "./src/scanner";
-import { StackVmCompiler, StackVmCompilerOutput } from "./src/stackvm/parser";
+import { StackVmCompiler, StackVmCompilerOutput } from "./src/stackvm/stackvm-compiler";
 import fs from 'fs';
 import path from 'node:path';
+const readline = require('readline');
 
-try {
-    const filePath = argv[2];
-    if (filePath) {
-        const source = load(filePath);
-        const code = compile(source);
-        writeSVMFile(code, filePath);
+(async () => {
+    try {
+        const filePath = argv[2];
+        if (filePath) {
+            const source = await load(filePath);
+            const code = compile(source);
+            writeSVMFile(code, filePath);
+        }
+        else {
+            console.log("Usage: compile [file]");
+        }
     }
-    else {
-        console.log("Usage: compile [file]");
+    catch (err) {
+        console.error(err);
     }
-}
-catch (err) {
-    console.error(err);
-}
+})();
 
 /**
- * Compiles an expression into StackVM assembly code.
- * @param expr Mathematical expression
- * @returns An array of assembly code instructions
+ * Compiles Mezcal code into StackVM assembly code.
+ * @param source Mezcal source code to compile
+ * @returns Output of the compiler containing assembly code instructions
  */
-export function compile(expr: string): StackVmCompilerOutput {
+export function compile(source: string): StackVmCompilerOutput {
     console.log("Scanning source...");
-    const scanner = new Scanner(expr);
+    const scanner = new Scanner(source);
     const tokens = scanner.scanTokens();
     if (scanner.errors.length > 0) {
         console.error("There were scanner errors:");
@@ -55,13 +58,36 @@ export function compile(expr: string): StackVmCompilerOutput {
 }
 
 /**
- * Load the file and evaluates it
+ * Load the file and expands any imports
  * @param filePath The file to load
  * @returns Result of the evaluation
  */
-function load(filePath: string): string {
+async function load(filePath: string, basePath = "./"): Promise<string> {
     try {
-        return fs.readFileSync(filePath, 'utf8');
+        // const contents = fs.readFileSync(filePath, 'utf8');
+        let contents = "";
+        const relPath = path.join(basePath, filePath);
+        if (!fs.existsSync(relPath)) {
+            throw new Error("Path doesn't exist " + relPath);
+        }
+
+        const rl = readline.createInterface({
+            input: fs.createReadStream(relPath),
+            crlfDelay: Infinity
+        });
+
+        for await (const line of rl) {
+            if (/^\s*import\s+".+"$/.test(line)) {
+                const importPath = line.split("import")[1].trim().slice(1, -1);
+                contents += await load(importPath, filePath);
+            }
+            else {
+                contents += line + "\n";
+            }
+        };
+
+        console.log(contents);
+        return contents;
     }
     catch (err) {
         console.error(err);

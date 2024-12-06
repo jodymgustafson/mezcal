@@ -1,6 +1,6 @@
 import { MezcalTokenType } from "../scanner";
 import { isFunctionName } from "./is-function-name";
-import { StackVmCompiler } from "./parser";
+import { StackVmCompiler } from "./stackvm-compiler";
 export abstract class Expression {
 
 }

@@ -73,37 +73,12 @@ export class StackVmCompiler {
     constructor(readonly tokens: MezcalToken[]) {
     }
 
-    /** Resets instructions to the main function */
-    mainFunction(): void {
-        this.instructions = this.functions.main;
-    }
-
-    addFunction(fnName: string): void {
-        this.functions[fnName] = this.instructions = ["start:"];
-    }
-
-    addInstructions(...instrs: string[]): void {
-        this.instructions.push(...instrs);
-    }
-
-    popInstruction(): string {
-        return this.instructions.pop();
-    }
-
-    getLabel(): string {
-        return `__${this.labelCnt++}`;
-    }
-
-    peekLabel(offset = 0): string {
-        return `__${this.labelCnt + offset}`;
-    }
-
     parse(): StackVmCompilerOutput {
         // const expressions: Expression[] = [];
 
         while (!this.isAtEnd()) {
-            const ast = this.parseExpression();
-            // expressions.push(ast);
+            this.parseExpression();
+            // expressions.push(expr);
         }
 
         this.instructions.push("end");
@@ -165,5 +140,30 @@ export class StackVmCompiler {
         const token = this.peek();
         const parselet = infixParselets[token.type];
         return parselet?.getPrecedence() ?? 0;
+    }
+
+    /** Resets instructions to the main function */
+    mainFunction(): void {
+        this.instructions = this.functions.main;
+    }
+
+    addFunction(fnName: string): void {
+        this.functions[fnName] = this.instructions = ["start:"];
+    }
+
+    addInstructions(...instrs: string[]): void {
+        this.instructions.push(...instrs);
+    }
+
+    popInstruction(): string {
+        return this.instructions.pop();
+    }
+
+    getLabel(): string {
+        return `__${this.labelCnt++}`;
+    }
+
+    peekLabel(offset = 0): string {
+        return `__${this.labelCnt + offset}`;
     }
 }

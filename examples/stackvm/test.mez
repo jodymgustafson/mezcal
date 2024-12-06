@@ -1,14 +1,4 @@
-# import "../../libs/conversion.lib.mez"
-
-# Converts celsius to fahrenheit
-function convert_c2f(c) begin
-  return (c * 9) / 5 + 32
-end
-
-# Converts fahrenheit to celsius
-function convert_f2c(f) begin
-  return (f - 32) * 5 / 9
-end
+import "../../../libs/conversion.lib.mez"
 
 let a$ = ""
 while a$ <> "q" begin

@@ -2,7 +2,7 @@ import { Token } from "../internal/token";
 import { MezcalToken, MezcalTokenType } from "../scanner";
 import { AssignmentExpression, Expression, ForExpression, FunctionExpression, IfExpression, FunctionCallExpression, NameExpression, NumberExpression, OperatorExpression, PostfixExpression, PrefixExpression, ReturnExpression, StringExpression, WhileExpression } from "./expression";
 import { isFunctionName } from "./is-function-name";
-import { StackVmCompiler } from "./parser";
+import { StackVmCompiler } from "./stackvm-compiler";
 
 const MAX_FN_ARGS_COUNT = 255;
 

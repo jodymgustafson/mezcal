@@ -3,40 +3,40 @@
 
 # Converts celsius to fahrenheit
 function convert_c2f(c) begin
-  (c * 9) / 5 + 32
+  return (c * 9) / 5 + 32
 end
 
 # Converts fahrenheit to celsius
 function convert_f2c(f) begin
-  (f - 32) * 5 / 9
+  return (f - 32) * 5 / 9
 end
 
 # Converts kilometers to miles
 function convert_km2m(k) begin
-  k / 1.60934
+  return k / 1.60934
 end
 
 # Converts miles to kilometers
 function convert_m2km(m) begin
-  m * 1.60934
+  return m * 1.60934
 end
 
 # Converts kilograms to pounds
 function convert_kg2lb(k) begin
-  k * 2.20462
+  return k * 2.20462
 end
 
 # Converts pounds to kilograms
 function convert_lb2kg(p) begin
-  p / 2.20462
+  return p / 2.20462
 end
 
 # Converts grams to ounces
 function convert_g2oz(g) begin
-  g / 28.34955683972748
+  return g / 28.34955683972748
 end
 
 # Converts ounces to grams
 function convert_oz2g(o) begin
-  o * 28.34955683972748
+  return o * 28.34955683972748
 end
