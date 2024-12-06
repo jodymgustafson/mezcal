@@ -70,7 +70,8 @@ export class StackVmCompiler {
     private idx: number = 0;
     private labelCnt = 0;
 
-    private instructions: string[] = ["start:"];
+    // We start with pushing 0 so main at least returns 0 if nothing else
+    private instructions: string[] = ["push 0", "start:"];
     readonly functions: StackVmCompilerOutput = {
         main: this.instructions
     };
@@ -93,7 +94,10 @@ export class StackVmCompiler {
             // expressions.push(expr);
         }
 
-        this.instructions.push("end");
+        // Make sure we end the main function
+        this.mainFunction();
+        this.addInstructions("end");
+
         return this.functions;
     }
 

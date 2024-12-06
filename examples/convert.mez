@@ -1,14 +1,7 @@
 # This program converts temperatures based on user input
 
 import "../libs/conversion.lib.mez"
-
-# Rounds a number to the specified number of decimal points
-# param n Number to round
-# param d Number of decimal places
-function roundDecimal(n, d) begin
-  m = 10 ^ d
-  return round(n * m) / m
-end
+import "../libs/round-decimal.lib.mez"
 
 let a = ""
 while a <> "q" begin

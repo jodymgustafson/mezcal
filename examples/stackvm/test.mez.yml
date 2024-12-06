@@ -5,6 +5,7 @@ stackvm:
   - name: main
     description: main
     definition: |
+      push 0
       start:
       push ""
       put a$
@@ -43,6 +44,8 @@ stackvm:
       pop
       push "Celsius: "
       get c
+      push 1
+      call roundDecimal
       call str.concat
       call writeln
       pop
@@ -69,6 +72,8 @@ stackvm:
       pop
       push "Fahrenheit: "
       get f
+      push 1
+      call roundDecimal
       call str.concat
       call writeln
       pop
@@ -125,5 +130,25 @@ stackvm:
       push 5
       mul
       push 9
+      div
+      end
+  - name: roundDecimal
+    description: roundDecimal
+    definition: |
+      start:
+      put d
+      pop
+      put n
+      pop
+      push 10
+      get d
+      call pow
+      put m
+      pop
+      get n
+      get m
+      mul
+      call round
+      get m
       div
       end

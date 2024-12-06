@@ -6,7 +6,7 @@ It also contains a simple scripting language for defining custom functions and s
 
 The package consists of a lexical scanner, a parser to create an abstract syntax tree, and an interpreter to evaluate the expression.
 
-There is also a compiler to compile to StackVM assembly language.
+There is also a compiler to compile to [StackVM](https://github.com/jodymgustafson/stack-vm) assembly language.
 Use this when you need to execute an expression many times, such as drawing a graph.
 
 See [test.mez](./examples/test.mez) for examples.
@@ -134,6 +134,19 @@ For example you could run these lines of code:
 > add(2, 3)
 5
 ```
+
+## Compiler
+The compiler compiles Mezcal code to StackVM assembly code. If you are running the same expressions
+or code over and over (e.g. graphing) then this will give the best performance.
+
+The compiler generates a StackVM YAML file.
+
+To compile a file run passing in the file to compile and optionally an output file name.
+If you don't provide an output name it will use the input file name.
+
+    node dist/compile.js path/to/file.mez optional/output/file.yml
+
+_Or_ run one of the batch files: `compile.bat` or `compile.ps`.
 
 ## Programming Guide
 Mezcal is a simple programming language that can be used to create custom functions and run programs.

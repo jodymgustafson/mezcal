@@ -1,6 +1,7 @@
 # node dist/compile.js examples/stackvm/test.mez 
 
 import "../../../libs/conversion.lib.mez"
+import "../../../libs/round-decimal.lib.mez"
 
 let a$ = ""
 while a$ <> "q" begin
@@ -9,12 +10,12 @@ while a$ <> "q" begin
   if a$ == "f" then begin
     let f = input("Fahrenheit:")
     let c = convert_f2c(f)
-    print("Celsius: " + c)
+    print("Celsius: " + roundDecimal(c, 1))
   end
   else if a$ == "c" then begin
     let c = input("Celsius:")
     let f = convert_c2f(c)
-    print("Fahrenheit: " + f)
+    print("Fahrenheit: " + roundDecimal(f, 1))
   end
   else if a$ <> "q" then print("Invalid command: " + a$)
 end
