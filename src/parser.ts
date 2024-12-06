@@ -2,7 +2,7 @@ import fs from "fs";
 import path from 'node:path';
 import { Token } from "./internal/token";
 import { AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./internal/expr";
-import { MathTokenType, Scanner } from "./scanner";
+import { MezcalTokenType, Scanner } from "./scanner";
 import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, WhileStmt } from "./internal/stmt";
 
 const MAX_FN_ARGS_COUNT = 255;
@@ -23,7 +23,7 @@ export class Parser {
     /**
      * @param tokens The lexical tokens created by MathScanner
      */
-    constructor(readonly tokens: Token<MathTokenType>[]) { }
+    constructor(readonly tokens: Token<MezcalTokenType>[]) { }
 
     /**
      * Parses the lexical tokens into an abstract syntax tree
@@ -365,7 +365,7 @@ export class Parser {
         return statements;
     }
 
-    private consume(type: MathTokenType, message: string): Token {
+    private consume(type: MezcalTokenType, message: string): Token {
         if (this.check(type)) return this.advance();
 
         throw this.error(this.peek(), message);
@@ -379,7 +379,7 @@ export class Parser {
      * Checks if the next token is one of the specified token types
      * and if so advances the pointer to the next token.
      */
-    private match(...types: MathTokenType[]): boolean {
+    private match(...types: MezcalTokenType[]): boolean {
         for (const type of types) {
             if (this.check(type)) {
                 this.advance();
@@ -390,7 +390,7 @@ export class Parser {
         return false;
     }
 
-    private check(type: MathTokenType): boolean {
+    private check(type: MezcalTokenType): boolean {
         if (this.isAtEnd()) return false;
         return this.peek().type === type;
     }

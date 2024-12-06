@@ -1,0 +1,129 @@
+stackvm:
+  version: "0.0.0"
+  name: examples/stackvm/test.mez
+  functions:
+  - name: main
+    description: main
+    definition: |
+      start:
+      push ""
+      put a$
+      pop
+      __0: # begin while
+      get a$
+      push "q"
+      call str.compare
+      push 0
+      cmp
+      beq __1
+      pop
+      push "Convert from celsius or fahrenheit or quit (c/f/q)?"
+      call writeln
+      pop
+      call readln
+      put a$
+      pop
+      # begin if
+      get a$
+      push "f"
+      call str.compare
+      push 0
+      cmp
+      bne __2
+      pop
+      push "Fahrenheit:"
+      call writeln
+      pop
+      call readln
+      put f
+      pop
+      get f
+      call convert_f2c
+      put c
+      pop
+      push "Celsius: "
+      get c
+      call str.concat
+      call writeln
+      pop
+      bra __3
+      __2: # else
+      pop
+      # begin if
+      get a$
+      push "c"
+      call str.compare
+      push 0
+      cmp
+      bne __4
+      pop
+      push "Celsius:"
+      call writeln
+      pop
+      call readln
+      put c
+      pop
+      get c
+      call convert_c2f
+      put f
+      pop
+      push "Fahrenheit: "
+      get f
+      call str.concat
+      call writeln
+      pop
+      bra __5
+      __4: # else
+      pop
+      # begin if
+      get a$
+      push "q"
+      call str.compare
+      push 0
+      cmp
+      beq __6
+      pop
+      push "Invalid command: "
+      get a$
+      call str.concat
+      call writeln
+      pop
+      __6: # end if
+      pop
+      __5: # end if
+      __3: # end if
+      bra __0
+      __1: # end while
+      pop
+      push "Bye!"
+      call writeln
+      pop
+      end
+  - name: convert_c2f
+    description: convert_c2f
+    definition: |
+      start:
+      put c
+      pop
+      get c
+      push 9
+      mul
+      push 5
+      div
+      push 32
+      add
+      end
+  - name: convert_f2c
+    description: convert_f2c
+    definition: |
+      start:
+      put f
+      pop
+      get f
+      push 32
+      sub
+      push 5
+      mul
+      push 9
+      div
+      end

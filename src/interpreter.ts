@@ -1,6 +1,6 @@
 import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, VariableExpr, AssignExpr, LogicalExpr, CallExpr } from "./internal/expr";
 import { Token } from "./internal/token";
-import { MathTokenType } from "./scanner";
+import { MezcalTokenType } from "./scanner";
 import { BlockStmt, ErrorStmt, ExpressionStmt, ForStmt, FunctionStmt, IfStmt, LetStmt, ReturnStmt, Stmt, StmtVisitor, WhileStmt } from "./internal/stmt";
 import { InterpreterContext } from "./internal/interpreter-context";
 import { UserFunction } from "./internal/user-function";
@@ -170,7 +170,7 @@ export class Interpreter implements ExprVisitor<any>, StmtVisitor<any> {
         // if (checkNumber) this.checkNumberOperand(expr.operator, left);
         // if (checkNumber) this.checkNumberOperand(expr.operator, right);
 
-        switch (expr.operator.type as MathTokenType) {
+        switch (expr.operator.type as MezcalTokenType) {
             case "PLUS":
                 return left + right;
             case "MINUS":
