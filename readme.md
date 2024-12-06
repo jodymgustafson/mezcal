@@ -6,8 +6,8 @@ It also contains a simple scripting language for defining custom functions and s
 
 The package consists of a lexical scanner, a parser to create an abstract syntax tree, and an interpreter to evaluate the expression.
 
-_(work in progress): There is also a compiler to compile to StackVM assembly language.
-Use this when you need to execute an expression many times, such as drawing a graph._
+There is also a compiler to compile to StackVM assembly language.
+Use this when you need to execute an expression many times, such as drawing a graph.
 
 See [test.mez](./examples/test.mez) for examples.
 

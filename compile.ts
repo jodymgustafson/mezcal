@@ -1,6 +1,17 @@
+/*
+    ___  ___                  _ 
+    |  \/  |                 | |
+    | .  . | ___ _______ __ _| |
+    | |\/| |/ _ \_  / __/ _` | |
+    | |  | |  __// / (_| (_| | |
+    \_|  |_/\___/___\___\__,_|_|
+                                
+    🐛 The Mezcal to StackVM compiler.
+*/
+
 import { argv } from "process";
 import { Scanner } from "./src/scanner";
-import { StackVmCompiler } from "./src/stackvm/parser";
+import { StackVmCompiler, StackVmCompilerOutput } from "./src/stackvm/parser";
 import fs from 'fs';
 import path from 'node:path';
 
@@ -9,9 +20,7 @@ try {
     if (filePath) {
         const source = load(filePath);
         const code = compile(source);
-        if (code.length > 0) {
-            writeSVMFile(code, filePath);
-        }
+        writeSVMFile(code, filePath);
     }
     else {
         console.log("Usage: compile [file]");
@@ -26,7 +35,7 @@ catch (err) {
  * @param expr Mathematical expression
  * @returns An array of assembly code instructions
  */
-export function compile(expr: string): string[] {
+export function compile(expr: string): StackVmCompilerOutput {
     console.log("Scanning source...");
     const scanner = new Scanner(expr);
     const tokens = scanner.scanTokens();
@@ -42,7 +51,7 @@ export function compile(expr: string): string[] {
         return instrs;
     }
 
-    return [];
+    return {};
 }
 
 /**
@@ -60,19 +69,22 @@ function load(filePath: string): string {
     }
 }
 
-function writeSVMFile(code: string[], filePath: string): void {
+function writeSVMFile(code: StackVmCompilerOutput, filePath: string): void {
     const s = [
         "stackvm:",
         `  version: "0.0.0"`,
         `  name: ${filePath}`,
         "  functions:",
-        "  - name: main",
-        "    description: Entry function",
-        "    definition: |"
     ];
 
-    code.forEach(c => s.push(`      ${c}`));
+    Object.keys(code).forEach(fn => {
+        s.push(`  - name: ${fn}`,
+            `    description: ${fn}`,
+            `    definition: |`
+        );
+        code[fn].forEach(c => s.push(`      ${c}`));
+    });
 
-    console.log("Writing yml file");
+    console.log("Writing StackVM file...");
     fs.writeFileSync(filePath + ".yml", s.join("\n"));
 }

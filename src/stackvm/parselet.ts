@@ -107,12 +107,12 @@ export class WhileParselet implements PrefixParselet {
         // The second label will be created by the condition expression
         const label2 = parser.peekLabel();
 
-        parser.addInstructions(`${label1}: # while`);
+        parser.addInstructions(`${label1}: # begin while`);
 
         const condition = parser.parseExpression(parser.getPrecedence());
         const body = parser.parseExpression(parser.getPrecedence());
 
-        parser.addInstructions(`bra ${label1}`, `${label2}: # while end`, "pop");
+        parser.addInstructions(`bra ${label1}`, `${label2}: # end while`, "pop");
 
         return new WhileExpression(condition, body);
     }
@@ -126,7 +126,7 @@ export class ForParselet implements PrefixParselet {
         const fromExpr = parser.parseExpression(parser.getPrecedence()) as AssignmentExpression;
         const varName = fromExpr.left.name;
 
-        parser.addInstructions(`${label1}: # for ${varName}`, `get ${varName}`);
+        parser.addInstructions(`${label1}: # begin for ${varName}`, `get ${varName}`);
 
         parser.consume("TO");
         const toExpr = parser.parseExpression(parser.getPrecedence());
@@ -137,7 +137,8 @@ export class ForParselet implements PrefixParselet {
         let stepExpr: Expression;
         if (parser.match("STEP")) {
             stepExpr = parser.parseExpression(parser.getPrecedence());
-            stepInstr = parser.instructions.pop();
+            // The step amount instruction needs to go later
+            stepInstr = parser.popInstruction();
         }
 
         const body = parser.parseExpression(parser.getPrecedence());
@@ -158,7 +159,9 @@ export class ForParselet implements PrefixParselet {
 
 export class FunctionParselet implements PrefixParselet {
     parse(parser: StackVmCompiler, token: MezcalToken): Expression {
-        const name = parser.consume("IDENTIFIER", "Expect function name.").lexeme;
+        const fnName = parser.consume("IDENTIFIER", "Expect function name.").lexeme;
+        parser.addFunction(fnName);
+
         parser.consume("LEFT_PAREN", "Expected '(' after function name.");
         
         const params: string[] = [];
@@ -175,25 +178,32 @@ export class FunctionParselet implements PrefixParselet {
 
         parser.consume("RIGHT_PAREN", "Expect ')' after parameters.");
 
-        if (parser.match("RETURN")) {
-            const body = parser.parseExpression(parser.getPrecedence());
-            return new FunctionExpression(name, params, [body]);
+        // Pop the params off the stack into vars
+        params.toReversed().forEach(p => parser.addInstructions(`put ${p}`, "pop"));
+
+        let bodyExpr: Expression[];
+        if (parser.peek().type === "RETURN") {
+            bodyExpr = [parser.parseExpression(parser.getPrecedence())];
         }
         else {
             parser.consume("BEGIN", "Expect 'begin' or 'return' before function body.");
-            const body = [];
+            bodyExpr = [];
             while (parser.peek().type !== "END") {
-                body.push(parser.parseExpression(parser.getPrecedence()));
+                bodyExpr.push(parser.parseExpression(parser.getPrecedence()));
             }
             parser.consume("END");
-            return new FunctionExpression(name, params, body);
         }
+
+        parser.mainFunction();
+        return new FunctionExpression(fnName, params, bodyExpr);
     }
 }
 
 export class ReturnParselet implements PrefixParselet {
     parse(parser: StackVmCompiler, token: MezcalToken): Expression {
-        return new ReturnExpression(parser.parseExpression(parser.getPrecedence()));
+        const expr = parser.parseExpression(parser.getPrecedence());
+        parser.addInstructions("end");
+        return new ReturnExpression(expr);
     }
 }
 

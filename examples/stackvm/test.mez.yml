@@ -3,14 +3,14 @@ stackvm:
   name: examples/stackvm/test.mez
   functions:
   - name: main
-    description: Entry function
+    description: main
     definition: |
       start:
       push ""
-      put a
+      put a$
       pop
-      __0: # while
-      get a
+      __0: # begin while
+      get a$
       push "q"
       call str.compare
       push 0
@@ -21,10 +21,10 @@ stackvm:
       call writeln
       pop
       call readln
-      put a
+      put a$
       pop
       # begin if
-      get a
+      get a$
       push "f"
       call str.compare
       push 0
@@ -50,7 +50,7 @@ stackvm:
       __2: # else
       pop
       # begin if
-      get a
+      get a$
       push "c"
       call str.compare
       push 0
@@ -76,7 +76,7 @@ stackvm:
       __4: # else
       pop
       # begin if
-      get a
+      get a$
       push "q"
       call str.compare
       push 0
@@ -84,7 +84,7 @@ stackvm:
       beq __6
       pop
       push "Invalid command: "
-      get a
+      get a$
       call str.concat
       call writeln
       pop
@@ -93,7 +93,7 @@ stackvm:
       __5: # end if
       __3: # end if
       bra __0
-      __1: # while end
+      __1: # end while
       pop
       push "Bye!"
       call writeln

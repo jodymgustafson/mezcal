@@ -1,6 +1,5 @@
-import { Token } from "../internal/token";
 import { MezcalToken, MezcalTokenType } from "../scanner";
-import { Expression, OperatorExpression } from "./expression";
+import { Expression } from "./expression";
 import {
     AssignmentParselet,
     BeginParselet,
@@ -60,16 +59,35 @@ const infixParselets: Partial<Record<MezcalTokenType, InfixParselet>> = {
     "OR": new BinaryOperatorParselet(Precedence.BOOLEAN, false),
 };
 
+export type StackVmCompilerOutput = Record<string, string[]>;
+
 export class StackVmCompiler {
-    readonly instructions: string[] = ["start:"];
     private idx: number = 0;
     private labelCnt = 0;
+
+    private instructions: string[] = ["start:"];
+    readonly functions: StackVmCompilerOutput = {
+        main: this.instructions
+    };
 
     constructor(readonly tokens: MezcalToken[]) {
     }
 
+    /** Resets instructions to the main function */
+    mainFunction(): void {
+        this.instructions = this.functions.main;
+    }
+
+    addFunction(fnName: string): void {
+        this.functions[fnName] = this.instructions = ["start:"];
+    }
+
     addInstructions(...instrs: string[]): void {
         this.instructions.push(...instrs);
+    }
+
+    popInstruction(): string {
+        return this.instructions.pop();
     }
 
     getLabel(): string {
@@ -80,7 +98,7 @@ export class StackVmCompiler {
         return `__${this.labelCnt + offset}`;
     }
 
-    parse(): string[] {
+    parse(): StackVmCompilerOutput {
         // const expressions: Expression[] = [];
 
         while (!this.isAtEnd()) {
@@ -89,7 +107,7 @@ export class StackVmCompiler {
         }
 
         this.instructions.push("end");
-        return this.instructions;
+        return this.functions;
     }
 
     parseExpression<T extends Expression>(precedence = 0): T {
