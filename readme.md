@@ -153,8 +153,11 @@ In addition you can use parenthesis to group expressions.
 Define variables using the assignment operator. You can optionally use the let keyword.
 Variables can be set to numbers or strings.
 
+Convention is to make string variables end with a dollar sign (e.g. s$) but it's not required
+unless you are compiling to StackVM. 
+
 ```
-let a = "A string"
+let a$ = "A string"
 piOver2 = pi / 2
 ```
 

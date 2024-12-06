@@ -1,3 +1,5 @@
+# node dist/compile.js examples/stackvm/test.mez 
+
 import "../../../libs/conversion.lib.mez"
 
 let a$ = ""

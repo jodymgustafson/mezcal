@@ -1,4 +1,3 @@
-import { Token } from "../internal/token";
 import { MezcalToken, MezcalTokenType } from "../scanner";
 import { AssignmentExpression, Expression, ForExpression, FunctionExpression, IfExpression, FunctionCallExpression, NameExpression, NumberExpression, OperatorExpression, PostfixExpression, PrefixExpression, ReturnExpression, StringExpression, WhileExpression } from "./expression";
 import { isFunctionName } from "./is-function-name";

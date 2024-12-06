@@ -23,9 +23,11 @@ export function optimizeOutput(code: StackVmCompilerOutput): StackVmCompilerOutp
 function isFunctionCalled(fnName: string, code: StackVmCompilerOutput): boolean {
     const fnNames = Object.keys(code);
     for (const name of fnNames) {
-        const fn = code[name];
-        if (fn.findIndex(instr => instr === "call " + fnName) >= 0) {
-            return true;
+        if (name !== fnName) {
+            const fn = code[name];
+            if (fn.findIndex(instr => instr === "call " + fnName) >= 0) {
+                return true;
+            }    
         }
     }
 

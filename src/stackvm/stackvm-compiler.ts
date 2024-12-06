@@ -59,8 +59,13 @@ const infixParselets: Partial<Record<MezcalTokenType, InfixParselet>> = {
     "OR": new BinaryOperatorParselet(Precedence.BOOLEAN, false),
 };
 
+/** Maps function names to stackvm assembly codes */
 export type StackVmCompilerOutput = Record<string, string[]>;
 
+/**
+ * Compiles Mezcal code into StackVM assembly codes.
+ * The output will at least have a main function.
+ */
 export class StackVmCompiler {
     private idx: number = 0;
     private labelCnt = 0;
@@ -70,9 +75,16 @@ export class StackVmCompiler {
         main: this.instructions
     };
 
+    /**
+     * @param tokens Output of the lexical scanner
+     */
     constructor(readonly tokens: MezcalToken[]) {
     }
 
+    /**
+     * Entry point to start compiling
+     * @returns StackVM assembly codes grouped by function name
+     */
     parse(): StackVmCompilerOutput {
         // const expressions: Expression[] = [];
 
@@ -85,6 +97,11 @@ export class StackVmCompiler {
         return this.functions;
     }
 
+    private isAtEnd(): boolean {
+        return this.peek().type === "EOF";
+    }
+
+    /** internal use */
     parseExpression<T extends Expression>(precedence = 0): T {
         let token = this.consume();
 
@@ -107,10 +124,7 @@ export class StackVmCompiler {
         return left as T;
     }
 
-    private isAtEnd(): boolean {
-        return this.peek().type === "EOF";
-    }
-
+    /** internal use */
     consume(expectedType?: MezcalTokenType, errorMsg?: string): MezcalToken {
         const token = this.tokens[this.idx++];
 
@@ -121,12 +135,14 @@ export class StackVmCompiler {
         );
     }
 
+    /** internal use */
     peek(offset: number = 0): MezcalToken {
         return this.tokens[this.idx + offset];
     }
 
     /**
      * Checks if the next token matches the type and if so consumes it 
+     * internal use
      */
     match(tokenType: MezcalTokenType): boolean {
         const isMatch = this.peek().type === tokenType;
@@ -136,33 +152,48 @@ export class StackVmCompiler {
         return isMatch;
     }
 
+    /** internal use */
     getPrecedence(): number {
         const token = this.peek();
         const parselet = infixParselets[token.type];
         return parselet?.getPrecedence() ?? 0;
     }
 
-    /** Resets instructions to the main function */
+    /**
+     * Resets instructions to the main function
+     * internal use
+     */
     mainFunction(): void {
         this.instructions = this.functions.main;
     }
 
+    /** internal use */
     addFunction(fnName: string): void {
         this.functions[fnName] = this.instructions = ["start:"];
     }
 
+    /** internal use */
     addInstructions(...instrs: string[]): void {
         this.instructions.push(...instrs);
     }
 
+    /** internal use */
     popInstruction(): string {
         return this.instructions.pop();
     }
 
+    /** 
+     * Gets the next label
+     * internal use
+     */
     getLabel(): string {
         return `__${this.labelCnt++}`;
     }
 
+    /**
+     * Gets the next label without incrementing
+     * internal use
+     */
     peekLabel(offset = 0): string {
         return `__${this.labelCnt + offset}`;
     }
