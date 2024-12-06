@@ -201,7 +201,7 @@ export class FunctionParselet implements PrefixParselet {
 
 export class ReturnParselet implements PrefixParselet {
     parse(parser: StackVmCompiler, token: MezcalToken): Expression {
-        const expr = parser.parseExpression(parser.getPrecedence());
+        const expr = parser.parseExpression();
         parser.addInstructions("end");
         return new ReturnExpression(expr);
     }

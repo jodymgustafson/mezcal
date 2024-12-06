@@ -1,17 +1,27 @@
 # import "../../libs/conversion.lib.mez"
 
+# Converts celsius to fahrenheit
+function convert_c2f(c) begin
+  return (c * 9) / 5 + 32
+end
+
+# Converts fahrenheit to celsius
+function convert_f2c(f) begin
+  return (f - 32) * 5 / 9
+end
+
 let a$ = ""
 while a$ <> "q" begin
   a$ = input("Convert from celsius or fahrenheit or quit (c/f/q)?")
 
   if a$ == "f" then begin
     let f = input("Fahrenheit:")
-    let c = f2c(f)
+    let c = convert_f2c(f)
     print("Celsius: " + c)
   end
   else if a$ == "c" then begin
     let c = input("Celsius:")
-    let f = c2f(c)
+    let f = convert_c2f(c)
     print("Fahrenheit: " + f)
   end
   else if a$ <> "q" then print("Invalid command: " + a$)

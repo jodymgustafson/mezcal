@@ -38,7 +38,7 @@ stackvm:
       put f
       pop
       get f
-      call f2c
+      call convert_f2c
       put c
       pop
       push "Celsius: "
@@ -64,7 +64,7 @@ stackvm:
       put c
       pop
       get c
-      call c2f
+      call convert_c2f
       put f
       pop
       push "Fahrenheit: "
@@ -98,4 +98,32 @@ stackvm:
       push "Bye!"
       call writeln
       pop
+      end
+  - name: convert_c2f
+    description: convert_c2f
+    definition: |
+      start:
+      put c
+      pop
+      get c
+      push 9
+      mul
+      push 5
+      div
+      push 32
+      add
+      end
+  - name: convert_f2c
+    description: convert_f2c
+    definition: |
+      start:
+      put f
+      pop
+      get f
+      push 32
+      sub
+      push 5
+      mul
+      push 9
+      div
       end
