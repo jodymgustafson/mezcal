@@ -1,7 +1,7 @@
 {
   "name": "mezcal",
-  "version": "0.0.0",
-  "description": "Mathematical Expression Calculator programming language interpreter",
+  "version": "1.0.0",
+  "description": "Mezcal (Mathematical Expression Calculator) programming language interpreter and compiler",
   "main": "index.js",
   "scripts": {
     "test": "jasmine",

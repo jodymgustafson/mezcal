@@ -95,7 +95,7 @@ async function load(filePath: string, basePath = "./"): Promise<string> {
     }
     catch (err) {
         console.error(err);
-        throw new Error("Error loading file", err);
+        throw new Error("Error loading file: " + err.message);
     }
 }
 

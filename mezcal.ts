@@ -11,7 +11,6 @@
     - Otherwise it will enter REPL mode.
 */
 
-import fs from 'fs';
 import { readLineAsync } from "./src/internal/read-line";
 import { Runtime } from "./src/runtime";
 import { exit } from "process";

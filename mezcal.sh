@@ -1,0 +1,1 @@
+node dist/mezcal.js $1
