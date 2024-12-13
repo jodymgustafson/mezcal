@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from 'node:path';
+// import fs from "fs";
+// import path from 'node:path';
 import { Token } from "./internal/token";
 import { AssignExpr, BinaryExpr, CallExpr, Expr, GroupingExpr, LiteralExpr, LogicalExpr, UnaryExpr, VariableExpr } from "./internal/expr";
 import { MezcalTokenType, Scanner } from "./scanner";
@@ -30,10 +30,10 @@ export class Parser {
      * @param basePath Path to use as the base when resolving imports, defaults to current working directory
      * @returns Root element of the AST
      */
-    parse(basePath = "./"): Stmt[] {
+    parse(): Stmt[] {
         try {
             const statements: Stmt[] = [];
-            statements.push(...this.import(basePath));
+            // statements.push(...this.import(basePath));
 
             while (!this.isAtEnd()) {
                 statements.push(this.declaration());
@@ -50,28 +50,6 @@ export class Parser {
 
     private synchronize(): void {
         // TODO
-    }
-
-    private import(basePath: string): Stmt[] {
-        const stmts = [];
-
-        if (!this.isAtEnd()) {
-            while (this.match("IMPORT")) {
-                const token = this.consume("STRING", "Import must be followed by a path.");
-                const filePath = path.join(basePath, token.value);
-                let source: string;
-                try {
-                    source = fs.readFileSync(filePath, "utf-8");
-                }
-                catch (err) {
-                    throw new ParseError(token, err.message);
-                }
-                const scanner = new Scanner(source);
-                stmts.push(...new Parser(scanner.scanTokens()).parse(path.dirname(filePath)));
-            }
-        }
-
-        return stmts;
     }
 
     private declaration(): Stmt {
@@ -411,4 +389,27 @@ export class Parser {
     private previous(): Token {
         return this.tokens[this.current - 1];
     }
+
+    // Moved imports out into loadFile()
+    // private import(basePath: string): Stmt[] {
+    //     const stmts = [];
+
+    //     if (!this.isAtEnd()) {
+    //         while (this.match("IMPORT")) {
+    //             const token = this.consume("STRING", "Import must be followed by a path.");
+    //             const filePath = path.join(basePath, token.value);
+    //             let source: string;
+    //             try {
+    //                 source = fs.readFileSync(filePath, "utf-8");
+    //             }
+    //             catch (err) {
+    //                 throw new ParseError(token, err.message);
+    //             }
+    //             const scanner = new Scanner(source);
+    //             stmts.push(...new Parser(scanner.scanTokens()).parse(path.dirname(filePath)));
+    //         }
+    //     }
+
+    //     return stmts;
+    // }
 }

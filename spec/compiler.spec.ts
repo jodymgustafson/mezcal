@@ -1,4 +1,4 @@
-import { compile } from "../compile"
+import { compile } from "../src/stackvm/compile";
 
 describe("When compile mezcal code to StackVM", () => {
     it("should compile 2 * (-3 + 1)^2", () => {
