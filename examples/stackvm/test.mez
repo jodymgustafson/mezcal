@@ -1,7 +1,7 @@
 # node dist/compile.js examples/stackvm/test.mez 
 
-import "../../../libs/conversion.lib.mez"
-import "../../../libs/round-decimal.lib.mez"
+import "../../libs/conversion.lib.mez"
+import "../../libs/round-decimal.lib.mez"
 
 let a$ = ""
 while a$ <> "q" begin

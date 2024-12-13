@@ -178,7 +178,7 @@ export class FunctionParselet implements PrefixParselet {
         parser.consume("RIGHT_PAREN", "Expect ')' after parameters.");
 
         // Pop the params off the stack into vars
-        params.toReversed().forEach(p => parser.addInstructions(`put ${p}`, "pop"));
+        params.slice().reverse().forEach(p => parser.addInstructions(`put ${p}`, "pop"));
 
         let bodyExpr: Expression[];
         if (parser.peek().type === "RETURN") {

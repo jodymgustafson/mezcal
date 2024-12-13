@@ -7,6 +7,7 @@
     \_|  |_/\___/___\___\__,_|_|
                                 
     🐛 The Mezcal command line and REPL.
+
     - To run a program pass the path to a Mezcal program on the command line.
     - Otherwise it will enter REPL mode.
 */
@@ -18,23 +19,12 @@ import { RuntimeError } from './src/interpreter';
 import { Token } from './src/internal/token';
 import { ParseError } from './src/parser';
 import { ScanError } from "./src/internal/lexical-scanner";
+import { loadFile } from "./src/load-file";
 
 const VERSION = require("../package.json").version;
 
 const runtime = new Runtime();
 
-if (process.argv.length > 2) {
-    const arg = process.argv[2];
-    if (arg === "-v") {
-        showVersion();
-    }
-    else {
-        runProgramFile(arg);
-    }
-    exit();
-}
-
-// Enter REPL mode
 const DEFAULT_PROMPT = "Mez> ";
 const EDIT_PROMPT = "... ";
 
@@ -44,13 +34,24 @@ let editorText = "";
 let prompt = DEFAULT_PROMPT;
 
 (async () => {
-    // REPL loop
+    if (process.argv.length > 2) {
+        const arg = process.argv[2];
+        if (arg === "-v") {
+            showVersion();
+        }
+        else {
+            await runProgramFile(arg);
+        }
+        exit();
+    }
+
+    // Enter REPL mode
     showVersion();
     console.log("Type ':help' for more information.");
     while (!quit) {
         try {
             let expr = await readLineAsync(prompt);
-            expr = checkCommand(expr);
+            expr = await checkCommand(expr);
             if (expr) {
                 try {
                     const value = runtime.evaluate(expr);
@@ -105,7 +106,7 @@ function logError(err: any) {
  * @param expr The expression entered
  * @returns The expression to evaluate if the command should be evaluated, or empty string
  */
-function checkCommand(expr: string): string {
+async function checkCommand(expr: string): Promise<string> {
     if (expr === ":b" || expr === ":break" || expr === "") {
         if (editMode) {
             editMode = false;
@@ -121,7 +122,8 @@ function checkCommand(expr: string): string {
     }
     else if (expr.startsWith(":l ") || expr.startsWith(":load ")) {
         const filePath = expr.split(" ")[1];
-        console.log(runtime.load(filePath));
+        const src = await loadFile(filePath);
+        console.log(runtime.evaluate(src));
         return "";
     }
     else if (expr === ":e" || expr === ":editor") {
@@ -146,9 +148,10 @@ function checkCommand(expr: string): string {
     return "";
 }
 
-function runProgramFile(filePath: string): void {
+async function runProgramFile(filePath: string): Promise<void> {
     try {
-        console.log(runtime.load(filePath));
+        const src = await loadFile(filePath);
+        console.log(runtime.evaluate(src));
     }
     catch (err) {
         logError(err);

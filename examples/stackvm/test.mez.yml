@@ -1,6 +1,6 @@
 stackvm:
   version: "0.0.0"
-  name: examples/stackvm/test.mez
+  name: examples\stackvm\test.mez
   functions:
   - name: main
     description: main
