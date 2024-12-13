@@ -2,7 +2,7 @@ import { AstPrinter } from "./ast-printer";
 import { ScanError } from "./internal/lexical-scanner";
 import { nativeFunctions } from "./internal/native-functions";
 import { Interpreter } from "./interpreter";
-import { InterpreterContext } from "./internal/interpreter-context";
+import { InterpreterContext, InterpreterFunctions } from "./internal/interpreter-context";
 import { ParseError, Parser } from "./parser";
 import { Scanner } from "./scanner";
 
@@ -18,8 +18,19 @@ export class MezcalRuntimeError<T = Error | ScanError | ParseError> extends Erro
  */
 export class Runtime {
     debug = false;
+    readonly interpreter: Interpreter;
 
-    constructor(readonly interpreter = new Interpreter(new InterpreterContext(undefined, undefined, nativeFunctions))) { }
+    /**
+     * 
+     * @param interpreter An interpreter to use, if not defined a default one will be created
+     * @param functions Any other internal functions to add
+     */
+    constructor(interpreter?: Interpreter, ...functions: InterpreterFunctions[]) {
+        if (functions.length > 0) {
+            Object.assign(nativeFunctions, ...functions);
+        }
+        this.interpreter = interpreter ?? new Interpreter(new InterpreterContext(undefined, undefined, nativeFunctions));
+    }
 
     /**
      * Runs Mezcal source code in the interpreter

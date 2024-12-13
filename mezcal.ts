@@ -20,10 +20,11 @@ import { Token } from './src/internal/token';
 import { ParseError } from './src/parser';
 import { ScanError } from "./src/internal/lexical-scanner";
 import { loadFile } from "./src/load-file";
+import { consoleFunctions } from "./src/internal/console-functions";
 
 const VERSION = require("../package.json").version;
 
-const runtime = new Runtime();
+const runtime = new Runtime(undefined, consoleFunctions);
 
 const DEFAULT_PROMPT = "Mez> ";
 const EDIT_PROMPT = "... ";
