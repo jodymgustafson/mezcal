@@ -1,0 +1,1 @@
+@node dist/scan.js %1
